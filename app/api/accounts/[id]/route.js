@@ -13,11 +13,11 @@ export async function PUT(request, { params }) {
   await mongooseConnect();
   const { id } = params;
   const {
-    newName: name,
-    newEmail: email,
-    newPhone: phone,
-    newPassword: password,
-    newRole: role,
+    name: name,
+    email: email,
+    phone: phone,
+    password: password,
+    role: role,
   } = await request.json();
   await Account.findByIdAndUpdate(id, { name, email, phone, password, role });
   return NextResponse.json({ message: "Account updated!" }, { statis: 200 });

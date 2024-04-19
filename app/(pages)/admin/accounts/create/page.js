@@ -1,9 +1,32 @@
 "use client";
 
-import { Button, Checkbox, Form, Input } from "antd";
+import { Button, Form, Input } from "antd";
+import { useRouter } from "next/navigation";
 
 const CreateAccount = () => {
-  const onFinish = (values) => {};
+  const router = useRouter();
+
+  const onFinish = async (values) => {
+    console.log("values: ", JSON.stringify(values));
+    try {
+      const res = await fetch(`http://localhost:3000/api/accounts`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (res.status !== 201) {
+        throw new Error("Failed to create account!");
+      }
+
+      router.refresh();
+      router.push("/admin/accounts");
+    } catch (error) {
+      console.log("Errors creating account: ", error);
+    }
+  };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
@@ -12,7 +35,7 @@ const CreateAccount = () => {
   return (
     <>
       <Form
-        labelCol={{ span: 8 }}
+        labelCol={{ span: 4 }}
         wrapperCol={{
           span: 16,
         }}
@@ -22,6 +45,7 @@ const CreateAccount = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
+        className="flex flex-col mx-auto mt-4"
       >
         <Form.Item
           label="Name"
@@ -81,7 +105,7 @@ const CreateAccount = () => {
 
         <Form.Item
           wrapperCol={{
-            offset: 8,
+            offset: 4,
             span: 16,
           }}
         >
