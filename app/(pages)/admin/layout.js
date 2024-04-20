@@ -1,6 +1,6 @@
 import NavigationBar from "@/components/nav-bar";
 
-export default function Layout({ children }) {
+export default function AdminLayout({ children }) {
   return (
     <>
       <NavigationBar />

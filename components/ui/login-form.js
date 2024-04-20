@@ -1,18 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { Button, Form, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
+import { login } from "@/lib/actions";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
 
   const onFinish = (values) => {
-    startTransition(async () => {
-      // const res = await fetch(`http://localhost:3000/api/auth`, {
-      //   method:
-      // })
-    });
+    login(values);
   };
 
   const onFinishFailed = (error) => {
@@ -59,7 +56,7 @@ export const LoginForm = () => {
           <Input.Password placeholder="123456" disabled={isPending} />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" block disabled={isPending}>
+          <Button type="primary" block disabled={isPending} htmlType="submit">
             Đăng nhập
           </Button>
         </Form.Item>

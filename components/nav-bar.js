@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "antd";
+import { Button, Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,26 +14,26 @@ const items = [
 ];
 
 const NavigationBar = () => {
-  const [current, setCurrent] = useState("dashboard");
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (pathname.includes("accounts")) setCurrent("accounts");
-    if (pathname.includes("dashboard")) setCurrent("dashboard");
-  }, []);
+  const [current, setCurrent] = useState(() => {
+    if (pathname.includes("accounts")) return "accounts";
+    if (pathname.includes("dashboard")) return "dashboard";
+  });
 
   return (
     <>
-      <Menu
-        onClick={(e) => setCurrent(e.key)}
-        mode="horizontal"
-        selectedKeys={[current]}
-        items={items}
-        style={{
-          flex: 1,
-          minWidth: 0,
-        }}
-      />
+      <div className="flex flex-row justify-between">
+        <Menu
+          onClick={(e) => setCurrent(e.key)}
+          mode="horizontal"
+          selectedKeys={[current]}
+          items={items}
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        />
+      </div>
     </>
   );
 };

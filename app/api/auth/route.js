@@ -1,13 +1,13 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
-import { message } from "antd";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
   await mongooseConnect();
-  const { email } = await request.json();
-  if (email) {
-    const account = await Account.findOne({ email: email });
+  const email = request.nextUrl.searchParams.get("email");
+  console.log("Request email: ", email);
+  const account = await Account.findOne({ email });
+  if (account) {
     return NextResponse.json(
       { account },
       {
@@ -15,6 +15,9 @@ export async function GET(request) {
       }
     );
   } else {
-    return NextResponse.json({ message: "Wrong email!" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Account doesn't exist!" },
+      { status: 400 }
+    );
   }
 }

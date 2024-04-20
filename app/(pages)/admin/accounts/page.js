@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import AccountTable from "@/components/ui/admin/AccountTable";
 
 const getAccounts = async () => {
@@ -10,6 +9,7 @@ const getAccounts = async () => {
     if (!res.ok) {
       throw new Error("Failed to fetch accounts.");
     }
+
     return res.json();
   } catch (error) {
     console.log("Error: ", error);
