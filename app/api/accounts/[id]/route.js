@@ -1,6 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 
 export async function GET(request, { params }) {
   await mongooseConnect();
@@ -20,5 +21,5 @@ export async function PUT(request, { params }) {
     role: role,
   } = await request.json();
   await Account.findByIdAndUpdate(id, { name, email, phone, password, role });
-  return NextResponse.json({ message: "Account updated!" }, { statis: 200 });
+  return NextResponse.json({ message: "Account updated!" }, { status: 200 });
 }

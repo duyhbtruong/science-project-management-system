@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import Table from "@/components/ui/admin/Table";
+import AccountTable from "@/components/ui/admin/AccountTable";
 
 const getAccounts = async () => {
   try {
@@ -19,13 +19,11 @@ const getAccounts = async () => {
 const AccountsPage = async () => {
   const accounts = await getAccounts();
 
-  // console.log("Accounts: ", accounts);
-
   return (
     <>
-      <div className="mx-auto w-[800px] mt-4 space-y-4">
-        <div>
-          <Table accounts={accounts} />
+      <div className="flex justify-center w-screen mt-8">
+        <div className="w-[1000px]">
+          <AccountTable accounts={accounts} />
         </div>
       </div>
     </>

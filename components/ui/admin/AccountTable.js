@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Space, Table } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
 const { Column } = Table;
@@ -10,24 +10,35 @@ const AccountTable = ({ accounts }) => {
   const router = useRouter();
 
   return (
-    <div className="space-y-4">
-      <Button
-        type="primary"
-        onClick={() => router.push("/admin/accounts/create")}
-      >
-        Create account
-      </Button>
+    <div className="flex flex-col gap-y-4">
+      <div className="flex justify-end">
+        <Button
+          type="primary"
+          onClick={() => router.push("/admin/accounts/create")}
+          icon={<PlusOutlined />}
+        >
+          Tạo tài khoản
+        </Button>
+      </div>
+
       <Table dataSource={accounts} rowKey={(record) => record._id}>
         <Column title="Name" dataIndex="name" key="name" />
         <Column title="Email" dataIndex="email" key="email" />
         <Column title="Phone" dataIndex="phone" key="phone" />
-        <Column title="Password" dataIndex="password" key="password" />
-        <Column title="Role" dataIndex="role" key="role" />
+        <Column
+          title="Role"
+          key="role"
+          render={(_, record) => {
+            if (record.role === "student") return "Sinh viên";
+            if (record.role === "instructor") return "GVHD";
+            if (record.role === "trainingDepartment") return "Phòng Đào tạo";
+            if (record.role === "appraiseDepartment") return "Phòng thẩm định";
+          }}
+        />
         <Column
           title="Action"
           key="action"
           render={(_, record) => {
-            // console.log("id: ", record._id);
             return (
               <Space size="middle">
                 <Button

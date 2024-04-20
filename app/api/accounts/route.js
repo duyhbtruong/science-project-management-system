@@ -1,7 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
-import { message } from "antd";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 
 export async function GET(request) {
   await mongooseConnect();
@@ -13,11 +13,18 @@ export async function POST(request) {
   const { name, email, phone, password, role } = await request.json();
   if (await Account.findOne({ email })) {
     return NextResponse.json(
-      { message: "Account already exists!" },
+      { message: "Email already in use!" },
       { status: 409 }
     );
   } else {
-    await Account.create({ name, email, phone, password, role });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await Account.create({
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      role,
+    });
     return NextResponse.json({ message: "Account created!" }, { status: 201 });
   }
 }

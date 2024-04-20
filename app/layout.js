@@ -1,4 +1,4 @@
-import "@/components/ui/global.css";
+import "@/components/global.css";
 import { ConfigProvider } from "antd";
 import { Inter } from "next/font/google";
 
