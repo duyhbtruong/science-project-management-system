@@ -3,13 +3,13 @@
 import { useTransition } from "react";
 import { Button, Form, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import { login } from "@/lib/actions";
+import { login } from "@/app/(pages)/auth/login/page";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
 
   const onFinish = (values) => {
-    login(values);
+    startTransition(() => login(values));
   };
 
   const onFinishFailed = (error) => {

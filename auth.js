@@ -1,5 +1,7 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import clientPromise from "./lib/mongodb";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -45,4 +47,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  adapter: MongoDBAdapter(clientPromise),
+  session: { strategy: "jwt" },
 });

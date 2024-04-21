@@ -1,9 +1,9 @@
 "use client";
 
-import { Button, Menu } from "antd";
+import { Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const items = [
   { label: <Link href="/admin/dashboard">Dashboard</Link>, key: "dashboard" },
@@ -28,10 +28,6 @@ const NavigationBar = () => {
           mode="horizontal"
           selectedKeys={[current]}
           items={items}
-          style={{
-            flex: 1,
-            minWidth: 0,
-          }}
         />
       </div>
     </>
