@@ -22,7 +22,7 @@ const NavigationBar = () => {
 
   return (
     <>
-      <div className="flex flex-row justify-between">
+      <div className="">
         <Menu
           onClick={(e) => setCurrent(e.key)}
           mode="horizontal"

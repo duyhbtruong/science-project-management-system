@@ -1,7 +1,6 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
 
 export async function GET(request, { params }) {
   await mongooseConnect();

@@ -121,8 +121,9 @@ const CreateAccount = () => {
               options={[
                 { value: "student", label: "Sinh viên" },
                 { value: "instructor", label: "GVHD" },
-                { value: "trainingDepartment", label: "Phòng Đào tạo" },
-                { value: "appraiseDepartment", label: "Phòng thẩm định" },
+                { value: "training", label: "Phòng Đào tạo" },
+                { value: "appraise", label: "Phòng thẩm định" },
+                { value: "admin", label: "Quản trị viên" },
               ]}
             />
           </Form.Item>

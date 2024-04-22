@@ -31,8 +31,9 @@ const AccountTable = ({ accounts }) => {
           render={(_, record) => {
             if (record.role === "student") return "Sinh viên";
             if (record.role === "instructor") return "GVHD";
-            if (record.role === "trainingDepartment") return "Phòng Đào tạo";
-            if (record.role === "appraiseDepartment") return "Phòng thẩm định";
+            if (record.role === "training") return "Phòng Đào tạo";
+            if (record.role === "appraise") return "Phòng thẩm định";
+            if (record.role === "admin") return "Quản trị viên";
           }}
         />
         <Column

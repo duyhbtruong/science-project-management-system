@@ -8,7 +8,9 @@ import bcrypt from "bcrypt";
 
 const getAccountByEmail = async (email) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/auth?email=${email}`);
+    const res = await fetch(`http://localhost:3000/api/auth?email=${email}`, {
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       throw new Error("Failed to fetch account.");
@@ -47,6 +49,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  secret: process.env.AUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
   adapter: MongoDBAdapter(clientPromise),
   session: { strategy: "jwt" },
 });

@@ -9,7 +9,7 @@ import {
 
 const { auth } = NextAuth(authConfig);
 
-export default auth((req) => {
+export default auth(async (req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
@@ -18,6 +18,35 @@ export default auth((req) => {
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   if (isApiAuthRoute) return null;
+
+  const userRole = req.auth?.user.role;
+  let callbackUrl;
+  if (userRole) {
+    callbackUrl = new URL(`/${userRole}/dashboard`, nextUrl);
+    // admin
+    if (nextUrl.pathname.startsWith(`/admin`) && userRole !== "admin") {
+      return Response.redirect(callbackUrl);
+    }
+    // student
+    if (nextUrl.pathname.startsWith(`/student`) && userRole !== "student") {
+      return Response.redirect(callbackUrl);
+    }
+    // instructor
+    if (
+      nextUrl.pathname.startsWith(`/instructor`) &&
+      userRole !== "instructor"
+    ) {
+      return Response.redirect(callbackUrl);
+    }
+    // training department
+    if (nextUrl.pathname.startsWith(`/training`) && userRole !== "training") {
+      return Response.redirect(callbackUrl);
+    }
+    // appraise department
+    if (nextUrl.pathname.startsWith(`/appraise`) && userRole !== "appraise") {
+      return Response.redirect(callbackUrl);
+    }
+  }
 
   if (isAuthRoute) {
     if (isLoggedIn)

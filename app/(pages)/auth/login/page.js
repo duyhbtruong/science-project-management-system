@@ -29,7 +29,7 @@ export const login = async (values) => {
   }
 };
 
-const LoginPage = () => {
+const LoginPage = async () => {
   return (
     <div className="h-screen flex items-center justify-center">
       <Card>
