@@ -1,29 +1,116 @@
-import AccountTable from "@/components/ui/admin/AccountTable";
+"use client";
 
-const getAccounts = async () => {
-  try {
-    const res = await fetch(`http://localhost:3000/api/accounts`, {
-      cache: "no-store",
-    });
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch accounts.");
+import { Button, Space, Table } from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+
+const { Column } = Table;
+
+const AccountsPage = () => {
+  const router = useRouter();
+  const [accounts, setAccounts] = useState();
+
+  const getAccounts = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/accounts`, {
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch accounts.");
+      }
+
+      return res.json();
+    } catch (error) {
+      console.log("Error: ", error);
     }
+  };
 
-    return res.json();
-  } catch (error) {
-    console.log("Error: ", error);
-  }
-};
+  const loadAccounts = async () => {
+    setAccounts(await getAccounts());
+  };
 
-const AccountsPage = async () => {
-  const accounts = await getAccounts();
+  const deleteAccount = async (id) => {
+    const confirmed = confirm("Are you sure?");
+
+    if (confirmed) {
+      try {
+        const res = await fetch(`http://localhost:3000/api/accounts?id=${id}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to delete account!");
+        }
+
+        loadAccounts();
+      } catch (error) {
+        console.log("Error: ", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadAccounts();
+  }, []);
+
+  // console.log("accounts: ", accounts);
 
   return (
     <>
       <div className="flex justify-center w-screen mt-8">
         <div className="w-[1000px]">
-          <AccountTable accounts={accounts} />
+          <div className="flex flex-col gap-y-4">
+            <div className="flex justify-end">
+              <Button
+                type="primary"
+                onClick={() => router.push("/admin/accounts/create")}
+                icon={<PlusOutlined />}
+              >
+                Tạo tài khoản
+              </Button>
+            </div>
+
+            <Table dataSource={accounts} rowKey={(record) => record._id}>
+              <Column title="Name" dataIndex="name" key="name" />
+              <Column title="Email" dataIndex="email" key="email" />
+              <Column title="Phone" dataIndex="phone" key="phone" />
+              <Column
+                title="Role"
+                key="role"
+                render={(_, record) => {
+                  if (record.role === "student") return "Sinh viên";
+                  if (record.role === "instructor") return "GVHD";
+                  if (record.role === "training") return "Phòng Đào tạo";
+                  if (record.role === "appraise") return "Phòng thẩm định";
+                  if (record.role === "admin") return "Quản trị viên";
+                }}
+              />
+              <Column
+                title="Action"
+                key="action"
+                render={(_, record) => {
+                  return (
+                    <Space size="middle">
+                      <Button
+                        icon={<EditOutlined />}
+                        onClick={() =>
+                          router.push(`/admin/accounts/${record._id}`)
+                        }
+                      />
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => deleteAccount(record._id)}
+                      />
+                    </Space>
+                  );
+                }}
+              />
+            </Table>
+          </div>
         </div>
       </div>
     </>

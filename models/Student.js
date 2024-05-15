@@ -1,9 +1,10 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-const studentSchema = new Schema({
+export const studentSchema = new Schema({
   studentId: { type: String, required: true, unique: true },
   faculty: { type: String, required: true },
   educationProgram: { type: String, required: true },
+  isRegistered: { type: Boolean, default: false, required: true },
   accountId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Account",

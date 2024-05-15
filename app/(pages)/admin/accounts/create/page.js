@@ -2,30 +2,88 @@
 
 import { Button, Card, Form, Input, Select, message } from "antd";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-const CreateAccount = () => {
+export default function CreateAccount() {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
+  const [role, setRole] = useState("student");
+
+  // console.log(role);
 
   const onFinish = async (values) => {
+    const { name, email, password, phone, role } = values;
     console.log("values: ", JSON.stringify(values));
     try {
-      const res = await fetch(`http://localhost:3000/api/accounts`, {
+      const accountRes = await fetch(`http://localhost:3000/api/accounts`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ name, email, password, phone, role }),
       });
 
-      if (res.status === 409) {
+      if (accountRes.status === 409) {
         messageApi.open({
           type: "error",
           content: "Email aleady in use!",
         });
-      } else {
-        router.refresh();
-        router.push("/admin/accounts");
+      } else if (accountRes.status === 201) {
+        const accountId = await accountRes.json();
+        if (role === "student") {
+          const { studentId, faculty, educationProgram } = values;
+          const studentRes = await fetch(`http://localhost:3000/api/students`, {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+              studentId,
+              faculty,
+              educationProgram,
+              accountId,
+            }),
+          });
+
+          if (studentRes.status === 409) {
+            messageApi.open({
+              type: "error",
+              content: "Student ID aleady exists!",
+            });
+          } else {
+            router.refresh();
+            router.push("/admin/accounts");
+          }
+        }
+
+        if (role === "instructor") {
+          const { instructorId, faculty, academicRank } = values;
+          const instructorRes = await fetch(
+            `http://localhost:3000/api/instructors`,
+            {
+              method: "POST",
+              headers: {
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({
+                instructorId,
+                faculty,
+                academicRank,
+                accountId,
+              }),
+            }
+          );
+
+          if (instructorRes.status === 409) {
+            messageApi.open({
+              type: "error",
+              content: "Instructor ID aleady exists!",
+            });
+          } else {
+            router.refresh();
+            router.push("/admin/accounts");
+          }
+        }
       }
     } catch (error) {
       console.log("Errors creating account: ", error);
@@ -47,6 +105,7 @@ const CreateAccount = () => {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
           layout="vertical"
+          initialValues={{ role: role }}
         >
           <Form.Item
             label="Tên tài khoản"
@@ -58,7 +117,7 @@ const CreateAccount = () => {
               },
             ]}
           >
-            <Input placeholder="John Doe" />
+            <Input placeholder="Nhập tên tài khoản..." />
           </Form.Item>
 
           <Form.Item
@@ -75,7 +134,7 @@ const CreateAccount = () => {
               },
             ]}
           >
-            <Input placeholder="johndoe@gmail.com" />
+            <Input placeholder="Nhập email..." />
           </Form.Item>
 
           <Form.Item label="Số điện thoại" name="phone">
@@ -117,16 +176,80 @@ const CreateAccount = () => {
           >
             <Select
               placeholder="Chọn 1 chức năng"
-              allowClear
+              onChange={(value) => setRole(value)}
               options={[
                 { value: "student", label: "Sinh viên" },
                 { value: "instructor", label: "GVHD" },
                 { value: "training", label: "Phòng Đào tạo" },
                 { value: "appraise", label: "Phòng thẩm định" },
-                { value: "admin", label: "Quản trị viên" },
               ]}
             />
           </Form.Item>
+
+          {role === "student" && (
+            <>
+              <Form.Item
+                label="Mã số sinh viên"
+                name="studentId"
+                rules={[
+                  { required: true, message: "Chưa nhập Mã số sinh viên." },
+                ]}
+              >
+                <Input placeholder="Nhập MSSV..." />
+              </Form.Item>
+
+              <Form.Item
+                label="Khoa"
+                name="faculty"
+                rules={[{ required: true, message: "Chưa chọn khoa." }]}
+              >
+                <Input placeholder="Nhập đơn vị khoa..." />
+              </Form.Item>
+
+              <Form.Item
+                label="Chương trình đào tạo"
+                name="educationProgram"
+                rules={[
+                  {
+                    required: true,
+                    message: "Chưa chọn chương trình đào tạo.",
+                  },
+                ]}
+              >
+                <Input placeholder="Nhập chương trình đào tạo..." />
+              </Form.Item>
+            </>
+          )}
+
+          {role === "instructor" && (
+            <>
+              <Form.Item
+                label="Mã số GVHD"
+                name="instructorId"
+                rules={[{ required: true, message: "Chưa nhập Mã số GVHD." }]}
+              >
+                <Input placeholder="Nhập mã số GVHD..." />
+              </Form.Item>
+
+              <Form.Item
+                label="Khoa"
+                name="faculty"
+                rules={[{ required: true, message: "Chưa nhập khoa." }]}
+              >
+                <Input placeholder="Nhập đơn vị khoa..." />
+              </Form.Item>
+
+              <Form.Item
+                label="Học hàm, học vị"
+                name="academicRank"
+                rules={[
+                  { required: true, message: "Chưa nhập học hàm, học vị." },
+                ]}
+              >
+                <Input placeholder="Nhập học hàm, học vị..." />
+              </Form.Item>
+            </>
+          )}
 
           <Form.Item>
             {contextHolder}
@@ -138,6 +261,4 @@ const CreateAccount = () => {
       </Card>
     </div>
   );
-};
-
-export default CreateAccount;
+}
