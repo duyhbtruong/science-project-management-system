@@ -3,6 +3,26 @@ import { Account } from "@/models/Account";
 import { Student } from "@/models/Student";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
+
+export async function GET(request) {
+  await mongooseConnect();
+  const id = request.nextUrl.searchParams.get("id");
+
+  if (!mongoose.isValidObjectId(id)) {
+    return NextResponse.json({ message: "Not ObjectId" }, { status: 200 });
+  }
+
+  const student = await Student.findOne({ accountId: id });
+  if (student) {
+    return NextResponse.json(student, { status: 200 });
+  } else {
+    return NextResponse.json(
+      { message: "Student does not exist!" },
+      { status: 200 }
+    );
+  }
+}
 
 export async function POST(request) {
   await mongooseConnect();

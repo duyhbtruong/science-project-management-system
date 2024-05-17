@@ -4,6 +4,25 @@ import { Instructor } from "@/models/Instructor";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
+export async function GET(request) {
+  await mongooseConnect();
+  const id = request.nextUrl.searchParams.get("id");
+
+  if (!mongoose.isValidObjectId(id)) {
+    return NextResponse.json({ message: "Not ObjectId" }, { status: 200 });
+  }
+
+  const instructor = await Instructor.findOne({ accountId: id });
+  if (instructor) {
+    return NextResponse.json(instructor, { status: 200 });
+  } else {
+    return NextResponse.json(
+      { message: "Instructor does not exist!" },
+      { status: 200 }
+    );
+  }
+}
+
 export async function POST(request) {
   await mongooseConnect();
   const {
