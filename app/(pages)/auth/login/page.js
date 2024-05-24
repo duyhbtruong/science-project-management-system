@@ -3,7 +3,7 @@
 import { LoginForm } from "@/components/ui/login-form";
 import { Card } from "antd";
 
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
 
@@ -29,7 +29,12 @@ export const login = async (values) => {
   }
 };
 
-const LoginPage = async () => {
+export const logout = async () => {
+  "use server";
+  await signOut({ redirectTo: "/auth/login" });
+};
+
+export default async function LoginPage() {
   return (
     <div className="h-screen flex items-center justify-center">
       <Card>
@@ -38,6 +43,4 @@ const LoginPage = async () => {
       </Card>
     </div>
   );
-};
-
-export default LoginPage;
+}

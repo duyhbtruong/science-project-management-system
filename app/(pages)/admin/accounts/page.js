@@ -5,28 +5,13 @@ import { useEffect, useState } from "react";
 
 import { Button, Space, Table } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { deleteAccountById, getAccounts } from "@/service/accountService";
 
 const { Column } = Table;
 
 const AccountsPage = () => {
   const router = useRouter();
   const [accounts, setAccounts] = useState();
-
-  const getAccounts = async () => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/accounts`, {
-        cache: "no-store",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch accounts.");
-      }
-
-      return res.json();
-    } catch (error) {
-      console.log("Error: ", error);
-    }
-  };
 
   const loadAccounts = async () => {
     setAccounts(await getAccounts());
@@ -36,19 +21,8 @@ const AccountsPage = () => {
     const confirmed = confirm("Are you sure?");
 
     if (confirmed) {
-      try {
-        const res = await fetch(`http://localhost:3000/api/accounts?id=${id}`, {
-          method: "DELETE",
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to delete account!");
-        }
-
-        loadAccounts();
-      } catch (error) {
-        console.log("Error: ", error);
-      }
+      await deleteAccountById(id);
+      loadAccounts();
     }
   };
 

@@ -1,40 +1,15 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
+import { Appraise } from "@/models/Appraise";
 import { Instructor } from "@/models/Instructor";
 import { Student } from "@/models/Student";
+import { Training } from "@/models/Training";
 import { NextResponse } from "next/server";
-// import bcrypt from "bcrypt";
 
 export async function GET(request) {
   await mongooseConnect();
   return NextResponse.json(await Account.find());
 }
-
-// export async function POST(request) {
-//   await mongooseConnect();
-//   const { name, email, phone, password, role } = await request.json();
-//   if (await Account.findOne({ email })) {
-//     return NextResponse.json(
-//       { message: "Email already in use!" },
-//       { status: 409 }
-//     );
-//   } else {
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     await Account.create({
-//       name,
-//       email,
-//       phone,
-//       password: hashedPassword,
-//       role,
-//     });
-//     const createdAccountId = await Account.findOne(
-//       { email: email },
-//       { _id: 1 }
-//     );
-
-//     return NextResponse.json(createdAccountId, { status: 201 });
-//   }
-// }
 
 export async function DELETE(request) {
   await mongooseConnect();
@@ -54,6 +29,23 @@ export async function DELETE(request) {
     );
     await Account.findByIdAndDelete(id);
     await Instructor.findByIdAndDelete(instructorId);
+  }
+
+  if (role === "training") {
+    const trainingId = await Training.findOne(
+      {
+        accountId: id,
+      },
+      { _id: 1 }
+    );
+    await Account.findByIdAndDelete(id);
+    await Training.findByIdAndDelete(trainingId);
+  }
+
+  if (role === "appraise") {
+    const appraiseId = await Appraise.findOne({ accountId: id }, { _id: 1 });
+    await Account.findByIdAndDelete(id);
+    await Appraise.findByIdAndDelete(appraiseId);
   }
 
   return NextResponse.json({ message: "Account deleted!" }, { status: 200 });

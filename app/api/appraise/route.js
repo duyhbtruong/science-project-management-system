@@ -1,12 +1,12 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
-import { Training } from "@/models/Training";
+import { Appraise } from "@/models/Appraise";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
 export async function POST(request) {
   await mongooseConnect();
-  const { trainingId, name, email, phone, password, role } =
+  const { appraiseId, name, email, phone, password, role } =
     await request.json();
 
   if (await Account.findOne({ email })) {
@@ -16,9 +16,9 @@ export async function POST(request) {
     );
   }
 
-  if (await Training.findOne({ trainingId })) {
+  if (await Appraise.findOne({ appraiseId })) {
     return NextResponse.json(
-      { message: "Training ID already exists!" },
+      { message: "Appraise ID already exists!" },
       { status: 409 }
     );
   }
@@ -33,13 +33,13 @@ export async function POST(request) {
   });
 
   const createdAccountId = await Account.findOne({ email: email }, { _id: 1 });
-  await Training.create({
-    trainingId,
+  await Appraise.create({
+    appraiseId,
     accountId: createdAccountId,
   });
 
   return NextResponse.json(
-    { message: "Training department account created!" },
+    { message: "Appraisal department account created!" },
     { status: 201 }
   );
 }

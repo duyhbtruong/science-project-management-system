@@ -1,8 +1,5 @@
 "use client";
 
-import { Form, Button, Input } from "antd";
-import { useRouter } from "next/navigation";
-
 const UpdateForm = ({ id, name, email, phone, password, role }) => {
   const router = useRouter();
 
@@ -20,7 +17,6 @@ const UpdateForm = ({ id, name, email, phone, password, role }) => {
         throw new Error("Failed to update account!");
       }
 
-      router.refresh();
       router.push("/admin/accounts");
     } catch (error) {
       console.log("Errors: ", error);

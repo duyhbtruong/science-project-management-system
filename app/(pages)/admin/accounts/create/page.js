@@ -1,5 +1,9 @@
 "use client";
 
+import { postAppraiseAccount } from "@/service/appraiseService";
+import { postInstructorService } from "@/service/instructorService";
+import { postStudentAccount } from "@/service/studentService";
+import { postTrainingAccount } from "@/service/trainingService";
 import { Button, Card, Form, Input, Select, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,81 +13,91 @@ export default function CreateAccount() {
   const [messageApi, contextHolder] = message.useMessage();
   const [role, setRole] = useState("student");
 
-  // console.log(role);
-
   const onFinish = async (values) => {
-    const { name, email, password, phone, role } = values;
-    console.log("values: ", JSON.stringify(values));
     try {
-      const accountRes = await fetch(`http://localhost:3000/api/accounts`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password, phone, role }),
-      });
-
-      if (accountRes.status === 409) {
-        messageApi.open({
-          type: "error",
-          content: "Email aleady in use!",
-        });
-      } else if (accountRes.status === 201) {
-        const accountId = await accountRes.json();
-        if (role === "student") {
-          const { studentId, faculty, educationProgram } = values;
-          const studentRes = await fetch(`http://localhost:3000/api/students`, {
-            method: "POST",
-            headers: {
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify({
-              studentId,
-              faculty,
-              educationProgram,
-              accountId,
-            }),
-          });
-
-          if (studentRes.status === 409) {
-            messageApi.open({
-              type: "error",
-              content: "Student ID aleady exists!",
-            });
+      switch (role) {
+        case "student": {
+          const res = await postStudentAccount(values);
+          if (res.status === 201) {
+            const { message } = await res.json();
+            messageApi
+              .open({
+                type: "success",
+                content: message,
+                duration: 2,
+              })
+              .then(() => router.push("/admin/accounts"));
           } else {
-            router.refresh();
-            router.push("/admin/accounts");
-          }
-        }
-
-        if (role === "instructor") {
-          const { instructorId, faculty, academicRank } = values;
-          const instructorRes = await fetch(
-            `http://localhost:3000/api/instructors`,
-            {
-              method: "POST",
-              headers: {
-                "Content-type": "application/json",
-              },
-              body: JSON.stringify({
-                instructorId,
-                faculty,
-                academicRank,
-                accountId,
-              }),
-            }
-          );
-
-          if (instructorRes.status === 409) {
+            const { message } = await res.json();
             messageApi.open({
-              type: "error",
-              content: "Instructor ID aleady exists!",
+              type: "info",
+              content: message,
             });
-          } else {
-            router.refresh();
-            router.push("/admin/accounts");
           }
+          break;
         }
+        case "instructor": {
+          const res = await postInstructorService(values);
+          if (res.status === 201) {
+            const { message } = await res.json();
+            messageApi
+              .open({
+                type: "success",
+                content: message,
+                duration: 2,
+              })
+              .then(() => router.push("/admin/accounts"));
+          } else {
+            const { message } = await res.json();
+            messageApi.open({
+              type: "info",
+              content: message,
+            });
+          }
+          break;
+        }
+        case "training": {
+          const res = await postTrainingAccount(values);
+          if (res.status === 201) {
+            const { message } = await res.json();
+            messageApi
+              .open({
+                type: "success",
+                content: message,
+                duration: 2,
+              })
+              .then(() => router.push("/admin/accounts"));
+          } else {
+            const { message } = await res.json();
+            messageApi.open({
+              type: "info",
+              content: message,
+            });
+          }
+          break;
+        }
+        case "appraise": {
+          const res = await postAppraiseAccount(values);
+          if (res.status === 201) {
+            const { message } = await res.json();
+            messageApi
+              .open({
+                type: "success",
+                content: message,
+                duration: 2,
+              })
+              .then(() => router.push("/admin/accounts"));
+          } else {
+            const { message } = await res.json();
+            messageApi.open({
+              type: "info",
+              content: message,
+            });
+          }
+          break;
+        }
+        default:
+          messageApi.error("Something went wrong!");
       }
     } catch (error) {
       console.log("Errors creating account: ", error);
@@ -91,11 +105,12 @@ export default function CreateAccount() {
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+    messageApi.error("Chưa nhập đầy đủ thông tin.");
   };
 
   return (
     <div className="mt-8 flex items-center justify-center">
+      {contextHolder}
       <Card>
         <Form
           style={{
@@ -251,8 +266,41 @@ export default function CreateAccount() {
             </>
           )}
 
+          {role === "appraise" && (
+            <>
+              <Form.Item
+                label="Mã số Phòng thẩm định"
+                name="appraiseId"
+                rules={[
+                  {
+                    required: true,
+                    message: "Chưa nhập Mã số Phòng thẩm định.",
+                  },
+                ]}
+              >
+                <Input placeholder="Nhập mã số Phòng thẩm định..." />
+              </Form.Item>
+            </>
+          )}
+
+          {role === "training" && (
+            <>
+              <Form.Item
+                label="Mã số Phòng Đào tạo"
+                name="trainingId"
+                rules={[
+                  {
+                    required: true,
+                    message: "Chưa nhập Mã số Phòng đào tạo.",
+                  },
+                ]}
+              >
+                <Input placeholder="Nhập mã số Phòng đào tạo..." />
+              </Form.Item>
+            </>
+          )}
+
           <Form.Item>
-            {contextHolder}
             <Button type="primary" htmlType="submit" block>
               Submit
             </Button>
