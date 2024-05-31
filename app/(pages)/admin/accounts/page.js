@@ -34,7 +34,7 @@ const AccountsPage = () => {
 
   return (
     <>
-      <div className="flex justify-center w-screen mt-8">
+      <div className="flex justify-center w-screen mt-6">
         <div className="w-[1000px]">
           <div className="flex flex-col gap-y-4">
             <div className="flex justify-end">

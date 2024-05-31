@@ -109,8 +109,9 @@ export default function CreateAccount() {
   };
 
   return (
-    <div className="mt-8 flex items-center justify-center">
+    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100">
       {contextHolder}
+      <div className="text-lg font-semibold">Form đăng ký đề tài</div>
       <Card>
         <Form
           style={{

@@ -9,13 +9,16 @@ import { LogOut } from "@/components/ui/icon/logout";
 
 const items = [
   { label: "UIT - RPMS", key: "logo", disabled: true },
-  { label: <Link href="/admin/dashboard">Dashboard</Link>, key: "dashboard" },
   {
-    label: <Link href="/admin/accounts">Quản lý tài khoản</Link>,
-    key: "accounts",
+    label: <Link href="/training/dashboard">Dashboard</Link>,
+    key: "dashboard",
   },
   {
-    label: <Link href="/admin/accounts">Hồ sơ</Link>,
+    label: <Link href="/training/topics">Quản lý đồ án</Link>,
+    key: "topics",
+  },
+  {
+    label: <Link href="/training/accounts">Hồ sơ</Link>,
     key: "profile",
     children: [
       {
@@ -32,7 +35,7 @@ const NavigationBar = () => {
   const pathname = usePathname();
   const [current, setCurrent] = useState(() => {
     if (pathname.includes("accounts")) return "accounts";
-    if (pathname.includes("dashboard")) return "dashboard";
+    if (pathname.includes("topics")) return "topics";
   });
 
   return (
