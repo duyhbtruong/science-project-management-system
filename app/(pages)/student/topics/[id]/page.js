@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CloseOutlined,
   MinusCircleOutlined,
   SyncOutlined,
   UploadOutlined,
@@ -119,10 +120,30 @@ export default function TopicInformationPage() {
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-56px)]">
       <div className="mx-32 py-6">
-        <div className="flex justify-center text-xl font-semibold pb-6">
-          QUẢN LÝ ĐỀ TÀI CÁ NHÂN
+        <div className="flex justify-between mb-6 bg-white rounded-md p-4">
+          <span className="text-xl font-semibold text-blue-600">
+            Quản lý Đề tài cá nhân
+          </span>
+          <Button icon={<CloseOutlined />} danger>
+            Hủy đăng ký
+          </Button>
         </div>
         <div className="flex flex-col gap-4">
+          {/* Thông tin Đề tài */}
+          <div className="flex flex-grow flex-col p-4 rounded-md bg-white">
+            <Descriptions
+              column={2}
+              bordered
+              title="Thông tin Đề tài"
+              items={topicItems}
+              extra={
+                <Button type="primary" icon={<UploadOutlined />}>
+                  Nộp bản mềm
+                </Button>
+              }
+            />
+          </div>
+
           <div className="flex gap-4">
             {/* Thông tin chủ nhiệm đề tài */}
             <div className="flex flex-grow flex-col p-4 rounded-md bg-white">
@@ -143,21 +164,6 @@ export default function TopicInformationPage() {
                 items={instructorItems}
               />
             </div>
-          </div>
-
-          {/* Thông tin Đề tài */}
-          <div className="flex flex-grow flex-col p-4 rounded-md bg-white">
-            <Descriptions
-              column={2}
-              bordered
-              title="Thông tin Đề tài"
-              items={topicItems}
-              extra={
-                <Button type="primary" icon={<UploadOutlined />}>
-                  Nộp bản mềm
-                </Button>
-              }
-            />
           </div>
         </div>
       </div>
