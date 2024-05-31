@@ -8,11 +8,14 @@ import {
   MinusCircleOutlined,
   PhoneOutlined,
   PlusOutlined,
+  TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Divider, FloatButton, Form, Input, Select, Space } from "antd";
+import { useRouter } from "next/navigation";
 
 export default function TopicPage() {
+  const router = useRouter();
   const onFinish = () => {};
   const onFinishFailed = () => {};
 
@@ -284,6 +287,7 @@ export default function TopicPage() {
                           style={{
                             width: "95%",
                           }}
+                          prefix={<TeamOutlined className="text-gray-400" />}
                         />
                       </Form.Item>
                       {fields.length > 1 && (
@@ -342,7 +346,12 @@ export default function TopicPage() {
                 <Button type="primary" htmlType="submit">
                   Submit
                 </Button>
-                <Button type="link">Tới trang Quản lý Đồ án</Button>
+                <Button
+                  type="link"
+                  onClick={() => router.push("/student/topics/1")}
+                >
+                  Tới trang Quản lý Đồ án
+                </Button>
               </Space>
             </Form.Item>
           </Form>
