@@ -9,8 +9,7 @@ export default function UpdateAccount({ params }) {
   const [messageApi, contextHolder] = message.useMessage();
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();
-  const [instructor, setInstructor] = useState();
-  const [training, setTraining] = useState();
+  const [technologyScience, setTechnologyScience] = useState();
   const [appraise, setAppraise] = useState();
   const [role, setRole] = useState();
 
@@ -19,8 +18,7 @@ export default function UpdateAccount({ params }) {
     setAccount(response.account);
     setRole(response.account.role);
     setStudent(response.student);
-    setInstructor(response.instructor);
-    setTraining(response.training);
+    setTechnologyScience(response.technologyScience);
     setAppraise(response.appraise);
   };
 
@@ -28,98 +26,7 @@ export default function UpdateAccount({ params }) {
     loadAccount();
   }, []);
 
-  const onFinish = async (values) => {
-    try {
-      switch (role) {
-        case "student": {
-          const res = await postStudentAccount(values);
-          if (res.status === 201) {
-            const { message } = await res.json();
-            messageApi
-              .open({
-                type: "success",
-                content: message,
-                duration: 2,
-              })
-              .then(() => router.push("/admin/accounts"));
-          } else {
-            const { message } = await res.json();
-            messageApi.open({
-              type: "info",
-              content: message,
-            });
-          }
-          break;
-        }
-        case "instructor": {
-          const res = await postInstructorService(values);
-          if (res.status === 201) {
-            const { message } = await res.json();
-            messageApi
-              .open({
-                type: "success",
-                content: message,
-                duration: 2,
-              })
-              .then(() => router.push("/admin/accounts"));
-          } else {
-            const { message } = await res.json();
-            messageApi.open({
-              type: "info",
-              content: message,
-            });
-          }
-          break;
-        }
-        case "training": {
-          const res = await postTrainingAccount(values);
-          if (res.status === 201) {
-            const { message } = await res.json();
-            messageApi
-              .open({
-                type: "success",
-                content: message,
-                duration: 2,
-              })
-              .then(() => router.push("/admin/accounts"));
-          } else {
-            const { message } = await res.json();
-            messageApi.open({
-              type: "info",
-              content: message,
-            });
-          }
-          break;
-        }
-        case "appraise": {
-          const res = await postAppraiseAccount(values);
-          if (res.status === 201) {
-            const { message } = await res.json();
-            messageApi
-              .open({
-                type: "success",
-                content: message,
-                duration: 2,
-              })
-              .then(() => router.push("/admin/accounts"));
-          } else {
-            const { message } = await res.json();
-            messageApi.open({
-              type: "info",
-              content: message,
-            });
-          }
-          break;
-        }
-        default:
-          messageApi.error("Something went wrong!");
-      }
-    } catch (error) {
-      console.log("Errors creating account: ", error);
-    }
-  };
-
-  const onFinishFailed = (errorInfo) => {};
+  const onFinish = async (values) => {};
 
   return (
     <div className="mt-8 flex items-center justify-center">
@@ -131,7 +38,6 @@ export default function UpdateAccount({ params }) {
               width: 500,
             }}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             autoComplete="off"
             layout="vertical"
             initialValues={{
@@ -140,12 +46,10 @@ export default function UpdateAccount({ params }) {
               phone: account.phone,
               role: account.role,
               studentId: student?.studentId,
-              instructorId: instructor?.instructorId,
-              trainingId: training?.trainingId,
+              technologyScienceId: technologyScience?.technologyScienceId,
               appraiseId: appraise?.appraiseId,
-              faculty: student ? student?.faculty : instructor?.faculty,
+              faculty: student?.faculty,
               educationProgram: student?.educationProgram,
-              academicRank: instructor?.academicRank,
             }}
           >
             <Form.Item
@@ -220,8 +124,10 @@ export default function UpdateAccount({ params }) {
                 onChange={(value) => setRole(value)}
                 options={[
                   { value: "student", label: "Sinh viên" },
-                  { value: "instructor", label: "GVHD" },
-                  { value: "training", label: "Phòng Đào tạo" },
+                  {
+                    value: "technologyScience",
+                    label: "Phòng Khoa học Công nghệ",
+                  },
                   { value: "appraise", label: "Phòng thẩm định" },
                 ]}
                 disabled
@@ -263,36 +169,6 @@ export default function UpdateAccount({ params }) {
               </>
             )}
 
-            {role === "instructor" && (
-              <>
-                <Form.Item
-                  label="Mã số GVHD"
-                  name="instructorId"
-                  rules={[{ required: true, message: "Chưa nhập Mã số GVHD." }]}
-                >
-                  <Input placeholder="Nhập mã số GVHD..." />
-                </Form.Item>
-
-                <Form.Item
-                  label="Khoa"
-                  name="faculty"
-                  rules={[{ required: true, message: "Chưa nhập khoa." }]}
-                >
-                  <Input placeholder="Nhập đơn vị khoa..." />
-                </Form.Item>
-
-                <Form.Item
-                  label="Học hàm, học vị"
-                  name="academicRank"
-                  rules={[
-                    { required: true, message: "Chưa nhập học hàm, học vị." },
-                  ]}
-                >
-                  <Input placeholder="Nhập học hàm, học vị..." />
-                </Form.Item>
-              </>
-            )}
-
             {role === "appraise" && (
               <>
                 <Form.Item
@@ -310,19 +186,19 @@ export default function UpdateAccount({ params }) {
               </>
             )}
 
-            {role === "training" && (
+            {role === "technologyScience" && (
               <>
                 <Form.Item
-                  label="Mã số Phòng Đào tạo"
-                  name="trainingId"
+                  label="Mã số Phòng Khoa học Công nghệ"
+                  name="technologyScienceId"
                   rules={[
                     {
                       required: true,
-                      message: "Chưa nhập Mã số Phòng đào tạo.",
+                      message: "Chưa nhập Mã số Phòng Khoa học Công nghệ.",
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập mã số Phòng đào tạo..." />
+                  <Input placeholder="Nhập mã số Phòng Khoa học Công nghệ..." />
                 </Form.Item>
               </>
             )}

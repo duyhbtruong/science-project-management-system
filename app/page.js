@@ -11,11 +11,8 @@ export default async function Home() {
   if (session.user.role === "student") {
     redirect("/student/dashboard");
   }
-  if (session.user.role === "instructor") {
-    redirect("/instructor/dashboard");
-  }
-  if (session.user.role === "training") {
-    redirect("/training/dashboard");
+  if (session.user.role === "technologyScience") {
+    redirect("/technologyScience/dashboard");
   }
   if (session.user.role === "appraise") {
     redirect("/appraise/dashboard");

@@ -34,7 +34,7 @@ const items = [
 const NavigationBar = () => {
   const pathname = usePathname();
   const [current, setCurrent] = useState(() => {
-    if (pathname.includes("accounts")) return "accounts";
+    if (pathname.includes("dashboard")) return "dashboard";
     if (pathname.includes("topics")) return "topics";
   });
 

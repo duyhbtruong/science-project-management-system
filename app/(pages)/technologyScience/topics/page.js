@@ -7,9 +7,21 @@ import {
   MinusCircleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Button, Space, Table, Tag } from "antd";
+import { Button, Modal, Space, Table, Tag } from "antd";
+import { useState } from "react";
 
 export default function TopicsManagePage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const topics = [
     {
       key: "1",
@@ -195,7 +207,7 @@ export default function TopicsManagePage() {
       render: (_, record) => {
         return (
           <Space size="middle">
-            <Button type="default" icon={<EyeOutlined />} />
+            <Button type="default" icon={<EyeOutlined />} onClick={showModal} />
             <Button danger icon={<DeleteOutlined />} />
           </Space>
         );
@@ -215,6 +227,11 @@ export default function TopicsManagePage() {
           />
         </div>
       </div>
+      <Modal open={isModalOpen} onCancel={handleCancel} onOk={handleOk}>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
     </div>
   );
 }

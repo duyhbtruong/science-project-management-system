@@ -1,6 +1,4 @@
 import { model, models, Schema } from "mongoose";
-import { studentSchema } from "@/models/Student";
-import { instructorSchema } from "@/models/Instructor";
 
 const TopicSchema = new Schema(
   {
@@ -8,11 +6,21 @@ const TopicSchema = new Schema(
     englishName: { type: String, required: true },
     type: { type: String },
     summary: { type: String, required: true },
-    reference: { type: String, required: true },
+    reference: { type: [String], required: true },
     expectedResult: { type: String, required: true },
     participants: { type: [String], required: true },
-    owner: studentSchema,
-    instructor: instructorSchema,
+    isReviewed: { type: Boolean, default: false, required: true },
+    isAppraised: { type: Boolean, default: false, required: true },
+    owner: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Student",
+      required: true,
+    },
+    instructor: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Instructor",
+      required: true,
+    },
   },
   {
     timestamps: true,

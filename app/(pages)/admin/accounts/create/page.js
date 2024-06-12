@@ -1,9 +1,8 @@
 "use client";
 
 import { postAppraiseAccount } from "@/service/appraiseService";
-import { postInstructorService } from "@/service/instructorService";
 import { postStudentAccount } from "@/service/studentService";
-import { postTrainingAccount } from "@/service/trainingService";
+import { postTechnologyScienceAccount } from "@/service/technologyScienceService";
 import { Button, Card, Form, Input, Select, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -36,28 +35,8 @@ export default function CreateAccount() {
           }
           break;
         }
-        case "instructor": {
-          const res = await postInstructorService(values);
-          if (res.status === 201) {
-            const { message } = await res.json();
-            messageApi
-              .open({
-                type: "success",
-                content: message,
-                duration: 2,
-              })
-              .then(() => router.push("/admin/accounts"));
-          } else {
-            const { message } = await res.json();
-            messageApi.open({
-              type: "info",
-              content: message,
-            });
-          }
-          break;
-        }
-        case "training": {
-          const res = await postTrainingAccount(values);
+        case "technologyScience": {
+          const res = await postTechnologyScienceAccount(values);
           if (res.status === 201) {
             const { message } = await res.json();
             messageApi
@@ -195,8 +174,10 @@ export default function CreateAccount() {
               onChange={(value) => setRole(value)}
               options={[
                 { value: "student", label: "Sinh viên" },
-                { value: "instructor", label: "GVHD" },
-                { value: "training", label: "Phòng Đào tạo" },
+                {
+                  value: "technologyScience",
+                  label: "Phòng Khoa học Công nghệ",
+                },
                 { value: "appraise", label: "Phòng thẩm định" },
               ]}
             />
@@ -237,66 +218,36 @@ export default function CreateAccount() {
             </>
           )}
 
-          {role === "instructor" && (
-            <>
-              <Form.Item
-                label="Mã số GVHD"
-                name="instructorId"
-                rules={[{ required: true, message: "Chưa nhập Mã số GVHD." }]}
-              >
-                <Input placeholder="Nhập mã số GVHD..." />
-              </Form.Item>
-
-              <Form.Item
-                label="Khoa"
-                name="faculty"
-                rules={[{ required: true, message: "Chưa nhập khoa." }]}
-              >
-                <Input placeholder="Nhập đơn vị khoa..." />
-              </Form.Item>
-
-              <Form.Item
-                label="Học hàm, học vị"
-                name="academicRank"
-                rules={[
-                  { required: true, message: "Chưa nhập học hàm, học vị." },
-                ]}
-              >
-                <Input placeholder="Nhập học hàm, học vị..." />
-              </Form.Item>
-            </>
-          )}
-
           {role === "appraise" && (
             <>
               <Form.Item
-                label="Mã số Phòng thẩm định"
+                label="Mã số Phòng Thẩm định"
                 name="appraiseId"
                 rules={[
                   {
                     required: true,
-                    message: "Chưa nhập Mã số Phòng thẩm định.",
+                    message: "Chưa nhập Mã số Phòng Thẩm định.",
                   },
                 ]}
               >
-                <Input placeholder="Nhập mã số Phòng thẩm định..." />
+                <Input placeholder="Nhập mã số Phòng Thẩm định..." />
               </Form.Item>
             </>
           )}
 
-          {role === "training" && (
+          {role === "technologyScience" && (
             <>
               <Form.Item
-                label="Mã số Phòng Đào tạo"
-                name="trainingId"
+                label="Mã số Phòng Khoa học Công nghệ"
+                name="technologyScienceId"
                 rules={[
                   {
                     required: true,
-                    message: "Chưa nhập Mã số Phòng đào tạo.",
+                    message: "Chưa nhập Mã số Phòng Khoa học Công nghệ.",
                   },
                 ]}
               >
-                <Input placeholder="Nhập mã số Phòng đào tạo..." />
+                <Input placeholder="Nhập mã số Phòng Khoa học Công nghệ..." />
               </Form.Item>
             </>
           )}

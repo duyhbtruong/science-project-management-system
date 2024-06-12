@@ -17,7 +17,6 @@ export async function POST(request) {
     reference,
     expectedResult,
     participants,
-    academicRank,
     owner,
     instructor,
   } = await request.json();
@@ -30,7 +29,6 @@ export async function POST(request) {
     reference,
     expectedResult,
     participants,
-    academicRank,
     owner,
     instructor,
   });

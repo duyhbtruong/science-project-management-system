@@ -30,6 +30,25 @@ export const getAccountById = async (id) => {
   }
 };
 
+export const getAccountByEmail = async (email) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/accounts?email=${email}`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to get account.");
+    }
+
+    return res.json();
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+};
+
 export const deleteAccountById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/accounts?id=${id}`, {

@@ -1,12 +1,12 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
-import { Training } from "@/models/Training";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import { TechnologyScience } from "@/models/TechnologyScience";
 
 export async function POST(request) {
   await mongooseConnect();
-  const { trainingId, name, email, phone, password, role } =
+  const { technologyScienceId, name, email, phone, password, role } =
     await request.json();
 
   if (await Account.findOne({ email })) {
@@ -16,9 +16,9 @@ export async function POST(request) {
     );
   }
 
-  if (await Training.findOne({ trainingId })) {
+  if (await TechnologyScience.findOne({ technologyScienceId })) {
     return NextResponse.json(
-      { message: "Training ID already exists!" },
+      { message: "Technology ScienceId ID already exists!" },
       { status: 409 }
     );
   }
@@ -33,13 +33,13 @@ export async function POST(request) {
   });
 
   const createdAccountId = await Account.findOne({ email: email }, { _id: 1 });
-  await Training.create({
-    trainingId,
+  await TechnologyScience.create({
+    technologyScienceId,
     accountId: createdAccountId,
   });
 
   return NextResponse.json(
-    { message: "Training department account created!" },
+    { message: "Technology Science account created!" },
     { status: 201 }
   );
 }

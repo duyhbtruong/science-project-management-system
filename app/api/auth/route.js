@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
 import { NextResponse } from "next/server";

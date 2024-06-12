@@ -1,30 +1,39 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
-import { Instructor } from "@/models/Instructor";
 import { Student } from "@/models/Student";
-import { Training } from "@/models/Training";
+import { TechnologyScience } from "@/models/TechnologyScience";
 import { Appraise } from "@/models/Appraise";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 
 export async function GET(request, { params }) {
   await mongooseConnect();
   const { id } = params;
+
+  if (!mongoose.isValidObjectId(id)) {
+    return NextResponse.json({ message: "Not ObjectId" }, { status: 200 });
+  }
+
   const account = await Account.findOne({ _id: id });
+
+  if (!account) {
+    return NextResponse.json(
+      { message: "Account does not exist!" },
+      { status: 200 }
+    );
+  }
 
   if (account.role === "student") {
     const student = await Student.findOne({ accountId: id });
     return NextResponse.json({ account, student }, { status: 200 });
   }
 
-  if (account.role === "instructor") {
-    const instructor = await Instructor.findOne({ accountId: id });
-    return NextResponse.json({ account, instructor }, { status: 200 });
-  }
-
-  if (account.role === "training") {
-    const training = await Training.findOne({ accountId: id });
-    return NextResponse.json({ account, training }, { status: 200 });
+  if (account.role === "technologyScience") {
+    const technologyScience = await TechnologyScience.findOne({
+      accountId: id,
+    });
+    return NextResponse.json({ account, technologyScience }, { status: 200 });
   }
 
   if (account.role === "appraise") {
@@ -76,41 +85,18 @@ export async function PUT(request, { params }) {
     });
   }
 
-  if (role === "instructor") {
-    const { instructorId, faculty, academicRank } = await request.json();
-    if (await Instructor.findOne({ instructorId })) {
+  if (role === "technologyScience") {
+    const { technologyScienceId } = await request.json();
+    if (await TechnologyScience.findOne({ technologyScienceId })) {
       return NextResponse.json(
-        { message: "Instructor ID already exists!" },
+        { message: "Technology Science ID already exists!" },
         { status: 409 }
       );
     }
 
-    const iId = await Instructor.findOne({ accountId: id }, { _id: 1 });
-    await Instructor.findByIdAndUpdate(iId, {
-      instructorId,
-      faculty,
-      academicRank,
-    });
-    await Account.findByIdAndUpdate(id, {
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-    });
-  }
-
-  if (role === "training") {
-    const { trainingId } = await request.json();
-    if (await Training.findOne({ trainingId })) {
-      return NextResponse.json(
-        { message: "Training ID already exists!" },
-        { status: 409 }
-      );
-    }
-
-    const tId = await Training.findOne({ accountId: id }, { _id: 1 });
-    await Training.findByIdAndUpdate(tId, {
-      trainingId,
+    const tsId = await TechnologyScience.findOne({ accountId: id }, { _id: 1 });
+    await Training.findByIdAndUpdate(tsId, {
+      technologyScienceId,
     });
     await Account.findByIdAndUpdate(id, {
       name,

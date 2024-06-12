@@ -56,9 +56,9 @@ const AccountsPage = () => {
                 key="role"
                 render={(_, record) => {
                   if (record.role === "student") return "Sinh viên";
-                  if (record.role === "instructor") return "GVHD";
-                  if (record.role === "training") return "Phòng Đào tạo";
-                  if (record.role === "appraise") return "Phòng thẩm định";
+                  if (record.role === "technologyScience")
+                    return "Phòng Khoa học Công nghệ";
+                  if (record.role === "appraise") return "Phòng Thẩm định";
                   if (record.role === "admin") return "Quản trị viên";
                 }}
               />
