@@ -19,41 +19,41 @@ export default auth(async (req) => {
 
   if (isApiAuthRoute) return null;
 
+  // Lấy user role để điều hướng
   const userRole = req.auth?.user.role;
   let callbackUrl;
   if (userRole) {
     callbackUrl = new URL(`/${userRole}/dashboard`, nextUrl);
-    // admin
+
+    // Điều hướng đến trang admin
     if (nextUrl.pathname.startsWith(`/admin`) && userRole !== "admin") {
       return Response.redirect(callbackUrl);
     }
-    // student
+    // Điều hướng đến trang student
     if (nextUrl.pathname.startsWith(`/student`) && userRole !== "student") {
       return Response.redirect(callbackUrl);
     }
-    // instructor
+    // Điều hướng đến trang technology science
     if (
-      nextUrl.pathname.startsWith(`/instructor`) &&
-      userRole !== "instructor"
+      nextUrl.pathname.startsWith(`/technologyScience`) &&
+      userRole !== "technologyScience"
     ) {
       return Response.redirect(callbackUrl);
     }
-    // training department
-    if (nextUrl.pathname.startsWith(`/training`) && userRole !== "training") {
-      return Response.redirect(callbackUrl);
-    }
-    // appraise department
+    // Điều hướng đến trang appraise
     if (nextUrl.pathname.startsWith(`/appraise`) && userRole !== "appraise") {
       return Response.redirect(callbackUrl);
     }
   }
 
+  // Nếu đã đăng nhập mà điều hướng đến trang auth thì redirect đến trang chính
   if (isAuthRoute) {
     if (isLoggedIn)
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
     return null;
   }
 
+  // Nếu chưa đăng nhập thì điều hướng đến trang đăng nhập
   if (!isLoggedIn && !isPublicRoute) {
     return Response.redirect(new URL("/auth/login", nextUrl));
   }
@@ -61,6 +61,7 @@ export default auth(async (req) => {
   return null;
 });
 
+// Tất cả url match với config thì middleware sẽ chạy
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
