@@ -3,6 +3,14 @@
 import { postAppraiseAccount } from "@/service/appraiseService";
 import { postStudentAccount } from "@/service/studentService";
 import { postTechnologyScienceAccount } from "@/service/technologyScienceService";
+import {
+  CodeOutlined,
+  IdcardOutlined,
+  LockOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { Button, Card, Form, Input, Select, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -29,7 +37,7 @@ export default function CreateAccount() {
           } else {
             const { message } = await res.json();
             messageApi.open({
-              type: "info",
+              type: "error",
               content: message,
             });
           }
@@ -49,7 +57,7 @@ export default function CreateAccount() {
           } else {
             const { message } = await res.json();
             messageApi.open({
-              type: "info",
+              type: "error",
               content: message,
             });
           }
@@ -69,7 +77,7 @@ export default function CreateAccount() {
           } else {
             const { message } = await res.json();
             messageApi.open({
-              type: "info",
+              type: "error",
               content: message,
             });
           }
@@ -83,21 +91,16 @@ export default function CreateAccount() {
     }
   };
 
-  const onFinishFailed = (errorInfo) => {
-    messageApi.error("Chưa nhập đầy đủ thông tin.");
-  };
-
   return (
     <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100">
       {contextHolder}
-      <div className="text-lg font-semibold">Form đăng ký đề tài</div>
+      <div className="text-lg font-semibold">Tạo mới tài khoản</div>
       <Card>
         <Form
           style={{
             width: 500,
           }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           autoComplete="off"
           layout="vertical"
           initialValues={{ role: role }}
@@ -112,7 +115,10 @@ export default function CreateAccount() {
               },
             ]}
           >
-            <Input placeholder="Nhập tên tài khoản..." />
+            <Input
+              prefix={<UserOutlined className="text-border" />}
+              placeholder="Nhập tên tài khoản..."
+            />
           </Form.Item>
 
           <Form.Item
@@ -129,11 +135,17 @@ export default function CreateAccount() {
               },
             ]}
           >
-            <Input placeholder="Nhập email..." />
+            <Input
+              prefix={<MailOutlined className="text-border" />}
+              placeholder="Nhập email..."
+            />
           </Form.Item>
 
           <Form.Item label="Số điện thoại" name="phone">
-            <Input placeholder="123456789" />
+            <Input
+              prefix={<PhoneOutlined rotate={90} className="text-border" />}
+              placeholder="Nhập số điện thoại..."
+            />
           </Form.Item>
 
           <Form.Item
@@ -156,7 +168,7 @@ export default function CreateAccount() {
               },
             ]}
           >
-            <Input.Password />
+            <Input.Password prefix={<LockOutlined className="text-border" />} />
           </Form.Item>
 
           <Form.Item
@@ -192,7 +204,10 @@ export default function CreateAccount() {
                   { required: true, message: "Chưa nhập Mã số sinh viên." },
                 ]}
               >
-                <Input placeholder="Nhập MSSV..." />
+                <Input
+                  prefix={<IdcardOutlined className="text-border" />}
+                  placeholder="Nhập MSSV..."
+                />
               </Form.Item>
 
               <Form.Item
@@ -200,7 +215,35 @@ export default function CreateAccount() {
                 name="faculty"
                 rules={[{ required: true, message: "Chưa chọn khoa." }]}
               >
-                <Input placeholder="Nhập đơn vị khoa..." />
+                <Select
+                  placeholder="Chọn khoa..."
+                  options={[
+                    {
+                      value: "Công nghệ Phần mềm",
+                      label: "Công nghệ Phần mềm",
+                    },
+                    {
+                      value: "Hệ thống Thông tin",
+                      label: "Hệ thống Thông tin",
+                    },
+                    {
+                      value: "Kỹ thuật Máy tính",
+                      label: "Kỹ thuật Máy tính",
+                    },
+                    {
+                      value: "Mạng Máy tính và Truyền thông",
+                      label: "Mạng Máy tính và Truyền thông",
+                    },
+                    {
+                      value: "Khoa học Máy tính",
+                      label: "Khoa học Máy tính",
+                    },
+                    {
+                      value: "Khoa học và Kỹ thuật Thông tin",
+                      label: "Khoa học và Kỹ thuật Thông tin",
+                    },
+                  ]}
+                />
               </Form.Item>
 
               <Form.Item
@@ -213,7 +256,19 @@ export default function CreateAccount() {
                   },
                 ]}
               >
-                <Input placeholder="Nhập chương trình đào tạo..." />
+                <Select
+                  placeholder="Chọn chương trình đào tạo..."
+                  options={[
+                    {
+                      value: "Chất lượng cao",
+                      label: "Chất lượng cao",
+                    },
+                    {
+                      value: "Đại trà",
+                      label: "Đại trà",
+                    },
+                  ]}
+                />
               </Form.Item>
             </>
           )}
@@ -222,7 +277,7 @@ export default function CreateAccount() {
             <>
               <Form.Item
                 label="Mã số Phòng Thẩm định"
-                name="appraiseId"
+                name="appraisalBoardId"
                 rules={[
                   {
                     required: true,
@@ -230,7 +285,10 @@ export default function CreateAccount() {
                   },
                 ]}
               >
-                <Input placeholder="Nhập mã số Phòng Thẩm định..." />
+                <Input
+                  prefix={<IdcardOutlined className="text-border" />}
+                  placeholder="Nhập mã số Phòng Thẩm định..."
+                />
               </Form.Item>
             </>
           )}
@@ -247,7 +305,10 @@ export default function CreateAccount() {
                   },
                 ]}
               >
-                <Input placeholder="Nhập mã số Phòng Khoa học Công nghệ..." />
+                <Input
+                  prefix={<IdcardOutlined className="text-border" />}
+                  placeholder="Nhập mã số Phòng Khoa học Công nghệ..."
+                />
               </Form.Item>
             </>
           )}

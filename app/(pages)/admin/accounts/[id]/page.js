@@ -47,7 +47,7 @@ export default function UpdateAccount({ params }) {
               role: account.role,
               studentId: student?.studentId,
               technologyScienceId: technologyScience?.technologyScienceId,
-              appraiseId: appraise?.appraiseId,
+              appraisalBoardId: appraise?.appraisalBoardId,
               faculty: student?.faculty,
               educationProgram: student?.educationProgram,
             }}
@@ -173,7 +173,7 @@ export default function UpdateAccount({ params }) {
               <>
                 <Form.Item
                   label="Mã số Phòng thẩm định"
-                  name="appraiseId"
+                  name="appraisalBoardId"
                   rules={[
                     {
                       required: true,

@@ -12,7 +12,6 @@ export const studentSchema = new Schema({
   topicId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Topic",
-    required: true,
     default: null,
   },
   // ID liên kết với tài khoản sinh viên

@@ -2,7 +2,7 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
 import { Student } from "@/models/Student";
 import { TechnologyScience } from "@/models/TechnologyScience";
-import { Appraise } from "@/models/Appraise";
+import { AppraisalBoard } from "@/models/AppraisalBoard";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
@@ -12,14 +12,17 @@ export async function GET(request, { params }) {
   const { id } = params;
 
   if (!mongoose.isValidObjectId(id)) {
-    return NextResponse.json({ message: "Not ObjectId" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Sai định dạng ObjectId!" },
+      { status: 200 }
+    );
   }
 
   const account = await Account.findOne({ _id: id });
 
   if (!account) {
     return NextResponse.json(
-      { message: "Account does not exist!" },
+      { message: "Tài khoản không tồn tại!" },
       { status: 200 }
     );
   }
@@ -37,7 +40,7 @@ export async function GET(request, { params }) {
   }
 
   if (account.role === "appraise") {
-    const appraise = await Appraise.findOne({ accountId: id });
+    const appraise = await AppraisalBoard.findOne({ accountId: id });
     return NextResponse.json({ account, appraise }, { status: 200 });
   }
 }
@@ -54,7 +57,7 @@ export async function PUT(request, { params }) {
 
   if (await Account.findOne({ email })) {
     return NextResponse.json(
-      { message: "Email already in use!" },
+      { message: "Email đã được sử dụng!" },
       { status: 409 }
     );
   }
@@ -66,7 +69,7 @@ export async function PUT(request, { params }) {
     const { studentId, faculty, educationProgram } = await request.json();
     if (await Student.findOne({ studentId })) {
       return NextResponse.json(
-        { message: "Student ID already exists!" },
+        { message: "Mã số sinh viên đã tồn tại!" },
         { status: 409 }
       );
     }
@@ -89,7 +92,7 @@ export async function PUT(request, { params }) {
     const { technologyScienceId } = await request.json();
     if (await TechnologyScience.findOne({ technologyScienceId })) {
       return NextResponse.json(
-        { message: "Technology Science ID already exists!" },
+        { message: "Mã số phòng Khoa học Công nghệ đã tồn tại!" },
         { status: 409 }
       );
     }
@@ -107,17 +110,17 @@ export async function PUT(request, { params }) {
   }
 
   if (role === "appraise") {
-    const { appraiseId } = await request.json();
-    if (await Appraise.findOne({ appraiseId })) {
+    const { appraisalBoardId } = await request.json();
+    if (await AppraisalBoard.findOne({ appraisalBoardId })) {
       return NextResponse.json(
-        { message: "Appraise ID already exists!" },
+        { message: "Mã số phòng Thẩm định đã tồn tại!" },
         { status: 409 }
       );
     }
 
-    const aId = await Appraise.findOne({ accountId: id }, { _id: 1 });
-    await Appraise.findByIdAndUpdate(aId, {
-      appraiseId,
+    const aId = await AppraisalBoard.findOne({ accountId: id }, { _id: 1 });
+    await AppraisalBoard.findByIdAndUpdate(aId, {
+      appraisalBoardId,
     });
     await Account.findByIdAndUpdate(id, {
       name,
@@ -127,5 +130,8 @@ export async function PUT(request, { params }) {
     });
   }
 
-  return NextResponse.json({ message: "Account updated!" }, { status: 200 });
+  return NextResponse.json(
+    { message: "Tài khoản đã được cập nhật!" },
+    { status: 200 }
+  );
 }

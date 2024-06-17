@@ -3,9 +3,17 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { Button, Space, Table } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Space, Table, Tag, Input } from "antd";
+const { Search } = Input;
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { deleteAccountById, getAccounts } from "@/service/accountService";
+import { dateFormat } from "@/utils/format";
+import Link from "next/link";
 
 const { Column } = Table;
 
@@ -30,14 +38,18 @@ const AccountsPage = () => {
     loadAccounts();
   }, []);
 
-  // console.log("accounts: ", accounts);
-
   return (
     <>
-      <div className="flex justify-center w-screen mt-6">
-        <div className="w-[1000px]">
-          <div className="flex flex-col gap-y-4">
-            <div className="flex justify-end">
+      <div className="w-screen min-h-[calc(100vh-45.8px)] px-32 pt-6 bg-gray-100">
+        <div className="flex flex-col gap-y-4">
+          <div className="flex justify-between">
+            <Search
+              className="w-[450px]"
+              placeholder="Tìm kiếm tài khoản..."
+              enterButton
+            />
+
+            <div className="flex justify-end gap-4">
               <Button
                 type="primary"
                 onClick={() => router.push("/admin/accounts/create")}
@@ -45,46 +57,100 @@ const AccountsPage = () => {
               >
                 Tạo tài khoản
               </Button>
+              <Button type="default" icon={<UploadOutlined />}>
+                Nhập danh sách
+              </Button>
             </div>
-
-            <Table dataSource={accounts} rowKey={(record) => record._id}>
-              <Column title="Name" dataIndex="name" key="name" />
-              <Column title="Email" dataIndex="email" key="email" />
-              <Column title="Phone" dataIndex="phone" key="phone" />
-              <Column
-                title="Role"
-                key="role"
-                render={(_, record) => {
-                  if (record.role === "student") return "Sinh viên";
-                  if (record.role === "technologyScience")
-                    return "Phòng Khoa học Công nghệ";
-                  if (record.role === "appraise") return "Phòng Thẩm định";
-                  if (record.role === "admin") return "Quản trị viên";
-                }}
-              />
-              <Column
-                title="Action"
-                key="action"
-                render={(_, record) => {
-                  return (
-                    <Space size="middle">
-                      <Button
-                        icon={<EditOutlined />}
-                        onClick={() =>
-                          router.push(`/admin/accounts/${record._id}`)
-                        }
-                      />
-                      <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => deleteAccount(record._id)}
-                      />
-                    </Space>
-                  );
-                }}
-              />
-            </Table>
           </div>
+
+          <Table
+            dataSource={accounts}
+            rowKey={(record) => record._id}
+            tableLayout="fixed"
+            pagination={{ pageSize: 8 }}
+          >
+            <Column
+              title="Tên tài khoản"
+              dataIndex="name"
+              key="name"
+              ellipsis
+            />
+            <Column
+              title="Email"
+              dataIndex="email"
+              key="email"
+              render={(_, record) => {
+                return (
+                  <Link
+                    href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.email}`}
+                  >
+                    {record.email}
+                  </Link>
+                );
+              }}
+              ellipsis
+            />
+            <Column
+              title="Quyền"
+              key="role"
+              render={(_, record) => {
+                if (record.role === "student")
+                  return <Tag color="geekblue">Sinh viên</Tag>;
+                if (record.role === "technologyScience")
+                  return <Tag color="orange">Phòng Khoa học Công nghệ</Tag>;
+                if (record.role === "appraise")
+                  return <Tag color="cyan">Phòng Thẩm định</Tag>;
+                if (record.role === "admin")
+                  return <Tag color="red">Quản trị viên</Tag>;
+              }}
+              filters={[
+                { text: "Sinh viên", value: "student" },
+                {
+                  text: "Phòng Khoa học Công nghệ",
+                  value: "technologyScience",
+                },
+                { text: "Phòng Thẩm định", value: "appraise" },
+                {
+                  text: "Quản trị viên",
+                  value: "admin",
+                },
+              ]}
+              onFilter={(value, record) => record.role.indexOf(value) === 0}
+            />
+            <Column
+              title="Ngày tạo"
+              key="createdAt"
+              render={(_, record) => {
+                const createdAt = new Date(record.createdAt);
+                return <div>{dateFormat(createdAt)}</div>;
+              }}
+            />
+            <Column
+              title="Hành động"
+              key="action"
+              render={(_, record) => {
+                const isAdmin = record.role === "admin" ? true : false;
+
+                return (
+                  <Space size="middle" align="end">
+                    <Button
+                      icon={<EditOutlined />}
+                      onClick={() =>
+                        router.push(`/admin/accounts/${record._id}`)
+                      }
+                      disabled={isAdmin}
+                    />
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => deleteAccount(record._id)}
+                      disabled={isAdmin}
+                    />
+                  </Space>
+                );
+              }}
+            />
+          </Table>
         </div>
       </div>
     </>

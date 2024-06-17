@@ -1,7 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/Account";
-import { Appraise } from "@/models/Appraise";
 import { Student } from "@/models/Student";
+import { AppraisalBoard } from "@/models/AppraisalBoard";
 import { TechnologyScience } from "@/models/TechnologyScience";
 import { NextResponse } from "next/server";
 
@@ -15,7 +15,7 @@ export async function GET(request) {
 
     if (!account) {
       return NextResponse.json(
-        { message: "Account does not exist!" },
+        { message: "Tài khoản không tồn tại!" },
         { status: 200 }
       );
     }
@@ -33,13 +33,13 @@ export async function GET(request) {
     }
 
     if (account.role === "appraise") {
-      const appraise = await Appraise.findOne({ accountId: account._id });
+      const appraise = await AppraisalBoard.findOne({ accountId: account._id });
       return NextResponse.json({ account, appraise }, { status: 200 });
     }
 
     if (account.role === "admin") {
       return NextResponse.json(
-        { message: "You are not authorized as admin!" },
+        { message: "Chưa được ủy quyền Admin!" },
         { status: 200 }
       );
     }
@@ -47,7 +47,7 @@ export async function GET(request) {
 
   if (email === "") {
     return NextResponse.json(
-      { message: "You are not authorized as admin!" },
+      { message: "Chưa được ủy quyền Admin!" },
       { status: 200 }
     );
   }
@@ -79,10 +79,16 @@ export async function DELETE(request) {
   }
 
   if (role === "appraise") {
-    const appraiseId = await Appraise.findOne({ accountId: id }, { _id: 1 });
+    const appraisalBoardId = await AppraisalBoard.findOne(
+      { accountId: id },
+      { _id: 1 }
+    );
     await Account.findByIdAndDelete(id);
-    await Appraise.findByIdAndDelete(appraiseId);
+    await AppraisalBoard.findByIdAndDelete(appraisalBoardId);
   }
 
-  return NextResponse.json({ message: "Account deleted!" }, { status: 200 });
+  return NextResponse.json(
+    { message: "Tài khoản đã được xóa!" },
+    { status: 200 }
+  );
 }

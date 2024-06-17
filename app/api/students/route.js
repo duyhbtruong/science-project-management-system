@@ -39,14 +39,14 @@ export async function POST(request) {
 
   if (await Account.findOne({ email })) {
     return NextResponse.json(
-      { message: "Email already in use!" },
+      { message: "Email đã được sử dụng!" },
       { status: 409 }
     );
   }
 
   if (await Student.findOne({ studentId })) {
     return NextResponse.json(
-      { message: "Student ID already exists!" },
+      { message: "Mã số sinh viên đã tồn tại!" },
       { status: 409 }
     );
   }
@@ -69,7 +69,7 @@ export async function POST(request) {
   });
 
   return NextResponse.json(
-    { message: "Student account created!" },
+    { message: "Tài khoản sinh viên đã được tạo thành công!" },
     { status: 201 }
   );
 }

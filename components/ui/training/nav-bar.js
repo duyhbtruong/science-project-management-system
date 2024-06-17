@@ -5,26 +5,22 @@ import { Button, Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LogOut } from "@/components/ui/icon/logout";
+import { LogoutOutlined } from "@ant-design/icons";
 
 const items = [
-  { label: "UIT - RPMS", key: "logo", disabled: true },
-  {
-    label: <Link href="/training/dashboard">Dashboard</Link>,
-    key: "dashboard",
-  },
+  { label: <AppLogo fontSize={`text-2xl`} />, key: "logo" },
   {
     label: <Link href="/training/topics">Quản lý đồ án</Link>,
     key: "topics",
   },
   {
-    label: <Link href="/training/accounts">Hồ sơ</Link>,
+    label: "Hồ sơ",
     key: "profile",
     children: [
       {
         label: "Đăng xuất",
         key: "logout",
-        icon: <LogOut className="size-4" />,
+        icon: <LogoutOutlined />,
         onClick: async () => await logout(),
       },
     ],
@@ -34,7 +30,6 @@ const items = [
 const NavigationBar = () => {
   const pathname = usePathname();
   const [current, setCurrent] = useState(() => {
-    if (pathname.includes("dashboard")) return "dashboard";
     if (pathname.includes("topics")) return "topics";
   });
 

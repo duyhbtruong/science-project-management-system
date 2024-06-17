@@ -11,14 +11,14 @@ export async function POST(request) {
 
   if (await Account.findOne({ email })) {
     return NextResponse.json(
-      { message: "Email already in use!" },
+      { message: "Email đã được sử dụng!" },
       { status: 409 }
     );
   }
 
   if (await TechnologyScience.findOne({ technologyScienceId })) {
     return NextResponse.json(
-      { message: "Technology ScienceId ID already exists!" },
+      { message: "Mã số phòng Khoa học Công nghệ đã tồn tại!" },
       { status: 409 }
     );
   }
@@ -39,7 +39,7 @@ export async function POST(request) {
   });
 
   return NextResponse.json(
-    { message: "Technology Science account created!" },
+    { message: "Tài khoản phòng Khoa học Công nghệ đã được tạo thành công!" },
     { status: 201 }
   );
 }

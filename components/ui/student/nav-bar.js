@@ -5,15 +5,10 @@ import { Button, Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LogOut } from "@/components/ui/icon/logout";
+import { LogoutOutlined } from "@ant-design/icons";
 
 const items = [
-  {
-    label: <span className="text-lg font-semibold">UIT - RPMS</span>,
-    key: "logo",
-    disabled: true,
-  },
-  { label: <Link href="/student/dashboard">Dashboard</Link>, key: "dashboard" },
+  { label: <AppLogo fontSize={`text-2xl`} />, key: "logo" },
   {
     label: <Link href="/student/topics">Đăng ký đề tài</Link>,
     key: "topics",
@@ -25,7 +20,7 @@ const items = [
       {
         label: "Đăng xuất",
         key: "logout",
-        icon: <LogOut className="size-4" />,
+        icon: <LogoutOutlined />,
         onClick: async () => await logout(),
       },
     ],
@@ -35,7 +30,6 @@ const items = [
 const NavigationBar = () => {
   const pathname = usePathname();
   const [current, setCurrent] = useState(() => {
-    if (pathname.includes("dashboard")) return "dashboard";
     if (pathname.includes("topics")) return "topics";
   });
 
