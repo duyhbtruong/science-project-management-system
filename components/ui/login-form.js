@@ -1,28 +1,25 @@
 "use client";
 
-import { useTransition } from "react";
-import { Button, Form, Input } from "antd";
+import { useState, useTransition } from "react";
+import { Alert, Button, Form, Input } from "antd";
 import { login } from "@/app/(pages)/auth/login/page";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
+  const [loginError, setLoginError] = useState();
 
   const onFinish = (values) => {
-    startTransition(() => {
-      login(values);
+    startTransition(async () => {
+      setLoginError(await login(values));
     });
   };
 
-  const onFinishFailed = (error) => {
-    console.log("Error: ", error);
-  };
-
   return (
-    <div className="mx-auto my-4 w-[400px] space-y-4">
+    <div className="mx-auto my-8 w-[400px] space-y-4">
       <Form
         style={{ maxWidth: 600 }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         autoComplete="off"
         layout="vertical"
       >
@@ -33,8 +30,13 @@ export const LoginForm = () => {
             { required: true, message: "Chưa nhập email!" },
             { type: "email", message: "Sai định dạng email!" },
           ]}
+          onFocus={() => setLoginError()}
         >
-          <Input placeholder="testing@example.com" disabled={isPending} />
+          <Input
+            prefix={<MailOutlined className="text-border" />}
+            placeholder="Nhập tên tài khoản..."
+            disabled={isPending}
+          />
         </Form.Item>
 
         <Form.Item
@@ -53,9 +55,20 @@ export const LoginForm = () => {
               },
             },
           ]}
+          onFocus={() => setLoginError()}
         >
-          <Input.Password placeholder="123456" disabled={isPending} />
+          <Input.Password
+            prefix={<LockOutlined className="text-border" />}
+            placeholder="Nhập mật khẩu..."
+            disabled={isPending}
+          />
         </Form.Item>
+        {loginError && loginError?.error && (
+          <Form.Item>
+            <Alert message={loginError.error} type="error" showIcon />
+          </Form.Item>
+        )}
+
         <Form.Item>
           <Button type="primary" block disabled={isPending} htmlType="submit">
             Đăng nhập

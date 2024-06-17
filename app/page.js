@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await auth();
-  // return <>{JSON.stringify(session.user.role)}</>;
 
+  // Điều hướng user dựa theo role
   if (session.user.role === "admin") {
-    redirect("/admin/dashboard");
+    redirect("/admin/accounts");
   }
   if (session.user.role === "student") {
     redirect("/student/dashboard");
