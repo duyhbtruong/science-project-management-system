@@ -92,7 +92,7 @@ export default function CreateAccount() {
   };
 
   return (
-    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100">
+    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[calc(100vh-45.8px)]">
       {contextHolder}
       <div className="text-lg font-semibold">Tạo mới tài khoản</div>
       <Card>
@@ -114,6 +114,7 @@ export default function CreateAccount() {
                 message: "Chưa nhập tên tài khoản!",
               },
             ]}
+            hasFeedback
           >
             <Input
               prefix={<UserOutlined className="text-border" />}
@@ -134,6 +135,7 @@ export default function CreateAccount() {
                 message: "Sai định dạng email",
               },
             ]}
+            hasFeedback
           >
             <Input
               prefix={<MailOutlined className="text-border" />}
@@ -141,7 +143,7 @@ export default function CreateAccount() {
             />
           </Form.Item>
 
-          <Form.Item label="Số điện thoại" name="phone">
+          <Form.Item label="Số điện thoại" name="phone" hasFeedback>
             <Input
               prefix={<PhoneOutlined rotate={90} className="text-border" />}
               placeholder="Nhập số điện thoại..."
@@ -167,6 +169,7 @@ export default function CreateAccount() {
                 },
               },
             ]}
+            hasFeedback
           >
             <Input.Password prefix={<LockOutlined className="text-border" />} />
           </Form.Item>
@@ -203,6 +206,7 @@ export default function CreateAccount() {
                 rules={[
                   { required: true, message: "Chưa nhập Mã số sinh viên." },
                 ]}
+                hasFeedback
               >
                 <Input
                   prefix={<IdcardOutlined className="text-border" />}
@@ -284,6 +288,7 @@ export default function CreateAccount() {
                     message: "Chưa nhập Mã số Phòng Thẩm định.",
                   },
                 ]}
+                hasFeedback
               >
                 <Input
                   prefix={<IdcardOutlined className="text-border" />}
@@ -304,6 +309,7 @@ export default function CreateAccount() {
                     message: "Chưa nhập Mã số Phòng Khoa học Công nghệ.",
                   },
                 ]}
+                hasFeedback
               >
                 <Input
                   prefix={<IdcardOutlined className="text-border" />}

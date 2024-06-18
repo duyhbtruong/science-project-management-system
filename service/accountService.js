@@ -49,6 +49,21 @@ export const getAccountByEmail = async (email) => {
   }
 };
 
+export const updateAccountById = async (id, values) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/accounts/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(values),
+    });
+
+    if (res.ok) {
+      return res.json();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const deleteAccountById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/accounts?id=${id}`, {

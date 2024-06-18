@@ -1,7 +1,15 @@
 "use client";
 
-import { getAccountById } from "@/service/accountService";
+import { getAccountById, updateAccountById } from "@/service/accountService";
+import { validatePhoneNumber } from "@/utils/validator";
+import {
+  LockOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { Form, Button, Input, message, Card, Select } from "antd";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function UpdateAccount({ params }) {
@@ -12,6 +20,8 @@ export default function UpdateAccount({ params }) {
   const [technologyScience, setTechnologyScience] = useState();
   const [appraise, setAppraise] = useState();
   const [role, setRole] = useState();
+
+  const router = useRouter();
 
   const loadAccount = async () => {
     const response = await getAccountById(id);
@@ -26,11 +36,22 @@ export default function UpdateAccount({ params }) {
     loadAccount();
   }, []);
 
-  const onFinish = async (values) => {};
+  const onFinish = async (values) => {
+    const res = await updateAccountById(id, values);
+    const { message } = res;
+    messageApi
+      .open({
+        type: "success",
+        content: message,
+        duration: 2,
+      })
+      .then(() => router.push("/admin/accounts"));
+  };
 
   return (
-    <div className="mt-8 flex items-center justify-center">
+    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[calc(100vh-45.8px)]">
       {contextHolder}
+      <div className="text-lg font-semibold">Cập nhật tài khoản</div>
       <Card>
         {account && (
           <Form
@@ -61,8 +82,12 @@ export default function UpdateAccount({ params }) {
                   message: "Chưa nhập tên tài khoản!",
                 },
               ]}
+              hasFeedback
             >
-              <Input placeholder="Nhập tên tài khoản..." />
+              <Input
+                prefix={<UserOutlined className="text-border" />}
+                placeholder="Nhập tên tài khoản..."
+              />
             </Form.Item>
 
             <Form.Item
@@ -79,21 +104,43 @@ export default function UpdateAccount({ params }) {
                 },
               ]}
             >
-              <Input placeholder="Nhập email..." />
+              <Input
+                prefix={<MailOutlined className="text-border" />}
+                placeholder="Nhập email..."
+                disabled
+              />
             </Form.Item>
 
-            <Form.Item label="Số điện thoại" name="phone">
-              <Input placeholder="123456789" />
+            <Form.Item
+              label="Số điện thoại"
+              name="phone"
+              rules={[
+                {
+                  validator(_, value) {
+                    if (!value) {
+                      return Promise.resolve();
+                    }
+                    if (!validatePhoneNumber(value)) {
+                      return Promise.reject(
+                        new Error("Số điện thoại chỉ được chứa chữ số!")
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+              hasFeedback
+            >
+              <Input
+                prefix={<PhoneOutlined rotate={90} className="text-border" />}
+                placeholder="Nhập số điện thoại..."
+              />
             </Form.Item>
 
             <Form.Item
               label="Mật khẩu"
               name="password"
               rules={[
-                {
-                  required: true,
-                  message: "Chưa nhập mật khẩu!",
-                },
                 {
                   validator(_, value) {
                     if (!value || value.length > 6) {
@@ -105,8 +152,11 @@ export default function UpdateAccount({ params }) {
                   },
                 },
               ]}
+              hasFeedback
             >
-              <Input.Password />
+              <Input.Password
+                prefix={<LockOutlined className="text-border" />}
+              />
             </Form.Item>
 
             <Form.Item
@@ -142,8 +192,9 @@ export default function UpdateAccount({ params }) {
                   rules={[
                     { required: true, message: "Chưa nhập Mã số sinh viên." },
                   ]}
+                  hasFeedback
                 >
-                  <Input placeholder="Nhập MSSV..." />
+                  <Input placeholder="Nhập MSSV..." disabled />
                 </Form.Item>
 
                 <Form.Item
@@ -151,7 +202,35 @@ export default function UpdateAccount({ params }) {
                   name="faculty"
                   rules={[{ required: true, message: "Chưa chọn khoa." }]}
                 >
-                  <Input placeholder="Nhập đơn vị khoa..." />
+                  <Select
+                    placeholder="Chọn khoa..."
+                    options={[
+                      {
+                        value: "Công nghệ Phần mềm",
+                        label: "Công nghệ Phần mềm",
+                      },
+                      {
+                        value: "Hệ thống Thông tin",
+                        label: "Hệ thống Thông tin",
+                      },
+                      {
+                        value: "Kỹ thuật Máy tính",
+                        label: "Kỹ thuật Máy tính",
+                      },
+                      {
+                        value: "Mạng Máy tính và Truyền thông",
+                        label: "Mạng Máy tính và Truyền thông",
+                      },
+                      {
+                        value: "Khoa học Máy tính",
+                        label: "Khoa học Máy tính",
+                      },
+                      {
+                        value: "Khoa học và Kỹ thuật Thông tin",
+                        label: "Khoa học và Kỹ thuật Thông tin",
+                      },
+                    ]}
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -164,7 +243,19 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập chương trình đào tạo..." />
+                  <Select
+                    placeholder="Chọn chương trình đào tạo..."
+                    options={[
+                      {
+                        value: "Chất lượng cao",
+                        label: "Chất lượng cao",
+                      },
+                      {
+                        value: "Đại trà",
+                        label: "Đại trà",
+                      },
+                    ]}
+                  />
                 </Form.Item>
               </>
             )}
@@ -181,7 +272,7 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập mã số Phòng thẩm định..." />
+                  <Input placeholder="Nhập mã số Phòng thẩm định..." disabled />
                 </Form.Item>
               </>
             )}
@@ -198,7 +289,10 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập mã số Phòng Khoa học Công nghệ..." />
+                  <Input
+                    disabled
+                    placeholder="Nhập mã số Phòng Khoa học Công nghệ..."
+                  />
                 </Form.Item>
               </>
             )}

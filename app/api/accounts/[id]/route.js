@@ -50,88 +50,53 @@ export async function PUT(request, { params }) {
   const { id } = params;
   const {
     name: name,
-    email: email,
     phone: phone,
     password: password,
+    faculty: faculty,
+    educationProgram: educationProgram,
   } = await request.json();
 
-  if (await Account.findOne({ email })) {
+  // Trường hợp cập nhật mật khẩu
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const { role } = await Account.findOne({ _id: id }, { role: 1 });
+    if (role === "student") {
+      const sId = await Student.findOne({ accountId: id }, { _id: 1 });
+      await Student.findByIdAndUpdate(sId, {
+        faculty,
+        educationProgram,
+      });
+    }
+
+    await Account.findByIdAndUpdate(id, {
+      name,
+      phone,
+      password: hashedPassword,
+    });
+
     return NextResponse.json(
-      { message: "Email đã được sử dụng!" },
-      { status: 409 }
+      { message: "Tài khoản đã được cập nhật!" },
+      { status: 200 }
+    );
+  } else {
+    const { role } = await Account.findOne({ _id: id }, { role: 1 });
+    if (role === "student") {
+      const sId = await Student.findOne({ accountId: id }, { _id: 1 });
+      await Student.findByIdAndUpdate(sId, {
+        faculty,
+        educationProgram,
+      });
+    }
+
+    await Account.findByIdAndUpdate(id, {
+      name,
+      phone,
+    });
+
+    return NextResponse.json(
+      { message: "Tài khoản đã được cập nhật!" },
+      { status: 200 }
     );
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const role = await Account.findOne({ _id: id }, { role: 1 });
-  if (role === "student") {
-    const { studentId, faculty, educationProgram } = await request.json();
-    if (await Student.findOne({ studentId })) {
-      return NextResponse.json(
-        { message: "Mã số sinh viên đã tồn tại!" },
-        { status: 409 }
-      );
-    }
-
-    const sId = await Student.findOne({ accountId: id }, { _id: 1 });
-    await Student.findByIdAndUpdate(sId, {
-      studentId,
-      faculty,
-      educationProgram,
-    });
-    await Account.findByIdAndUpdate(id, {
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-    });
-  }
-
-  if (role === "technologyScience") {
-    const { technologyScienceId } = await request.json();
-    if (await TechnologyScience.findOne({ technologyScienceId })) {
-      return NextResponse.json(
-        { message: "Mã số phòng Khoa học Công nghệ đã tồn tại!" },
-        { status: 409 }
-      );
-    }
-
-    const tsId = await TechnologyScience.findOne({ accountId: id }, { _id: 1 });
-    await Training.findByIdAndUpdate(tsId, {
-      technologyScienceId,
-    });
-    await Account.findByIdAndUpdate(id, {
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-    });
-  }
-
-  if (role === "appraise") {
-    const { appraisalBoardId } = await request.json();
-    if (await AppraisalBoard.findOne({ appraisalBoardId })) {
-      return NextResponse.json(
-        { message: "Mã số phòng Thẩm định đã tồn tại!" },
-        { status: 409 }
-      );
-    }
-
-    const aId = await AppraisalBoard.findOne({ accountId: id }, { _id: 1 });
-    await AppraisalBoard.findByIdAndUpdate(aId, {
-      appraisalBoardId,
-    });
-    await Account.findByIdAndUpdate(id, {
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-    });
-  }
-
-  return NextResponse.json(
-    { message: "Tài khoản đã được cập nhật!" },
-    { status: 200 }
-  );
 }
