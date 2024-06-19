@@ -12,3 +12,32 @@ export const createTopic = async (formData) => {
     console.log(error);
   }
 };
+
+export const getTopicById = async (id) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
+      method: "GET",
+      cache: "no-cache",
+    });
+
+    if (res.ok) {
+      return res.json();
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
+export const deleteTopicById = async (id) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/topics?id=${id}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      return res.json();
+    }
+  } catch (error) {
+    return error;
+  }
+};

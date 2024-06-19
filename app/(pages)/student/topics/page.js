@@ -37,12 +37,12 @@ export default function TopicPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
+  async function fetchUserData() {
+    setStudent(await getStudentAccount(account.id));
+  }
+
   useEffect(() => {
     if (!account) return;
-
-    async function fetchUserData() {
-      setStudent(await getStudentAccount(account.id));
-    }
     fetchUserData();
   }, [account]);
 
@@ -76,8 +76,17 @@ export default function TopicPage() {
 
     const res = await createTopic(formData);
     const { message } = res;
-    messageApi.success(message);
+    messageApi
+      .open({
+        type: "success",
+        content: message,
+        duration: 2,
+      })
+      .then(() => {
+        fetchUserData();
+      });
   };
+  console.log(student);
 
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
@@ -212,7 +221,9 @@ export default function TopicPage() {
               >
                 <Select
                   placeholder="Chọn loại hình nghiên cứu..."
-                  options={[{ value: "basic", label: "Nghiên cứu cơ bản" }]}
+                  options={[
+                    { value: "Nghiên cứu cơ bản", label: "Nghiên cứu cơ bản" },
+                  ]}
                 />
               </Form.Item>
 
@@ -483,13 +494,7 @@ export default function TopicPage() {
 
               <Form.Item>
                 <Space>
-                  <SubmitButton form={form}>Submit</SubmitButton>
-                  <Button
-                    type="link"
-                    onClick={() => router.push("/student/topics/1")}
-                  >
-                    Tới trang Quản lý Đồ án
-                  </Button>
+                  <SubmitButton form={form}>Đăng ký</SubmitButton>
                 </Space>
               </Form.Item>
             </Form>
@@ -506,7 +511,7 @@ export default function TopicPage() {
             icon={<ArrowRightOutlined />}
             key="link"
             type="primary"
-            href={`/student/topics/1`}
+            href={student ? `/student/topics/${student.topicId}` : ``}
           >
             Đến trang Quản lý đề tài cá nhân
           </Button>,

@@ -18,7 +18,7 @@ export async function GET(request) {
     return NextResponse.json(student, { status: 200 });
   } else {
     return NextResponse.json(
-      { message: "Student does not exist!" },
+      { message: "Sinh viên không tồn tại!" },
       { status: 200 }
     );
   }
