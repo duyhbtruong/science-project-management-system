@@ -27,11 +27,11 @@ export default auth(async (req) => {
 
     // Điều hướng đến trang admin
     if (nextUrl.pathname.startsWith(`/admin`) && userRole !== "admin") {
-      return Response.redirect(callbackUrl);
+      return Response.redirect(new URL(`/admin/accounts`, nextUrl));
     }
     // Điều hướng đến trang student
     if (nextUrl.pathname.startsWith(`/student`) && userRole !== "student") {
-      return Response.redirect(callbackUrl);
+      return Response.redirect(new URL(`/student/topics`, nextUrl));
     }
     // Điều hướng đến trang technology science
     if (

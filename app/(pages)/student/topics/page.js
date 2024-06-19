@@ -3,23 +3,30 @@
 import { useSession } from "next-auth/react";
 import {
   AlignLeftOutlined,
+  ArrowRightOutlined,
   CodeOutlined,
   IdcardOutlined,
   MailOutlined,
   MinusCircleOutlined,
-  PhoneOutlined,
   PlusOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Divider, Form, Input, Select, Space } from "antd";
+import {
+  Button,
+  Divider,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Spin,
+  message,
+} from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getStudentAccount } from "@/service/studentService";
-import { getAccountByEmail } from "@/service/accountService";
 import { createTopic } from "@/service/topicService";
-
-const emailRegex = /\S+@\S+\.\S+/;
 
 export default function TopicPage() {
   const router = useRouter();
@@ -27,8 +34,8 @@ export default function TopicPage() {
   const account = session.data?.user;
   const [form] = Form.useForm();
   const [student, setStudent] = useState();
-  const [instructor, setInstructor] = useState();
-  const [errorMessage, setErrorMessage] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (!account) return;
@@ -39,9 +46,18 @@ export default function TopicPage() {
     fetchUserData();
   }, [account]);
 
-  const onFinish = (values) => {
-    // console.log(values.educationProgram);
+  useEffect(() => {
+    if (!student) return;
 
+    form.setFieldsValue({
+      name: account.name,
+      email: account.email,
+      faculty: student.faculty,
+      educationProgram: student.educationProgram,
+    });
+  }, [student]);
+
+  const onFinish = async (values) => {
     const formData = {
       vietnameseName: values.vietnameseName,
       englishName: values.englishName,
@@ -50,76 +66,43 @@ export default function TopicPage() {
       reference: values.references,
       expectedResult: values.expectedResult,
       participants: values.participants,
-      owner: account.id,
-      instructor: instructor.instructor._id,
+      owner: student._id,
+      instructor: {
+        name: values.instructorName,
+        email: values.instructorEmail,
+        academicRank: values.instructorAcademicRank,
+      },
     };
 
-    // console.log(formData);
-    const res = createTopic(formData);
-    console.log(">>> topic create res: ", res);
+    const res = await createTopic(formData);
+    const { message } = res;
+    messageApi.success(message);
   };
-
-  const handleInstructorEmailOnChange = async (event) => {
-    console.log(event.target.value);
-    if (event.target.value === "") {
-      setErrorMessage("Không được để trống email GVHD.");
-      return;
-    }
-
-    // console.log(emailRegex.test(event.target.value));
-
-    if (!emailRegex.test(event.target.value)) {
-      setErrorMessage("Sai định dạng email!");
-      return;
-    }
-
-    // console.log(">>>> ins email: ", event.target.value);
-
-    const res = await getAccountByEmail(event.target.value);
-    // console.log(res);
-    if (res.message) {
-      setErrorMessage("Email không tồn tại!");
-      return;
-    }
-
-    if (res.account?.role !== "instructor") {
-      setErrorMessage("Email không phải của GVHD!");
-      return;
-    }
-
-    setInstructor(res);
-    setErrorMessage(null);
-  };
-
-  // console.log(student);
-  // console.log(instructor);
 
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
       {/* Column */}
+      {contextHolder}
       <div className="mx-32 py-6">
         <div className="flex justify-center text-xl font-semibold pb-6">
-          ĐĂNG KÝ ĐỀ TÀI
+          Đăng ký Đề tài
         </div>
-        {student && (
+        <Spin spinning={student ? false : true}>
           <div className="flex justify-center">
             <Form
               form={form}
               name="register-topic"
-              className="py-2 px-4 w-[640px] bg-white rounded-md"
+              className="py-2 px-4 w-[640px] bg-white rounded-md shadow-md"
               onFinish={onFinish}
               layout="vertical"
               autoComplete="off"
               initialValues={{
                 email: account?.email,
                 name: account?.name,
-                phone: student?.phone,
                 educationProgram: student?.educationProgram,
                 faculty: student?.faculty,
                 references: [""],
                 participants: [""],
-                instructorName: instructor?.account.name,
-                instructorAcademicRank: instructor?.instructor.academicRank,
               }}
             >
               <Divider orientation="center">Thông tin Chủ nhiệm đề tài</Divider>
@@ -130,7 +113,7 @@ export default function TopicPage() {
               >
                 <Input
                   disabled
-                  prefix={<MailOutlined className="text-gray-400" />}
+                  prefix={<MailOutlined className="text-border" />}
                 />
               </Form.Item>
               <Form.Item
@@ -140,14 +123,7 @@ export default function TopicPage() {
               >
                 <Input
                   disabled
-                  prefix={<UserOutlined className="text-gray-400" />}
-                />
-              </Form.Item>
-              <Form.Item label="Số điện thoại liên lạc" name="phone">
-                <Input
-                  prefix={
-                    <PhoneOutlined className="text-gray-400" rotate={90} />
-                  }
+                  prefix={<UserOutlined className="text-border" />}
                 />
               </Form.Item>
               <Form.Item
@@ -157,7 +133,7 @@ export default function TopicPage() {
               >
                 <Input
                   disabled
-                  prefix={<CodeOutlined className="text-gray-400" />}
+                  prefix={<CodeOutlined className="text-border" />}
                 />
               </Form.Item>
               <Form.Item
@@ -167,7 +143,7 @@ export default function TopicPage() {
               >
                 <Input
                   disabled
-                  prefix={<IdcardOutlined className="text-gray-400" />}
+                  prefix={<IdcardOutlined className="text-border" />}
                 />
               </Form.Item>
 
@@ -193,7 +169,8 @@ export default function TopicPage() {
                 ]}
               >
                 <Input
-                  prefix={<AlignLeftOutlined className="text-gray-400" />}
+                  placeholder="Nhập tên tiếng Việt của đề tài..."
+                  prefix={<AlignLeftOutlined className="text-border" />}
                 />
               </Form.Item>
 
@@ -218,7 +195,8 @@ export default function TopicPage() {
                 ]}
               >
                 <Input
-                  prefix={<AlignLeftOutlined className="text-gray-400" />}
+                  placeholder="Nhập tên tiếng Anh của đề tài..."
+                  prefix={<AlignLeftOutlined className="text-border" />}
                 />
               </Form.Item>
 
@@ -233,6 +211,7 @@ export default function TopicPage() {
                 ]}
               >
                 <Select
+                  placeholder="Chọn loại hình nghiên cứu..."
                   options={[{ value: "basic", label: "Nghiên cứu cơ bản" }]}
                 />
               </Form.Item>
@@ -246,9 +225,18 @@ export default function TopicPage() {
                     required: true,
                     message: "Không được để trống tóm tắt đề tài.",
                   },
+                  {
+                    max: 300,
+                    message: "Không được dài quá 300 chữ!",
+                  },
                 ]}
               >
-                <Input.TextArea showCount rows={5} style={{ resize: "none" }} />
+                <Input.TextArea
+                  showCount
+                  maxLength={300}
+                  rows={5}
+                  style={{ resize: "none" }}
+                />
               </Form.Item>
 
               <Form.List
@@ -274,40 +262,45 @@ export default function TopicPage() {
               >
                 {(references, { add, remove }, { errors }) => (
                   <>
-                    {references.map((reference, index) => (
-                      <Form.Item
-                        label={index == 0 ? "Tài liệu tham khảo" : null}
-                        required={true}
-                        key={reference.key}
-                      >
+                    {references.map((reference, index) => {
+                      const { key, ...restProps } = reference;
+                      return (
                         <Form.Item
-                          {...reference}
-                          validateTrigger={["onChange", "onBlur"]}
-                          rules={[
-                            {
-                              required: true,
-                              whitespace: true,
-                              message:
-                                "Nhập tài liệu tham khảo hoặc xóa trường này đi.",
-                            },
-                          ]}
-                          noStyle
+                          label={index == 0 ? "Tài liệu tham khảo" : null}
+                          required={true}
+                          key={key}
                         >
-                          <Input
-                            placeholder={`[${index + 1}] Tài liệu tham khảo...`}
-                            style={{
-                              width: references.length < 2 ? "100%" : "95%",
-                            }}
-                          />
+                          <Form.Item
+                            {...restProps}
+                            validateTrigger={["onChange", "onBlur"]}
+                            rules={[
+                              {
+                                required: true,
+                                whitespace: true,
+                                message:
+                                  "Nhập tài liệu tham khảo hoặc xóa trường này đi.",
+                              },
+                            ]}
+                            noStyle
+                          >
+                            <Input
+                              placeholder={`[${
+                                index + 1
+                              }] Tài liệu tham khảo...`}
+                              style={{
+                                width: references.length < 2 ? "100%" : "95%",
+                              }}
+                            />
+                          </Form.Item>
+                          {references.length > 1 && (
+                            <MinusCircleOutlined
+                              className="ml-2"
+                              onClick={() => remove(reference.name)}
+                            />
+                          )}
                         </Form.Item>
-                        {references.length > 1 && (
-                          <MinusCircleOutlined
-                            className="ml-2"
-                            onClick={() => remove(reference.name)}
-                          />
-                        )}
-                      </Form.Item>
-                    ))}
+                      );
+                    })}
                     <Form.Item>
                       <Button
                         type="dashed"
@@ -334,9 +327,18 @@ export default function TopicPage() {
                     required: true,
                     message: "Không được để trống nội dung dự kiến kết quả.",
                   },
+                  {
+                    max: 300,
+                    message: "Không được dài quá 300 chữ!",
+                  },
                 ]}
               >
-                <Input.TextArea showCount rows={5} style={{ resize: "none" }} />
+                <Input.TextArea
+                  showCount
+                  maxLength={300}
+                  rows={5}
+                  style={{ resize: "none" }}
+                />
               </Form.Item>
 
               <Form.List
@@ -361,47 +363,50 @@ export default function TopicPage() {
               >
                 {(fields, { add, remove }, { errors }) => (
                   <>
-                    {fields.map((field, index) => (
-                      <Form.Item
-                        label={
-                          index == 0
-                            ? "Danh sách thành viên đề tài (Kể cả CNĐT) - mỗi dòng một thành viên"
-                            : null
-                        }
-                        required={true}
-                        key={field.key}
-                      >
+                    {fields.map((field, index) => {
+                      const { key, ...restProps } = field;
+                      return (
                         <Form.Item
-                          {...field}
-                          validateTrigger={["onChange", "onBlur"]}
-                          rules={[
-                            {
-                              required: true,
-                              whitespace: true,
-                              message:
-                                "Nhập tên thành viên hoặc xóa dòng này nếu không cần thiết.",
-                            },
-                          ]}
-                          noStyle
+                          label={
+                            index == 0
+                              ? "Danh sách thành viên đề tài (Kể cả CNĐT) - mỗi dòng một thành viên"
+                              : null
+                          }
+                          required={true}
+                          key={key}
                         >
-                          <Input
-                            placeholder={`Nhập tên thành viên thứ ${
-                              index + 1
-                            }... `}
-                            style={{
-                              width: fields.length < 2 ? "100%" : "95%",
-                            }}
-                            prefix={<TeamOutlined className="text-gray-400" />}
-                          />
+                          <Form.Item
+                            {...restProps}
+                            validateTrigger={["onChange", "onBlur"]}
+                            rules={[
+                              {
+                                required: true,
+                                whitespace: true,
+                                message:
+                                  "Nhập tên thành viên hoặc xóa dòng này nếu không cần thiết.",
+                              },
+                            ]}
+                            noStyle
+                          >
+                            <Input
+                              placeholder={`Nhập tên thành viên thứ ${
+                                index + 1
+                              }... `}
+                              style={{
+                                width: fields.length < 2 ? "100%" : "95%",
+                              }}
+                              prefix={<TeamOutlined className="text-border" />}
+                            />
+                          </Form.Item>
+                          {fields.length > 1 && (
+                            <MinusCircleOutlined
+                              className="ml-2"
+                              onClick={() => remove(field.name)}
+                            />
+                          )}
                         </Form.Item>
-                        {fields.length > 1 && (
-                          <MinusCircleOutlined
-                            className="ml-2"
-                            onClick={() => remove(field.name)}
-                          />
-                        )}
-                      </Form.Item>
-                    ))}
+                      );
+                    })}
                     <Form.Item>
                       <Button
                         type="dashed"
@@ -424,36 +429,57 @@ export default function TopicPage() {
                 label="Email GVHD"
                 name="instructorEmail"
                 hasFeedback
-                help={errorMessage}
-                validateStatus={errorMessage ? "error" : "success"}
-                rules={[{ required: true }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Không được để trống email GVHD!",
+                  },
+                  {
+                    type: "email",
+                    message: "Sai định dạng email!",
+                  },
+                ]}
               >
                 <Input
-                  prefix={<MailOutlined className="text-gray-400" />}
-                  onChange={handleInstructorEmailOnChange}
-                  onSubmit={(event) => {
-                    if (event.target.value === "") {
-                      setErrorMessage("Không được để trống email GVHD.");
-                      return;
-                    }
-                  }}
+                  prefix={<MailOutlined className="text-border" />}
+                  placeholder="Nhập email giáo viên hướng dẫn..."
                 />
               </Form.Item>
-              {/* <Form.Item label="Họ và Tên GVHD" name="instructorName">
+              <Form.Item
+                label="Họ và Tên GVHD"
+                name="instructorName"
+                rules={[
+                  {
+                    required: true,
+                    message: "Không được để trống tên GVHD!",
+                  },
+                ]}
+              >
                 <Input
-                  disabled
-                  prefix={<UserOutlined className="text-gray-400" />}
+                  prefix={<UserOutlined className="text-border" />}
+                  placeholder="Nhập tên giáo viên hướng dẫn..."
                 />
               </Form.Item>
               <Form.Item
                 label="Học hàm, học vị của GVHD"
                 name="instructorAcademicRank"
+                rules={[
+                  {
+                    required: true,
+                    message: "Chọn học hàm, học vị của GVHD...",
+                  },
+                ]}
               >
-                <Input
-                  disabled
-                  prefix={<IdcardOutlined className="text-gray-400" />}
+                <Select
+                  placeholder="Chọn học hàm, học vị..."
+                  options={[
+                    { title: "ThS", value: "ThS" },
+                    { title: "TS", value: "TS" },
+                    { title: "GS.TS", value: "GS.TS" },
+                    { title: "PGS.TS", value: "PGS.TS" },
+                  ]}
                 />
-              </Form.Item> */}
+              </Form.Item>
 
               <Form.Item>
                 <Space>
@@ -468,8 +494,27 @@ export default function TopicPage() {
               </Form.Item>
             </Form>
           </div>
-        )}
+        </Spin>
       </div>
+
+      <Modal
+        title="Đăng ký đề tài"
+        open={student ? (student.topicId === null ? false : true) : false}
+        closable={false}
+        footer={[
+          <Button
+            icon={<ArrowRightOutlined />}
+            key="link"
+            type="primary"
+            href={`/student/topics/1`}
+          >
+            Đến trang Quản lý đề tài cá nhân
+          </Button>,
+        ]}
+      >
+        <p>Bạn đã đăng ký đề tài Nghiên cứu khoa học!</p>
+        <p>Vui lòng đến trang Quản lý đề tài cá nhân.</p>
+      </Modal>
     </div>
   );
 }

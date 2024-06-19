@@ -9,7 +9,7 @@ export default async function Home() {
     redirect("/admin/accounts");
   }
   if (session.user.role === "student") {
-    redirect("/student/dashboard");
+    redirect("/student/topics");
   }
   if (session.user.role === "technologyScience") {
     redirect("/technologyScience/dashboard");

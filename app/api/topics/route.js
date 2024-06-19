@@ -1,4 +1,5 @@
 import { mongooseConnect } from "@/lib/mongoose";
+import { Student } from "@/models/Student";
 import { Topic } from "@/models/Topic";
 import { NextResponse } from "next/server";
 
@@ -32,5 +33,10 @@ export async function POST(request) {
     owner,
     instructor,
   });
-  return NextResponse.json({ message: "Topic created!" }, { status: 201 });
+  const topicId = await Topic.findOne({ owner: owner }, { _id: 1 });
+  await Student.findByIdAndUpdate({ _id: owner }, { topicId: topicId._id });
+  return NextResponse.json(
+    { message: "Đăng ký đề tài thành công!" },
+    { status: 201 }
+  );
 }
