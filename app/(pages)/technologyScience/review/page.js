@@ -1,51 +1,16 @@
 "use client";
 
-import { deleteTopicById, getTopics } from "@/service/topicService";
-import { dateFormat } from "@/utils/format";
-import {
-  CheckCircleOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  SyncOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Descriptions,
-  Input,
-  Modal,
-  Space,
-  Spin,
-  Table,
-  Tag,
-  message,
-} from "antd";
-import Link from "next/link";
+import { getTopics } from "@/service/topicService";
+import { HighlightOutlined } from "@ant-design/icons";
+import { Input, Button, Space, Spin, Table } from "antd";
 import { useEffect, useState } from "react";
 const { Search } = Input;
 
-export default function TopicsManagePage() {
+export default function ReviewPage() {
   const [topics, setTopics] = useState();
-  const [messageApi, messageContextHolder] = message.useMessage();
-  const [modal, modalContextHolder] = Modal.useModal();
 
   const loadTopics = async () => {
     setTopics(await getTopics());
-  };
-
-  const deleteTopic = async (id) => {
-    const confirmed = await modal.confirm({
-      title: "Xóa đề tài",
-      content: "Bạn có chắc chắn muốn xóa đề tài này không?",
-    });
-    if (confirmed) {
-      const res = await deleteTopicById(id);
-      const { message } = res;
-      messageApi.open({
-        type: "success",
-        content: "Bạn đã xóa thành công đề tài!",
-      });
-      loadTopics();
-    }
   };
 
   useEffect(() => {
@@ -66,107 +31,18 @@ export default function TopicsManagePage() {
       key: "type",
     },
     {
-      title: "Ngày đăng ký",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (_, { createdAt }) => {
-        return <p>{dateFormat(new Date(createdAt))}</p>;
-      },
-    },
-    {
-      title: "Trạng thái kiểm duyệt",
-      dataIndex: "isReviewed",
-      key: "isReviewed",
-      render: (_, { isReviewed }) => {
-        let color, icon, text;
-        switch (isReviewed) {
-          case true:
-            color = "success";
-            text = "Đã kiểm duyệt";
-            icon = <CheckCircleOutlined />;
-            break;
-          case false:
-            color = "default";
-            text = "Chưa kiểm duyệt";
-            icon = <SyncOutlined spin />;
-          default:
-            break;
-        }
-        return (
-          <Tag color={color} icon={icon}>
-            {text}
-          </Tag>
-        );
-      },
-      filters: [
-        {
-          text: "Đã kiểm duyệt",
-          value: true,
-        },
-        {
-          text: "Chưa kiểm duyệt",
-          value: false,
-        },
-      ],
-      onFilter: (value, record) => record.isReviewed === value,
-    },
-    {
-      title: "Trạng thái thẩm định",
-      dataIndex: "isAppraised",
-      key: "isAppraised",
-      render: (_, { isAppraised }) => {
-        let color, icon, text;
-        switch (isAppraised) {
-          case true:
-            color = "success";
-            text = "Đã thẩm định";
-            icon = <CheckCircleOutlined />;
-            break;
-          case false:
-            color = "default";
-            text = "Chưa thẩm định";
-            icon = <SyncOutlined spin />;
-          default:
-            break;
-        }
-        return (
-          <Tag color={color} icon={icon}>
-            {text}
-          </Tag>
-        );
-      },
-      filters: [
-        {
-          text: "Đã thẩm định",
-          value: true,
-        },
-        {
-          text: "Chưa thẩm định",
-          value: false,
-        },
-      ],
-      onFilter: (value, record) => record.isAppraised === value,
-    },
-    {
       title: "Hành động",
       key: "action",
       width: "10%",
       render: (_, record) => {
         return (
           <Space size="middle">
-            <Button
-              onClick={() => deleteTopic(record._id)}
-              danger
-              icon={<DeleteOutlined />}
-            />
+            <Button onClick={() => {}} danger icon={<HighlightOutlined />} />
           </Space>
         );
       },
     },
   ];
-
-  console.log(topics);
-
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
       <div className="flex flex-col mx-32 py-6">
@@ -253,8 +129,6 @@ export default function TopicsManagePage() {
           />
         </Spin>
       </div>
-      {messageContextHolder}
-      {modalContextHolder}
     </div>
   );
 }

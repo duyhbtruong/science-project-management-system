@@ -47,7 +47,6 @@ export async function DELETE(request) {
 
   await Topic.findByIdAndDelete(id);
   const studentId = await Student.findOne({ topicId: id }, { _id: 1 });
-  console.log(studentId);
   await Student.findByIdAndUpdate(studentId, { topicId: null });
   return NextResponse.json(
     { message: "Hủy đăng ký đề tài thành công!" },

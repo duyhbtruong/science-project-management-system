@@ -1,4 +1,4 @@
-import NavigationBar from "@/components/ui/training/nav-bar";
+import NavigationBar from "@/components/ui/technologyScience/nav-bar";
 
 export default function AdminLayout({ children }) {
   return (

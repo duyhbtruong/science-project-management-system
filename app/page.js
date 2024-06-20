@@ -12,7 +12,7 @@ export default async function Home() {
     redirect("/student/topics");
   }
   if (session.user.role === "technologyScience") {
-    redirect("/technologyScience/dashboard");
+    redirect("/technologyScience/topics");
   }
   if (session.user.role === "appraise") {
     redirect("/appraise/dashboard");

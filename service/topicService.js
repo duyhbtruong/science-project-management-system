@@ -13,6 +13,21 @@ export const createTopic = async (formData) => {
   }
 };
 
+export const getTopics = async () => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/topics`, {
+      method: "GET",
+      cache: "no-cache",
+    });
+
+    if (res) {
+      return res.json();
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getTopicById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
