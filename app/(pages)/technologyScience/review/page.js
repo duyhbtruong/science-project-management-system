@@ -1,13 +1,21 @@
 "use client";
 
 import { getTopics } from "@/service/topicService";
-import { HighlightOutlined } from "@ant-design/icons";
-import { Input, Button, Space, Spin, Table } from "antd";
+import { dateFormat } from "@/utils/format";
+import {
+  CheckOutlined,
+  DeleteOutlined,
+  HighlightOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
+import { Input, Button, Space, Spin, Table, Tag } from "antd";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 const { Search } = Input;
 
 export default function ReviewPage() {
   const [topics, setTopics] = useState();
+  const router = useRouter();
 
   const loadTopics = async () => {
     setTopics(await getTopics());
@@ -16,6 +24,7 @@ export default function ReviewPage() {
   useEffect(() => {
     loadTopics();
   }, []);
+  console.log(topics);
 
   const columns = [
     {
@@ -31,13 +40,43 @@ export default function ReviewPage() {
       key: "type",
     },
     {
+      title: "Ngày đăng ký",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (_, record) => {
+        const createdAt = new Date(record.createdAt);
+        return <p>{dateFormat(createdAt)}</p>;
+      },
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "isReviewed",
+      key: "isReviewed",
+      render: (_, record) => {
+        return (
+          <Tag
+            color={record.isReviewed ? "success" : "default"}
+            icon={record.isReviewed ? <CheckOutlined /> : <SyncOutlined spin />}
+          >
+            {record.isReviewed ? "Đã kiểm duyệt" : "Chưa kiểm duyệt"}
+          </Tag>
+        );
+      },
+    },
+    {
       title: "Hành động",
       key: "action",
       width: "10%",
       render: (_, record) => {
         return (
           <Space size="middle">
-            <Button onClick={() => {}} danger icon={<HighlightOutlined />} />
+            <Button
+              onClick={() =>
+                router.push(`/technologyScience/review/${record._id}`)
+              }
+              icon={<HighlightOutlined />}
+            />
+            <Button onClick={() => {}} danger icon={<DeleteOutlined />} />
           </Space>
         );
       },
@@ -58,74 +97,6 @@ export default function ReviewPage() {
             columns={columns}
             dataSource={topics}
             pagination={{ pageSize: 8 }}
-            expandable={{
-              expandedRowRender: (record) => {
-                const instructorItems = [
-                  {
-                    label: "Tên",
-                    key: "name",
-                    children: <p>{record.instructor.name}</p>,
-                  },
-                  {
-                    label: "Email",
-                    key: "email",
-                    children: (
-                      <Link
-                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
-                      >
-                        {record.instructor.email}
-                      </Link>
-                    ),
-                  },
-                  {
-                    label: "Học hàm, học vị",
-                    key: "academicRank",
-                    children: <p>{record.instructor.academicRank}</p>,
-                  },
-                ];
-
-                const reviewItems = [
-                  {
-                    label: "Trạng thái",
-                    key: "isReviewed",
-                    children: (
-                      <Tag
-                        color={record.isReviewed ? "success" : "default"}
-                        icon={
-                          record.isReviewed ? (
-                            <CheckCircleOutlined />
-                          ) : (
-                            <SyncOutlined spin />
-                          )
-                        }
-                      >
-                        {record.isReviewed
-                          ? "Đã kiểm duyệt"
-                          : "Chưa kiểm duyệt"}
-                      </Tag>
-                    ),
-                  },
-                  {
-                    label: "Kết quả",
-                    key: "result",
-                    children: <p>70</p>,
-                  },
-                ];
-
-                return (
-                  <div className="space-y-4">
-                    <Descriptions
-                      title="Thông tin Giảng viên Hướng dẫn"
-                      items={instructorItems}
-                    />
-                    <Descriptions
-                      title="Thông tin kiểm duyệt"
-                      items={reviewItems}
-                    />
-                  </div>
-                );
-              },
-            }}
           />
         </Spin>
       </div>
