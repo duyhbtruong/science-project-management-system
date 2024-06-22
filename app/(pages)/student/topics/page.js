@@ -25,7 +25,7 @@ import {
 } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getStudentAccount } from "@/service/studentService";
+import { getStudentAccountByAccountId } from "@/service/studentService";
 import { createTopic } from "@/service/topicService";
 
 export default function TopicPage() {
@@ -38,7 +38,7 @@ export default function TopicPage() {
   const [messageApi, contextHolder] = message.useMessage();
 
   async function fetchUserData() {
-    setStudent(await getStudentAccount(account.id));
+    setStudent(await getStudentAccountByAccountId(account.id));
   }
 
   useEffect(() => {

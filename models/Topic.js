@@ -25,6 +25,8 @@ const topicSchema = new Schema(
     participants: { type: [String], required: true },
     // Trạng thái đánh giá đề tài: Chưa đánh giá | Đã đánh giá
     isReviewed: { type: Boolean, default: false, required: true },
+    // Danh sách kết quả kiểm duyệt
+    reviews: { type: [mongoose.SchemaTypes.ObjectId] },
     // Trạng thái kiểm duyệt: Chưa kiểm duyệt | Đã kiểm duyệt
     isAppraised: { type: Boolean, default: false, required: true },
     // Chủ sở hữu đề tài

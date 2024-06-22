@@ -1,5 +1,7 @@
 "use client";
 
+import { createReview, getReviewByTopicId } from "@/service/reviewService";
+import { getStudentAccountById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
 import { InfoOutlined, LinkOutlined } from "@ant-design/icons";
 import {
@@ -12,19 +14,29 @@ import {
   Select,
   Space,
   Spin,
+  message,
 } from "antd";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ReviewTopicPage({ params }) {
   const { id: topicId } = params;
+  const session = useSession();
+  const userId = session?.data?.user?.id;
   const [topic, setTopic] = useState();
+  const [review, setReview] = useState();
   const [value, setValue] = useState("Có");
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+  const router = useRouter();
+
   const showModal = () => {
     setIsModalOpen(true);
   };
+
   const handleOk = () => {
     setIsModalOpen(false);
   };
@@ -33,31 +45,32 @@ export default function ReviewTopicPage({ params }) {
   for (let i = 5; i <= 100; i += 5) {
     data.push({ value: i, label: `${i}` });
   }
+
   const topicItems = [
     {
       key: "1",
       label: "Tên tiếng Việt",
-      children: topic.vietnameseName,
+      children: topic?.vietnameseName,
     },
     {
       key: "2",
       label: "Tên tiếng Anh",
-      children: topic.englishName,
+      children: topic?.englishName,
     },
     {
       key: "3",
       label: "Tóm tắt đề tài",
-      children: topic.summary,
+      children: topic?.summary,
     },
     {
       key: "4",
       label: "Dự kiến kết quả",
-      children: topic.expectedResult,
+      children: topic?.expectedResult,
     },
     {
       key: "5",
       label: "Thành viên",
-      children: topic.participants.map((participant, index) => {
+      children: topic?.participants?.map((participant, index) => {
         return (
           <div key={`participants-${index}`} className="block">
             • {participant}
@@ -68,7 +81,7 @@ export default function ReviewTopicPage({ params }) {
     {
       key: "6",
       label: "Tài liệu tham khảo",
-      children: topic.reference.map((reference, index) => {
+      children: topic?.reference?.map((reference, index) => {
         return (
           <div key={`reference-${index}`} className="block">
             • {reference}
@@ -77,11 +90,12 @@ export default function ReviewTopicPage({ params }) {
       }),
     },
   ];
+
   const instructorItems = [
     {
       key: "1",
       label: "Tên",
-      children: topic.instructor.name,
+      children: topic?.instructor?.name,
     },
     {
       key: "2",
@@ -89,32 +103,82 @@ export default function ReviewTopicPage({ params }) {
       children: (
         <Link
           className="space-x-1"
-          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic.instructor.email}`}
+          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
           <LinkOutlined />
-          <span>{topic.instructor.email}</span>
+          <span>{topic?.instructor?.email}</span>
         </Link>
       ),
     },
     {
       key: "3",
       label: "Học hàm, hoc vị",
-      children: topic.instructor.name,
+      children: topic?.instructor?.name,
     },
   ];
 
   const loadTopic = async () => {
     setTopic(await getTopicById(topicId));
   };
+
+  const loadReview = async () => {
+    setReview(await getReviewByTopicId(topicId, userId));
+  };
+
   useEffect(() => {
     loadTopic();
   }, []);
 
-  const onFinish = (formData) => {
-    console.log(formData);
+  useEffect(() => {
+    if (!topicId || !userId) return;
+    loadReview();
+  }, [topicId, userId]);
+
+  useEffect(() => {
+    if (!review) return;
+    form.setFieldsValue({
+      criteriaOne: review?.criteria[0],
+      criteriaTwo: review?.criteria[1],
+      criteriaThree: review?.criteria[2],
+      criteriaFour: review?.criteria[3],
+      criteriaFive: review?.criteria[4],
+      criteriaSix: review?.criteria[5],
+      criteriaSeven: review?.criteria[6],
+      criteriaEight: review?.criteria[7],
+      criteriaNine: review?.grade,
+      criteriaTen: review?.isEureka,
+      criteriaEleven: review?.note,
+    });
+  }, [review]);
+
+  const onFinish = async (formData) => {
+    const values = {
+      criteria: [
+        formData.criteriaOne,
+        formData.criteriaTwo,
+        formData.criteriaThree,
+        formData.criteriaFour,
+        formData.criteriaFive,
+        formData.criteriaSix,
+        formData.criteriaSeven,
+        formData.criteriaEight,
+      ],
+      topicId: topicId,
+      technologyScienceId: userId,
+      grade: formData.criteriaNine,
+      isEureka: formData.criteriaTen,
+      note: formData.criteriaEleven,
+    };
+    const res = await createReview(values);
+    const { message } = res;
+    messageApi
+      .open({
+        type: "success",
+        content: message,
+      })
+      .then(() => router.push(`/technologyScience/review`));
   };
 
-  console.log(topic);
   return (
     <div className="min-h-[calc(100vh-45.8px)] bg-gray-100 px-32">
       <div className="flex justify-between py-4">
@@ -139,7 +203,7 @@ export default function ReviewTopicPage({ params }) {
           >
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={0}
+              name={`criteriaOne`}
               label="1. Tổng quan về đề tài, sự cần thiết, ứng dụng có được mô tả rõ ràng, phù hợp (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -158,7 +222,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={1}
+              name={`criteriaTwo`}
               label="2. Các công trình, giải pháp liên quan có được mô tả rõ ràng, phù hợp (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -177,7 +241,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={2}
+              name={`criteriaThree`}
               label="3. Mục tiêu đề tài có được mô tả rõ ràng, phù hợp (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -196,7 +260,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={3}
+              name={`criteriaFour`}
               label="4. Tài liệu tham khảo có cập nhật, trích dẫn và ghi định dạng đúng (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -215,7 +279,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={4}
+              name={`criteriaFive`}
               label="5. Nội dung và phương pháp nghiên cứu có phù hợp (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -234,7 +298,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={5}
+              name={`criteriaSix`}
               label="6. Kết quả dự kiến có khả thi, nhất quán với mục tiêu và nội dung thực hiện (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -253,7 +317,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={6}
+              name={`criteriaSeven`}
               label="7. Thuyết minh đề tài có nội dung đầy đủ, được trình bày rõ ràng, bố cục hợp lý, ít lỗi chế bản (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -272,7 +336,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={7}
+              name={`criteriaEight`}
               label="8. Đánh giá về giá trị học thuật, tính mới, độ phức tạp, trình độ sáng tạo, mức độ ứng dụng thực tiễn (5: cao nhất, 1: thấp nhất)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -291,7 +355,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={8}
+              name={`criteriaNine`}
               label="9. Kết quả CHUNG (thang điểm 100 - 70 điểm trở lên là ĐẠT)"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -301,7 +365,7 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={9}
+              name={`criteriaTen`}
               label="10. Đề tài xuất sắc đạt yêu cầu tham gia giải EUREKA"
               rules={[
                 { required: true, message: "Không được để trống mục này!" },
@@ -331,27 +395,48 @@ export default function ReviewTopicPage({ params }) {
             </Form.Item>
             <Form.Item
               className="p-4 bg-white rounded-md"
-              name={10}
+              name={`criteriaEleven`}
               label="11. Góp ý, nhận xét dành cho CNĐT (Bắt buộc nếu điểm Kết quả CHUNG dưới 70)"
+              rules={[
+                {
+                  required: true,
+                  message: "Nếu không có nhận xét, điền 'Không có'",
+                },
+              ]}
             >
               <Input.TextArea autoSize placeholder="Nhập nhận xét..." />
             </Form.Item>
             <Form.Item className="flex justify-end">
-              <SubmitButton form={form}>Xác nhận</SubmitButton>
+              <Space>
+                <Button onClick={() => form.resetFields()}>Reset</Button>
+                <SubmitButton form={form}>Xác nhận</SubmitButton>
+              </Space>
             </Form.Item>
           </Form>
 
           <div className="space-y-4 bg-white rounded-md sticky top-4 h-fit w-[290px] p-4">
             <span className="font-medium">Danh sách tiêu chí</span>
             <div className="flex flex-wrap gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num, index) => {
+              {[
+                "One",
+                "Two",
+                "Three",
+                "Four",
+                "Five",
+                "Six",
+                "Seven",
+                "Eight",
+                "Nine",
+                "Ten",
+                "Eleven",
+              ].map((num, index) => {
                 return (
                   <Button
                     key={`button-${index}`}
                     className="w-[45px]"
-                    onClick={() => form.scrollToField(index)}
+                    onClick={() => form.scrollToField(`criteria${num}`)}
                   >
-                    {num}
+                    {index + 1}
                   </Button>
                 );
               })}
@@ -386,6 +471,7 @@ export default function ReviewTopicPage({ params }) {
           />
         </div>
       </Modal>
+      {contextHolder}
     </div>
   );
 }

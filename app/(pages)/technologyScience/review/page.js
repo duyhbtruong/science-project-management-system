@@ -1,30 +1,51 @@
 "use client";
 
+import { deleteReviewByTopicId } from "@/service/reviewService";
 import { getTopics } from "@/service/topicService";
 import { dateFormat } from "@/utils/format";
 import {
   CheckOutlined,
   DeleteOutlined,
+  ExclamationCircleOutlined,
   HighlightOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Input, Button, Space, Spin, Table, Tag } from "antd";
+import { Input, Button, Space, Spin, Table, Tag, Modal, message } from "antd";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 const { Search } = Input;
 
 export default function ReviewPage() {
+  const session = useSession();
+  const userId = session?.data?.user?.id;
   const [topics, setTopics] = useState();
   const router = useRouter();
+  const [modal, modalContextHolder] = Modal.useModal();
+  const [messageApi, messageContextHolder] = message.useMessage();
+
+  const config = {
+    title: "Hủy kết quả kiểm duyệt?",
+    content: <p>Bạn có muốn hủy kết quả kiểm duyệt của đề tài này không?</p>,
+  };
 
   const loadTopics = async () => {
     setTopics(await getTopics());
   };
 
+  const deleteReview = async (topicId, technologyScienceId) => {
+    const res = await deleteReviewByTopicId(topicId, technologyScienceId);
+    const { message } = res;
+    messageApi.open({
+      type: "success",
+      content: message,
+    });
+    loadTopics();
+  };
+
   useEffect(() => {
     loadTopics();
   }, []);
-  console.log(topics);
 
   const columns = [
     {
@@ -76,12 +97,22 @@ export default function ReviewPage() {
               }
               icon={<HighlightOutlined />}
             />
-            <Button onClick={() => {}} danger icon={<DeleteOutlined />} />
+            <Button
+              onClick={async () => {
+                const confirmed = await modal.confirm(config);
+                if (confirmed) {
+                  deleteReview(record._id, userId);
+                }
+              }}
+              danger
+              icon={<DeleteOutlined />}
+            />
           </Space>
         );
       },
     },
   ];
+
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
       <div className="flex flex-col mx-32 py-6">
@@ -100,6 +131,8 @@ export default function ReviewPage() {
           />
         </Spin>
       </div>
+      {modalContextHolder}
+      {messageContextHolder}
     </div>
   );
 }

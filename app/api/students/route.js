@@ -8,19 +8,44 @@ import mongoose from "mongoose";
 export async function GET(request) {
   await mongooseConnect();
   const id = request.nextUrl.searchParams.get("id");
+  const studentId = request.nextUrl.searchParams.get("studentId");
 
-  if (!mongoose.isValidObjectId(id)) {
-    return NextResponse.json({ message: "Not ObjectId" }, { status: 200 });
+  if (id) {
+    if (!mongoose.isValidObjectId(id)) {
+      return NextResponse.json(
+        { message: "Sai định dạng ObjectId" },
+        { status: 200 }
+      );
+    }
+
+    const student = await Student.findOne({ accountId: id });
+    if (student) {
+      return NextResponse.json(student, { status: 200 });
+    } else {
+      return NextResponse.json(
+        { message: "Sinh viên không tồn tại!" },
+        { status: 200 }
+      );
+    }
   }
 
-  const student = await Student.findOne({ accountId: id });
-  if (student) {
-    return NextResponse.json(student, { status: 200 });
-  } else {
-    return NextResponse.json(
-      { message: "Sinh viên không tồn tại!" },
-      { status: 200 }
-    );
+  if (studentId) {
+    if (!mongoose.isValidObjectId(studentId)) {
+      return NextResponse.json(
+        { message: "Sai định dạng ObjectId" },
+        { status: 200 }
+      );
+    }
+
+    const student = await Student.findOne({ _id: studentId });
+    if (student) {
+      return NextResponse.json(student, { status: 200 });
+    } else {
+      return NextResponse.json(
+        { message: "Sinh viên không tồn tại!" },
+        { status: 200 }
+      );
+    }
   }
 }
 

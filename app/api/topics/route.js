@@ -1,11 +1,14 @@
 import { mongooseConnect } from "@/lib/mongoose";
+import { ReviewGrade } from "@/models/ReviewGrade";
 import { Student } from "@/models/Student";
 import { Topic } from "@/models/Topic";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
   await mongooseConnect();
-  return NextResponse.json(await Topic.find());
+  const topics = await Topic.find();
+
+  return NextResponse.json(topics, { status: 200 });
 }
 
 export async function POST(request) {

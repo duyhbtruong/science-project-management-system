@@ -5,7 +5,6 @@ import { dateFormat } from "@/utils/format";
 import {
   CheckCircleOutlined,
   DeleteOutlined,
-  EyeOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
 import {
@@ -25,6 +24,7 @@ const { Search } = Input;
 
 export default function TopicsManagePage() {
   const [topics, setTopics] = useState();
+  const [activeExpRow, setActiveExpRow] = useState([]);
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
 
@@ -39,7 +39,6 @@ export default function TopicsManagePage() {
     });
     if (confirmed) {
       const res = await deleteTopicById(id);
-      const { message } = res;
       messageApi.open({
         type: "success",
         content: "Bạn đã xóa thành công đề tài!",
@@ -165,8 +164,6 @@ export default function TopicsManagePage() {
     },
   ];
 
-  console.log(topics);
-
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
       <div className="flex flex-col mx-32 py-6">
@@ -184,70 +181,80 @@ export default function TopicsManagePage() {
             pagination={{ pageSize: 8 }}
             expandable={{
               expandedRowRender: (record) => {
-                const instructorItems = [
-                  {
-                    label: "Tên",
-                    key: "name",
-                    children: <p>{record.instructor.name}</p>,
-                  },
-                  {
-                    label: "Email",
-                    key: "email",
-                    children: (
-                      <Link
-                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
-                      >
-                        {record.instructor.email}
-                      </Link>
-                    ),
-                  },
-                  {
-                    label: "Học hàm, học vị",
-                    key: "academicRank",
-                    children: <p>{record.instructor.academicRank}</p>,
-                  },
-                ];
+                if (record._id === activeExpRow[0]) {
+                  const instructorItems = [
+                    {
+                      label: "Tên",
+                      key: "name",
+                      children: <p>{record.instructor.name}</p>,
+                    },
+                    {
+                      label: "Email",
+                      key: "email",
+                      children: (
+                        <Link
+                          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
+                        >
+                          {record.instructor.email}
+                        </Link>
+                      ),
+                    },
+                    {
+                      label: "Học hàm, học vị",
+                      key: "academicRank",
+                      children: <p>{record.instructor.academicRank}</p>,
+                    },
+                  ];
 
-                const reviewItems = [
-                  {
-                    label: "Trạng thái",
-                    key: "isReviewed",
-                    children: (
-                      <Tag
-                        color={record.isReviewed ? "success" : "default"}
-                        icon={
-                          record.isReviewed ? (
-                            <CheckCircleOutlined />
-                          ) : (
-                            <SyncOutlined spin />
-                          )
-                        }
-                      >
-                        {record.isReviewed
-                          ? "Đã kiểm duyệt"
-                          : "Chưa kiểm duyệt"}
-                      </Tag>
-                    ),
-                  },
-                  {
-                    label: "Kết quả",
-                    key: "result",
-                    children: <p>70</p>,
-                  },
-                ];
+                  const reviewItems = [
+                    {
+                      label: "Trạng thái",
+                      key: "isReviewed",
+                      children: (
+                        <Tag
+                          color={record.isReviewed ? "success" : "default"}
+                          icon={
+                            record.isReviewed ? (
+                              <CheckCircleOutlined />
+                            ) : (
+                              <SyncOutlined spin />
+                            )
+                          }
+                        >
+                          {record.isReviewed
+                            ? "Đã kiểm duyệt"
+                            : "Chưa kiểm duyệt"}
+                        </Tag>
+                      ),
+                    },
+                    {
+                      label: "Kết quả",
+                      key: "result",
+                      children: <p>Chưa có</p>,
+                    },
+                  ];
 
-                return (
-                  <div className="space-y-4">
-                    <Descriptions
-                      title="Thông tin Giảng viên Hướng dẫn"
-                      items={instructorItems}
-                    />
-                    <Descriptions
-                      title="Thông tin kiểm duyệt"
-                      items={reviewItems}
-                    />
-                  </div>
-                );
+                  return (
+                    <div className="space-y-4">
+                      <Descriptions
+                        title="Thông tin Giảng viên Hướng dẫn"
+                        items={instructorItems}
+                      />
+                      <Descriptions
+                        title="Thông tin kiểm duyệt"
+                        items={reviewItems}
+                      />
+                    </div>
+                  );
+                }
+              },
+              expandedRowKeys: activeExpRow,
+              onExpand: (expanded, record) => {
+                let keys = [];
+                if (expanded) {
+                  keys.push(record._id);
+                }
+                setActiveExpRow(keys);
               },
             }}
           />

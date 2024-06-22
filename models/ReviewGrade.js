@@ -1,5 +1,5 @@
 import { Double } from "mongodb";
-import { model, models, Schema } from "mongoose";
+import mongoose, { model, models, Schema } from "mongoose";
 
 // Model cho Class Review Grade
 const reviewGradeSchema = new Schema(
@@ -16,9 +16,19 @@ const reviewGradeSchema = new Schema(
       ref: "TechnologyScience",
       required: true,
     },
-    // Điểm
+    // Điểm từng tiêu chí
+    criteria: {
+      type: [Number],
+      required: true,
+    },
+    // Điểm CHUNG
     grade: {
-      type: Double,
+      type: Number,
+      required: true,
+    },
+    // Đạt chuẩn Euraka?
+    isEureka: {
+      type: String,
       required: true,
     },
     // Note
