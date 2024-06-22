@@ -3,15 +3,33 @@
 import { getAccountById } from "@/service/accountService";
 import { deleteTopicById, getTopicById } from "@/service/topicService";
 import {
+  CheckCircleOutlined,
   CloseOutlined,
-  MinusCircleOutlined,
+  InboxOutlined,
+  PaperClipOutlined,
   SyncOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { Button, Descriptions, Flex, Modal, Spin, Tag, Tooltip } from "antd";
+import {
+  Button,
+  Descriptions,
+  Flex,
+  Modal,
+  Space,
+  Spin,
+  Tag,
+  Tooltip,
+  Upload,
+  message,
+} from "antd";
+const { Dragger } = Upload;
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { storage } from "@/lib/firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { uploadFile } from "@/service/upload";
+import Link from "next/link";
 
 export default function TopicInformationPage({ params }) {
   const { id: topicId } = params;
@@ -20,7 +38,11 @@ export default function TopicInformationPage({ params }) {
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();
   const [topic, setTopic] = useState();
-  const [modal, contextHolder] = Modal.useModal();
+  const [fileUpload, setFileUpload] = useState([]);
+  const [fileLink, setFileLink] = useState();
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [modal, modalContextHolder] = Modal.useModal();
+  const [messageApi, messageContextHolder] = message.useMessage();
   const router = useRouter();
 
   const studentItems = [
@@ -85,19 +107,20 @@ export default function TopicInformationPage({ params }) {
       key: "4",
       label: "Loại hình nghiên cứu",
       children: <p>{topic?.type}</p>,
-      span: 2,
+      span: 1,
     },
     {
       key: "5",
       label: "Trạng thái kiểm duyệt",
       children: (
-        <Flex justify="space-between">
-          {!topic?.isReviewed && (
-            <Tag icon={<SyncOutlined spin />} color="default">
-              Chưa kiểm duyệt
-            </Tag>
-          )}
-        </Flex>
+        <Tag
+          icon={
+            topic?.isReviewed ? <CheckCircleOutlined /> : <SyncOutlined spin />
+          }
+          color={topic?.isReviewed ? "success" : "default"}
+        >
+          {topic?.isReviewed ? "Đã kiểm duyệt" : "Chưa kiểm duyệt"}
+        </Tag>
       ),
       span: 1,
     },
@@ -144,6 +167,28 @@ export default function TopicInformationPage({ params }) {
     ),
   };
 
+  const handleChange = ({ fileList: newFile }) => {
+    setFileUpload(newFile);
+  };
+
+  const handleImageUpload = () => {
+    if (fileUpload.length === 0) {
+      setIsUploadOpen(false);
+      return;
+    }
+    const dateTime = giveCurrentDateTime();
+    const fileRef = ref(storage, `ban_mem/${fileUpload[0].name}`);
+    uploadBytes(fileRef, fileUpload[0]).then(async (snapshot) => {
+      const fileRef = snapshot.ref._location.path_;
+      const res = await uploadFile(topic._id, fileRef);
+      const { message } = res;
+      messageApi.success(message);
+      setIsUploadOpen(false);
+      loadTopic();
+      setFileUpload([]);
+    });
+  };
+
   const loadAccount = async () => {
     const res = await getAccountById(accountId);
     setAccount(res.account);
@@ -164,6 +209,14 @@ export default function TopicInformationPage({ params }) {
     loadTopic();
   }, []);
 
+  useEffect(() => {
+    if (!topic) return;
+    if (!topic.fileRef) return;
+    getDownloadURL(ref(storage, topic?.fileRef)).then((url) =>
+      setFileLink(url)
+    );
+  }, [topic]);
+  console.log(topic);
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-56px)]">
       <div className="mx-32 py-6">
@@ -189,28 +242,37 @@ export default function TopicInformationPage({ params }) {
         <div className="flex flex-col gap-4">
           {/* Thông tin Đề tài */}
           <Spin spinning={!topic}>
-            <div className="flex flex-grow flex-col p-4 rounded-md bg-white">
+            <div className="flex flex-col gap-4 p-4 rounded-md bg-white">
               <Descriptions
                 column={2}
                 bordered
                 title="Thông tin Đề tài"
                 items={topicItems}
                 extra={
-                  <Tooltip
-                    title={
-                      !topic?.isReviewed
-                        ? "Bạn phải được kiểm duyệt trước khi nộp bản mềm!"
-                        : ""
-                    }
-                  >
-                    <Button
-                      disabled={topic?.isReviewed ? false : true}
-                      type="primary"
-                      icon={<UploadOutlined />}
+                  <Space>
+                    {fileLink && (
+                      <Link className="mr-2" href={fileLink}>
+                        <PaperClipOutlined className="mr-1" />
+                        Tài liệu đã tài lên
+                      </Link>
+                    )}
+                    <Tooltip
+                      title={
+                        !topic?.isReviewed
+                          ? "Bạn phải được kiểm duyệt trước khi nộp bản mềm!"
+                          : ""
+                      }
                     >
-                      Nộp bản mềm
-                    </Button>
-                  </Tooltip>
+                      <Button
+                        disabled={topic?.isReviewed ? false : true}
+                        type="primary"
+                        icon={<UploadOutlined />}
+                        onClick={() => setIsUploadOpen(true)}
+                      >
+                        Nộp bản mềm
+                      </Button>
+                    </Tooltip>
+                  </Space>
                 }
               />
             </div>
@@ -243,7 +305,49 @@ export default function TopicInformationPage({ params }) {
           </div>
         </div>
       </div>
-      {contextHolder}
+      <Modal
+        title="Upload bản mềm"
+        open={isUploadOpen}
+        width={800}
+        centered
+        onOk={handleImageUpload}
+        okText="Xác nhận"
+        cancelText="Hủy"
+        onCancel={() => {
+          setFileUpload([]);
+          setIsUploadOpen(false);
+        }}
+      >
+        <Dragger
+          name="file"
+          multiple={false}
+          maxCount={1}
+          onChange={handleChange}
+          fileList={fileUpload}
+        >
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">
+            Nhấn hoặc thả file vào khu vực này để đăng tài liệu.
+          </p>
+          <p className="ant-upload-hint">
+            Định dạng tên File là: MSSV_TEN_DE_TAI.
+          </p>
+        </Dragger>
+      </Modal>
+      {modalContextHolder}
+      {messageContextHolder}
     </div>
   );
 }
+
+export const giveCurrentDateTime = () => {
+  const today = new Date();
+  const date =
+    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+  const time =
+    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  const dateTime = date + " " + time;
+  return dateTime;
+};

@@ -29,6 +29,10 @@ const topicSchema = new Schema(
     reviews: { type: [mongoose.SchemaTypes.ObjectId] },
     // Trạng thái kiểm duyệt: Chưa kiểm duyệt | Đã kiểm duyệt
     isAppraised: { type: Boolean, default: false, required: true },
+    // Danh sách kết quả nghiệm thu
+    appraises: { type: [mongoose.SchemaTypes.ObjectId] },
+    // fileRef
+    fileRef: { type: String, default: null },
     // Chủ sở hữu đề tài
     owner: {
       type: mongoose.SchemaTypes.ObjectId,
