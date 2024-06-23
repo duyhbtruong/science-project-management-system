@@ -6,7 +6,7 @@ import {
 } from "@/service/appraiseGradeService";
 import { getStudentAccountById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
-import { InfoOutlined, LinkOutlined } from "@ant-design/icons";
+import { ExportOutlined, InfoOutlined, LinkOutlined } from "@ant-design/icons";
 import {
   Button,
   Descriptions,
@@ -108,7 +108,7 @@ export default function ReviewTopicPage({ params }) {
           className="space-x-1"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
-          <LinkOutlined />
+          <ExportOutlined className="mr-1" />
           <span>{topic?.instructor?.email}</span>
         </Link>
       ),
@@ -116,7 +116,7 @@ export default function ReviewTopicPage({ params }) {
     {
       key: "3",
       label: "Học hàm, hoc vị",
-      children: topic?.instructor?.name,
+      children: topic?.instructor?.academicRank,
     },
   ];
 
