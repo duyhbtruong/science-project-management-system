@@ -5,7 +5,9 @@ import { deleteTopicById, getTopicById } from "@/service/topicService";
 import {
   CheckCircleOutlined,
   CloseOutlined,
+  ExportOutlined,
   InboxOutlined,
+  LinkOutlined,
   PaperClipOutlined,
   SyncOutlined,
   UploadOutlined,
@@ -49,7 +51,15 @@ export default function TopicInformationPage({ params }) {
     {
       key: "1",
       label: "Email",
-      children: <p>{account?.email}</p>,
+      children: (
+        <Link
+          target="_blank"
+          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${account?.email}`}
+        >
+          <ExportOutlined className="mr-2" />
+          {account?.email}
+        </Link>
+      ),
     },
     {
       key: "2",
@@ -150,7 +160,15 @@ export default function TopicInformationPage({ params }) {
     {
       key: "1",
       label: "Email",
-      children: <p>{topic?.instructor?.email}</p>,
+      children: (
+        <Link
+          target="_blank"
+          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
+        >
+          <ExportOutlined className="mr-2" />
+          {topic?.instructor?.email}
+        </Link>
+      ),
     },
     {
       key: "2",

@@ -436,7 +436,7 @@ export default function TopicPage() {
 
               <Divider orientation="center">Thông tin GVHD</Divider>
               <Form.Item
-                label="Email GVHD"
+                label="Email"
                 name="instructorEmail"
                 hasFeedback
                 rules={[
@@ -456,7 +456,7 @@ export default function TopicPage() {
                 />
               </Form.Item>
               <Form.Item
-                label="Họ và Tên GVHD"
+                label="Họ và Tên"
                 name="instructorName"
                 rules={[
                   {
@@ -471,7 +471,7 @@ export default function TopicPage() {
                 />
               </Form.Item>
               <Form.Item
-                label="Học hàm, học vị của GVHD"
+                label="Học hàm, học vị"
                 name="instructorAcademicRank"
                 rules={[
                   {
