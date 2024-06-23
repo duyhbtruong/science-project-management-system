@@ -3,7 +3,7 @@
 import { createReview, getReviewByTopicId } from "@/service/reviewService";
 import { getStudentAccountById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
-import { InfoOutlined, LinkOutlined } from "@ant-design/icons";
+import { ExportOutlined, InfoOutlined, LinkOutlined } from "@ant-design/icons";
 import {
   Button,
   Descriptions,
@@ -38,6 +38,10 @@ export default function ReviewTopicPage({ params }) {
   };
 
   const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
     setIsModalOpen(false);
   };
 
@@ -105,7 +109,7 @@ export default function ReviewTopicPage({ params }) {
           className="space-x-1"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
-          <LinkOutlined />
+          <ExportOutlined className="mr-1" />
           <span>{topic?.instructor?.email}</span>
         </Link>
       ),
@@ -113,7 +117,7 @@ export default function ReviewTopicPage({ params }) {
     {
       key: "3",
       label: "Học hàm, hoc vị",
-      children: topic?.instructor?.name,
+      children: topic?.instructor?.academicRank,
     },
   ];
 
@@ -450,11 +454,8 @@ export default function ReviewTopicPage({ params }) {
         open={isModalOpen}
         width={1000}
         centered
-        footer={
-          <Button type="primary" onClick={handleOk}>
-            OK
-          </Button>
-        }
+        onOk={handleOk}
+        onCancel={handleCancel}
       >
         <div className="space-y-4 mt-4">
           <Descriptions

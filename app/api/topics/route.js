@@ -6,8 +6,20 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   await mongooseConnect();
-  const topics = await Topic.find();
 
+  // Trường hợp tìm kiếm đề tài
+  const search = request.nextUrl.searchParams.get("search");
+  if (search) {
+    const topics = await Topic.find({
+      $or: [
+        { vietnameseName: { $regex: ".*" + search + ".*" } },
+        { englishName: { $regex: ".*" + search + ".*" } },
+      ],
+    });
+    return NextResponse.json(topics, { status: 200 });
+  }
+  // Trường hợp get all đề tài
+  const topics = await Topic.find();
   return NextResponse.json(topics, { status: 200 });
 }
 

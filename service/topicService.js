@@ -43,6 +43,23 @@ export const getTopicById = async (id) => {
   }
 };
 
+export const searchTopic = async (searchValue) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/topics?search=${searchValue.toUpperCase()}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+    if (res.ok) {
+      return res.json();
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
 export const deleteTopicById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics?id=${id}`, {

@@ -1,10 +1,16 @@
 "use client";
 
-import { deleteTopicById, getTopics } from "@/service/topicService";
+import {
+  deleteTopicById,
+  getTopics,
+  searchTopic,
+} from "@/service/topicService";
 import { dateFormat } from "@/utils/format";
 import {
   CheckCircleOutlined,
   DeleteOutlined,
+  ExportOutlined,
+  PaperClipOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
 import {
@@ -47,22 +53,35 @@ export default function TopicsManagePage() {
     }
   };
 
+  const handleSearchTopic = async (searchValue) => {
+    const res = await searchTopic(searchValue);
+    setTopics(res);
+  };
+
+  const handleSearchChange = async (event) => {
+    if (event.target.value === "") {
+      loadTopics();
+    }
+  };
+
   useEffect(() => {
     loadTopics();
   }, []);
 
   const columns = [
     {
-      title: "Tên đề tài",
+      title: "Tên tiếng Việt",
       dataIndex: "vietnameseName",
       key: "vietnameseName",
       width: "25%",
       ellipsis: true,
     },
     {
-      title: "Loại hình",
-      dataIndex: "type",
-      key: "type",
+      title: "Tên tiếng Anh",
+      dataIndex: "englishName",
+      key: "englishName",
+      width: "25%",
+      ellipsis: true,
     },
     {
       title: "Ngày đăng ký",
@@ -171,6 +190,8 @@ export default function TopicsManagePage() {
           className="w-[450px] mb-4"
           placeholder="Tìm kiếm đề tài..."
           enterButton
+          onSearch={handleSearchTopic}
+          onChange={handleSearchChange}
         />
         <Spin spinning={!topics}>
           <Table
@@ -193,8 +214,10 @@ export default function TopicsManagePage() {
                       key: "email",
                       children: (
                         <Link
+                          target="_blank"
                           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
                         >
+                          <ExportOutlined className="mr-1" />
                           {record.instructor.email}
                         </Link>
                       ),
@@ -206,31 +229,50 @@ export default function TopicsManagePage() {
                     },
                   ];
 
-                  const reviewItems = [
+                  const topicDataItems = [
                     {
-                      label: "Trạng thái",
-                      key: "isReviewed",
+                      label: "Loại hình nghiên cứu",
+                      key: "type",
+                      children: <p>{record.type}</p>,
+                    },
+                    {
+                      label: "Thành viên",
+                      key: "participants",
                       children: (
-                        <Tag
-                          color={record.isReviewed ? "success" : "default"}
-                          icon={
-                            record.isReviewed ? (
-                              <CheckCircleOutlined />
-                            ) : (
-                              <SyncOutlined spin />
-                            )
-                          }
-                        >
-                          {record.isReviewed
-                            ? "Đã kiểm duyệt"
-                            : "Chưa kiểm duyệt"}
-                        </Tag>
+                        <p>
+                          {record.participants.map((participant, index) => (
+                            <span key={`participant-${index}`}>
+                              {index + 1}. {participant}
+                              <br />
+                            </span>
+                          ))}
+                        </p>
                       ),
                     },
                     {
-                      label: "Kết quả",
-                      key: "result",
-                      children: <p>Chưa có</p>,
+                      label: "Số lượng kiểm duyệt",
+                      key: "reviews",
+                      children: <p>{record.reviews.length}</p>,
+                    },
+                    {
+                      label: "Số lượng thẩm định",
+                      key: "appraise",
+                      children: <p>{record.appraises.length}</p>,
+                    },
+                    {
+                      label: "Tài liệu",
+                      key: "fileRef",
+                      children: (
+                        <div>
+                          {!record.fileRef && "Chưa có"}
+                          {record.fileRef && (
+                            <Link target="_blank" href={record.fileRef}>
+                              <PaperClipOutlined className="mr-1" />
+                              Tài liệu đã nộp
+                            </Link>
+                          )}
+                        </div>
+                      ),
                     },
                   ];
 
@@ -241,8 +283,9 @@ export default function TopicsManagePage() {
                         items={instructorItems}
                       />
                       <Descriptions
-                        title="Thông tin kiểm duyệt"
-                        items={reviewItems}
+                        title="Thông tin Đề tài"
+                        items={topicDataItems}
+                        column={2}
                       />
                     </div>
                   );

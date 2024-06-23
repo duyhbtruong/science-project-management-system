@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteReviewByTopicId } from "@/service/reviewService";
-import { getTopics } from "@/service/topicService";
+import { getTopics, searchTopic } from "@/service/topicService";
 import { dateFormat } from "@/utils/format";
 import {
   CheckOutlined,
@@ -50,22 +50,35 @@ export default function ReviewPage() {
     }
   };
 
+  const handleSearchChange = (event) => {
+    if (event.target.value) {
+      loadTopics();
+    }
+  };
+
+  const handleSearchTopic = async (searchValue) => {
+    const res = await searchTopic(searchValue);
+    setTopics(res);
+  };
+
   useEffect(() => {
     loadTopics();
   }, []);
 
   const columns = [
     {
-      title: "Tên đề tài",
+      title: "Tên tiếng Việt",
       dataIndex: "vietnameseName",
       key: "vietnameseName",
       width: "25%",
       ellipsis: true,
     },
     {
-      title: "Loại hình",
-      dataIndex: "type",
-      key: "type",
+      title: "Tên tiếng Anh",
+      dataIndex: "englishName",
+      key: "englishName",
+      width: "25%",
+      ellipsis: true,
     },
     {
       title: "Ngày đăng ký",
@@ -127,6 +140,8 @@ export default function ReviewPage() {
           className="w-[450px] mb-4"
           placeholder="Tìm kiếm đề tài..."
           enterButton
+          onSearch={handleSearchTopic}
+          onChange={handleSearchChange}
         />
         <Spin spinning={!topics}>
           <Table
