@@ -17,7 +17,7 @@ export const getTopics = async () => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics`, {
       method: "GET",
-      cache: "no-cache",
+      cache: "no-store",
     });
 
     if (res) {
@@ -32,7 +32,7 @@ export const getTopicById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
       method: "GET",
-      cache: "no-cache",
+      cache: "no-store",
     });
 
     if (res.ok) {

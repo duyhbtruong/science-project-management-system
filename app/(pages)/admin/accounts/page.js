@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { Button, Space, Table, Tag, Input } from "antd";
+import { Button, Space, Table, Tag, Input, Modal } from "antd";
 const { Search } = Input;
 import {
   EditOutlined,
@@ -11,7 +11,11 @@ import {
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { deleteAccountById, getAccounts } from "@/service/accountService";
+import {
+  deleteAccountById,
+  getAccounts,
+  searchAccounts,
+} from "@/service/accountService";
 import { dateFormat } from "@/utils/format";
 import Link from "next/link";
 
@@ -20,16 +24,31 @@ const { Column } = Table;
 const AccountsPage = () => {
   const router = useRouter();
   const [accounts, setAccounts] = useState();
+  const [modal, modalContextHolder] = Modal.useModal();
 
   const loadAccounts = async () => {
     setAccounts(await getAccounts());
   };
 
   const deleteAccount = async (id) => {
-    const confirmed = confirm("Are you sure?");
+    const confirmed = await modal.confirm({
+      title: "Xóa tài khoản",
+      content: "Bạn có chắc chắn muốn xóa tài khoản này không?",
+    });
 
     if (confirmed) {
       await deleteAccountById(id);
+      loadAccounts();
+    }
+  };
+
+  const handleAccountSearch = async (searchValue) => {
+    const res = await searchAccounts(searchValue);
+    setAccounts(res);
+  };
+
+  const handleSearchChange = (event) => {
+    if (event.target.value === "") {
       loadAccounts();
     }
   };
@@ -47,6 +66,8 @@ const AccountsPage = () => {
               className="w-[450px]"
               placeholder="Tìm kiếm tài khoản..."
               enterButton
+              onSearch={handleAccountSearch}
+              onChange={handleSearchChange}
             />
 
             <div className="flex justify-end gap-4">
@@ -57,9 +78,9 @@ const AccountsPage = () => {
               >
                 Tạo tài khoản
               </Button>
-              <Button type="default" icon={<UploadOutlined />}>
+              {/* <Button type="default" icon={<UploadOutlined />}>
                 Nhập danh sách
-              </Button>
+              </Button> */}
             </div>
           </div>
 
@@ -153,6 +174,7 @@ const AccountsPage = () => {
           </Table>
         </div>
       </div>
+      {modalContextHolder}
     </>
   );
 };

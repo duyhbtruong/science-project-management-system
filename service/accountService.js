@@ -49,6 +49,23 @@ export const getAccountByEmail = async (email) => {
   }
 };
 
+export const searchAccounts = async (searchValues) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/accounts?search=${searchValues}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+    if (res) {
+      return res.json();
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
 export const updateAccountById = async (id, values) => {
   try {
     const res = await fetch(`http://localhost:3000/api/accounts/${id}`, {

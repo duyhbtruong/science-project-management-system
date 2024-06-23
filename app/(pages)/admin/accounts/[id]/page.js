@@ -8,7 +8,7 @@ import {
   PhoneOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Form, Button, Input, message, Card, Select } from "antd";
+import { Form, Button, Input, message, Card, Select, Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -20,6 +20,7 @@ export default function UpdateAccount({ params }) {
   const [technologyScience, setTechnologyScience] = useState();
   const [appraise, setAppraise] = useState();
   const [role, setRole] = useState();
+  const [form] = Form.useForm();
 
   const router = useRouter();
 
@@ -35,6 +36,22 @@ export default function UpdateAccount({ params }) {
   useEffect(() => {
     loadAccount();
   }, []);
+
+  useEffect(() => {
+    if (!account) return;
+
+    form.setFieldsValue({
+      name: account?.name,
+      email: account?.email,
+      phone: account?.phone,
+      role: account?.role,
+      studentId: student?.studentId,
+      technologyScienceId: technologyScience?.technologyScienceId,
+      appraisalBoardId: appraise?.appraisalBoardId,
+      faculty: student?.faculty,
+      educationProgram: student?.educationProgram,
+    });
+  }, [account]);
 
   const onFinish = async (values) => {
     const res = await updateAccountById(id, values);
@@ -52,26 +69,16 @@ export default function UpdateAccount({ params }) {
     <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[calc(100vh-45.8px)]">
       {contextHolder}
       <div className="text-lg font-semibold">Cập nhật tài khoản</div>
-      <Card>
-        {account && (
+      <Card className="shadow-md">
+        <Spin spinning={!account}>
           <Form
+            form={form}
             style={{
               width: 500,
             }}
             onFinish={onFinish}
             autoComplete="off"
             layout="vertical"
-            initialValues={{
-              name: account.name,
-              email: account.email,
-              phone: account.phone,
-              role: account.role,
-              studentId: student?.studentId,
-              technologyScienceId: technologyScience?.technologyScienceId,
-              appraisalBoardId: appraise?.appraisalBoardId,
-              faculty: student?.faculty,
-              educationProgram: student?.educationProgram,
-            }}
           >
             <Form.Item
               label="Tên tài khoản"
@@ -299,11 +306,11 @@ export default function UpdateAccount({ params }) {
 
             <Form.Item>
               <Button type="primary" htmlType="submit" block>
-                Submit
+                Cập nhật
               </Button>
             </Form.Item>
           </Form>
-        )}
+        </Spin>
       </Card>
     </div>
   );

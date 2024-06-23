@@ -19,7 +19,7 @@ export const getAppraiseGradeById = async (id) => {
       `http://localhost:3000/api/appraiseGrade?id=${id}`,
       {
         method: "GET",
-        cache: "no-cache",
+        cache: "no-store",
       }
     );
     if (res) {
@@ -36,7 +36,7 @@ export const getAppraiseGradeByTopicId = async (topicId, appraisalBoardId) => {
       `http://localhost:3000/api/appraiseGrade?topicId=${topicId}&appraisalBoardId=${appraisalBoardId}`,
       {
         method: "GET",
-        cache: "no-cache",
+        cache: "no-store",
       }
     );
     if (res) {

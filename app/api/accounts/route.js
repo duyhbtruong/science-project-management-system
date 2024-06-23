@@ -8,6 +8,15 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
   await mongooseConnect();
 
+  // Trường hợp tìm kiếm tài khoản
+  const search = request.nextUrl.searchParams.get("search");
+  if (search) {
+    const accounts = await Account.find({
+      name: { $regex: ".*" + search + ".*" },
+    });
+    return NextResponse.json(accounts, { status: 200 });
+  }
+
   // Trường hợp tìm tài khoản bằng email
   const email = request.nextUrl.searchParams.get("email");
   if (email) {

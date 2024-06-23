@@ -84,10 +84,10 @@ export default function CreateAccount() {
           break;
         }
         default:
-          messageApi.error("Something went wrong!");
+          messageApi.error("Có gì đó sai sai...");
       }
     } catch (error) {
-      console.log("Errors creating account: ", error);
+      console.log("Lỗi tạo tài khoản: ", error);
     }
   };
 
@@ -95,7 +95,7 @@ export default function CreateAccount() {
     <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[calc(100vh-45.8px)]">
       {contextHolder}
       <div className="text-lg font-semibold">Tạo mới tài khoản</div>
-      <Card>
+      <Card className="shadow-md">
         <Form
           style={{
             width: 500,
@@ -321,7 +321,7 @@ export default function CreateAccount() {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Submit
+              Tạo
             </Button>
           </Form.Item>
         </Form>

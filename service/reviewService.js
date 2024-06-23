@@ -17,7 +17,7 @@ export const getReviewById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/review?id=${id}`, {
       method: "GET",
-      cache: "no-cache",
+      cache: "no-store",
     });
     if (res) {
       return res.json();
@@ -33,7 +33,7 @@ export const getReviewByTopicId = async (topicId, technologyScienceId) => {
       `http://localhost:3000/api/review?topicId=${topicId}&technologyScienceId=${technologyScienceId}`,
       {
         method: "GET",
-        cache: "no-cache",
+        cache: "no-store",
       }
     );
     if (res) {
