@@ -39,7 +39,7 @@ export default function TopicInformationPage({ params }) {
   const [student, setStudent] = useState();
   const [topic, setTopic] = useState();
   const [fileUpload, setFileUpload] = useState([]);
-  const [fileLink, setFileLink] = useState();
+  // const [fileLink, setFileLink] = useState();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [modal, modalContextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -58,16 +58,21 @@ export default function TopicInformationPage({ params }) {
     },
     {
       key: "3",
+      label: "Mã số sinh viên",
+      children: <p>{student?.studentId}</p>,
+    },
+    {
+      key: "4",
       label: "Số điện thoại",
       children: <p>{account?.phone}</p>,
     },
     {
-      key: "4",
+      key: "5",
       label: "Đơn vị",
       children: <p>{student?.faculty}</p>,
     },
     {
-      key: "5",
+      key: "6",
       label: "Chương trình đào tạo",
       children: <p>{student?.educationProgram}</p>,
     },
@@ -128,13 +133,14 @@ export default function TopicInformationPage({ params }) {
       key: "6",
       label: "Trạng thái thẩm định",
       children: (
-        <Flex justify="space-between">
-          {!topic?.isAppraised && (
-            <Tag icon={<SyncOutlined spin />} color="default">
-              Chưa thẩm định
-            </Tag>
-          )}
-        </Flex>
+        <Tag
+          icon={
+            topic?.isAppraised ? <CheckCircleOutlined /> : <SyncOutlined spin />
+          }
+          color={topic?.isAppraised ? "success" : "default"}
+        >
+          {topic?.isAppraised ? "Đã thẩm định" : "Chưa thẩm định"}
+        </Tag>
       ),
       span: 1,
     },
@@ -177,16 +183,20 @@ export default function TopicInformationPage({ params }) {
       return;
     }
     const dateTime = giveCurrentDateTime();
-    const fileRef = ref(storage, `ban_mem/${fileUpload[0].name}`);
-    uploadBytes(fileRef, fileUpload[0]).then(async (snapshot) => {
-      const fileRef = snapshot.ref._location.path_;
-      const res = await uploadFile(topic._id, fileRef);
-      const { message } = res;
-      messageApi.success(message);
-      setIsUploadOpen(false);
-      loadTopic();
-      setFileUpload([]);
-    });
+    const fileRef = ref(storage, `${student?.studentId}/${fileUpload[0].name}`);
+    uploadBytes(fileRef, fileUpload[0]?.originFileObj)
+      .then((snapshot) => {
+        const fileRef = snapshot.ref._location.path_;
+        return getDownloadURL(ref(storage, fileRef));
+      })
+      .then((downloadLink) => uploadFile(topic._id, downloadLink))
+      .then((res) => {
+        const { message } = res;
+        messageApi.success(message);
+        setIsUploadOpen(false);
+        loadTopic();
+        setFileUpload([]);
+      });
   };
 
   const loadAccount = async () => {
@@ -209,14 +219,16 @@ export default function TopicInformationPage({ params }) {
     loadTopic();
   }, []);
 
-  useEffect(() => {
-    if (!topic) return;
-    if (!topic.fileRef) return;
-    getDownloadURL(ref(storage, topic?.fileRef)).then((url) =>
-      setFileLink(url)
-    );
-  }, [topic]);
-  console.log(topic);
+  // useEffect(() => {
+  //   if (!topic) return;
+  //   if (!topic.fileRef) return;
+  //   getDownloadURL(ref(storage, topic?.fileRef)).then((url) =>
+  //     setFileLink(url)
+  //   );
+  // }, [topic]);
+  // console.log(topic);
+  console.log(fileUpload[0]?.originFileObj);
+
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-56px)]">
       <div className="mx-32 py-6">
@@ -250,10 +262,14 @@ export default function TopicInformationPage({ params }) {
                 items={topicItems}
                 extra={
                   <Space>
-                    {fileLink && (
-                      <Link className="mr-2" href={fileLink}>
+                    {topic?.fileRef && (
+                      <Link
+                        target="_blank"
+                        className="mr-2"
+                        href={topic?.fileRef}
+                      >
                         <PaperClipOutlined className="mr-1" />
-                        Tài liệu đã tài lên
+                        Tài liệu đã tải lên
                       </Link>
                     )}
                     <Tooltip
@@ -320,6 +336,7 @@ export default function TopicInformationPage({ params }) {
       >
         <Dragger
           name="file"
+          accept=".pdf"
           multiple={false}
           maxCount={1}
           onChange={handleChange}

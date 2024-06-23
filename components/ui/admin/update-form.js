@@ -23,10 +23,6 @@ const UpdateForm = ({ id, name, email, phone, password, role }) => {
     }
   };
 
-  const onFinishFailed = (error) => {
-    console.log("Errors: ", error);
-  };
-
   return (
     <Form
       labelCol={{ span: 4 }}
@@ -37,7 +33,6 @@ const UpdateForm = ({ id, name, email, phone, password, role }) => {
         maxWidth: 600,
       }}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
       autoComplete="off"
       initialValues={{
         name: name,

@@ -15,6 +15,6 @@ export default async function Home() {
     redirect("/technologyScience/topics");
   }
   if (session.user.role === "appraise") {
-    redirect("/appraise/dashboard");
+    redirect("/appraise/topics");
   }
 }

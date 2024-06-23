@@ -51,6 +51,8 @@ export async function DELETE(request) {
   await Topic.findByIdAndDelete(id);
   const studentId = await Student.findOne({ topicId: id }, { _id: 1 });
   await Student.findByIdAndUpdate(studentId, { topicId: null });
+  await ReviewGrade.deleteMany({ topicId: id });
+  await AppraiseGrade.deleteMany({ topicId: id });
   return NextResponse.json(
     { message: "Hủy đăng ký đề tài thành công!" },
     { status: 200 }

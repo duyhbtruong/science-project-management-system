@@ -1,22 +1,24 @@
 "use client";
 
-import { deleteReviewByTopicId } from "@/service/reviewService";
 import { getTopics } from "@/service/topicService";
-import { dateFormat } from "@/utils/format";
 import {
   CheckOutlined,
   DeleteOutlined,
-  ExclamationCircleOutlined,
   HighlightOutlined,
+  PaperClipOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Input, Button, Space, Spin, Table, Tag, Modal, message } from "antd";
+import { Modal, Spin, Table, message, Input, Tag, Space, Button } from "antd";
+const { Search } = Input;
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-const { Search } = Input;
+import { storage } from "@/lib/firebase";
+import { getDownloadURL, ref } from "firebase/storage";
+import Link from "next/link";
+import { deleteAppraiseGradeByTopicId } from "@/service/appraiseGradeService";
 
-export default function ReviewPage() {
+export default function AppraiseTopicPage() {
   const session = useSession();
   const userId = session?.data?.user?.id;
   const [topics, setTopics] = useState();
@@ -25,18 +27,18 @@ export default function ReviewPage() {
   const [messageApi, messageContextHolder] = message.useMessage();
 
   const config = {
-    title: "Hủy kết quả kiểm duyệt?",
-    content: <p>Bạn có muốn hủy kết quả kiểm duyệt của đề tài này không?</p>,
+    title: "Hủy kết quả thẩm định?",
+    content: <p>Bạn có muốn hủy kết quả thẩm định của đề tài này không?</p>,
   };
 
   const loadTopics = async () => {
     setTopics(await getTopics());
   };
 
-  const deleteReview = async (topicId, technologyScienceId) => {
-    const res = await deleteReviewByTopicId(topicId, technologyScienceId);
+  const deleteAppraiseGrade = async (topicId, appraisalBoardId) => {
+    const res = await deleteAppraiseGradeByTopicId(topicId, appraisalBoardId);
     const { message } = res;
-    if (message === "Chưa kiểm duyệt đề tài này!") {
+    if (message === "Chưa thẩm định đề tài này!") {
       messageApi.open({
         type: "error",
         content: message,
@@ -68,25 +70,31 @@ export default function ReviewPage() {
       key: "type",
     },
     {
-      title: "Ngày đăng ký",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      title: "Tài liệu",
+      dataIndex: "fileRef",
+      key: "fileRef",
       render: (_, record) => {
-        const createdAt = new Date(record.createdAt);
-        return <p>{dateFormat(createdAt)}</p>;
+        if (!record.fileRef) return <span>Chưa nộp</span>;
+        return (
+          <Link target="_blank" href={record.fileRef}>
+            <PaperClipOutlined /> Đường dẫn tài liệu
+          </Link>
+        );
       },
     },
     {
       title: "Trạng thái",
-      dataIndex: "isReviewed",
-      key: "isReviewed",
+      dataIndex: "isAppraised",
+      key: "isAppraised",
       render: (_, record) => {
         return (
           <Tag
-            color={record.isReviewed ? "success" : "default"}
-            icon={record.isReviewed ? <CheckOutlined /> : <SyncOutlined spin />}
+            color={record.isAppraised ? "success" : "default"}
+            icon={
+              record.isAppraised ? <CheckOutlined /> : <SyncOutlined spin />
+            }
           >
-            {record.isReviewed ? "Đã kiểm duyệt" : "Chưa kiểm duyệt"}
+            {record.isAppraised ? "Đã thẩm định" : "Chưa thẩm định"}
           </Tag>
         );
       },
@@ -99,16 +107,16 @@ export default function ReviewPage() {
         return (
           <Space size="middle">
             <Button
-              onClick={() =>
-                router.push(`/technologyScience/review/${record._id}`)
-              }
+              disabled={!record.fileRef}
+              onClick={() => router.push(`/appraise/topics/${record._id}`)}
               icon={<HighlightOutlined />}
             />
             <Button
+              disabled={!record.fileRef}
               onClick={async () => {
                 const confirmed = await modal.confirm(config);
                 if (confirmed) {
-                  deleteReview(record._id, userId);
+                  deleteAppraiseGrade(record._id, userId);
                 }
               }}
               danger
@@ -121,7 +129,7 @@ export default function ReviewPage() {
   ];
 
   return (
-    <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
+    <div className="min-h-[calc(100vh-45.8px)] bg-gray-100">
       <div className="flex flex-col mx-32 py-6">
         <Search
           className="w-[450px] mb-4"

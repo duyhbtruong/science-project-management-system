@@ -1,5 +1,5 @@
 import { Double } from "mongodb";
-import { model, models, Schema } from "mongoose";
+import mongoose, { model, models, Schema } from "mongoose";
 
 const appraiseGradeSchema = new Schema(
   {
@@ -15,9 +15,19 @@ const appraiseGradeSchema = new Schema(
       ref: "AppraisalBoard",
       required: true,
     },
-    // Điểm
+    // Điểm từng tiêu chí
+    criteria: {
+      type: [Number],
+      required: true,
+    },
+    // Điểm CHUNG
     grade: {
-      type: Double,
+      type: Number,
+      required: true,
+    },
+    // Đạt chuẩn Euraka?
+    isEureka: {
+      type: String,
       required: true,
     },
     // Note

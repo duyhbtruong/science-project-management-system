@@ -1,5 +1,5 @@
 import { mongooseConnect } from "@/lib/mongoose";
-import { ReviewGrade } from "@/models/ReviewGrade";
+import { AppraiseGrade } from "@/models/AppraiseGrade";
 import { Topic } from "@/models/Topic";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
@@ -8,9 +8,7 @@ export async function GET(request) {
   await mongooseConnect();
   const id = request.nextUrl.searchParams.get("id");
   const topicId = request.nextUrl.searchParams.get("topicId");
-  const technologyScienceId = request.nextUrl.searchParams.get(
-    "technologyScienceId"
-  );
+  const appraisalBoardId = request.nextUrl.searchParams.get("appraisalBoardId");
 
   // Get dựa theo Id của bảng Review Grade
   if (id) {
@@ -20,45 +18,42 @@ export async function GET(request) {
         { status: 200 }
       );
     }
-    const review = await ReviewGrade.findOne({ _id: id });
-    return NextResponse.json(review, {
+    const appraise = await AppraiseGrade.findOne({ _id: id });
+    return NextResponse.json(appraise, {
       status: 200,
     });
   }
 
   // Get dựa theo Id của topicId và technologyScienceId
-  if (topicId && technologyScienceId) {
+  if (topicId && appraisalBoardId) {
     if (
       !mongoose.isValidObjectId(topicId) ||
-      !mongoose.isValidObjectId(technologyScienceId)
+      !mongoose.isValidObjectId(appraisalBoardId)
     ) {
       return NextResponse.json(
         { message: "Không đúng định dạng ObjectId!" },
         { status: 200 }
       );
     }
-    const review = await ReviewGrade.findOne({
-      $and: [
-        { topicId: topicId },
-        { technologyScienceId: technologyScienceId },
-      ],
+    const appraise = await AppraiseGrade.findOne({
+      $and: [{ topicId: topicId }, { appraisalBoardId: appraisalBoardId }],
     });
-    return NextResponse.json(review, { status: 200 });
+    return NextResponse.json(appraise, { status: 200 });
   }
 
   // Get all
-  return NextResponse.json(await ReviewGrade.find(), { status: 200 });
+  return NextResponse.json(await AppraiseGrade.find(), { status: 200 });
 }
 
 export async function POST(request) {
   await mongooseConnect();
-  const { topicId, technologyScienceId, criteria, grade, isEureka, note } =
+  const { topicId, appraisalBoardId, criteria, grade, isEureka, note } =
     await request.json();
 
   // Kiểm tra Object Id
   if (
     !mongoose.isValidObjectId(topicId) ||
-    !mongoose.isValidObjectId(technologyScienceId)
+    !mongoose.isValidObjectId(appraisalBoardId)
   ) {
     return NextResponse.json(
       { message: "Sai định dạng Object Id!" },
@@ -67,17 +62,14 @@ export async function POST(request) {
   }
 
   // Kiểm tra xem có phải update không
-  const isUpdate = await ReviewGrade.find({
-    $and: [{ topicId: topicId }, { technologyScienceId: technologyScienceId }],
+  const isUpdate = await AppraiseGrade.find({
+    $and: [{ topicId: topicId }, { appraisalBoardId: appraisalBoardId }],
   });
 
   if (isUpdate.length === 1) {
-    await ReviewGrade.updateOne(
+    await AppraiseGrade.updateOne(
       {
-        $and: [
-          { topicId: topicId },
-          { technologyScienceId: technologyScienceId },
-        ],
+        $and: [{ topicId: topicId }, { appraisalBoardId: appraisalBoardId }],
       },
       {
         $set: {
@@ -94,9 +86,9 @@ export async function POST(request) {
     );
   }
 
-  await ReviewGrade.create({
+  await AppraiseGrade.create({
     topicId,
-    technologyScienceId,
+    appraisalBoardId,
     criteria,
     grade,
     isEureka,
@@ -104,34 +96,37 @@ export async function POST(request) {
   });
 
   // Kiểm tra lần đánh giá này có phải là đánh giá đầu tiên hay không
-  const { isReviewed } = await Topic.findOne(
+  const { isAppraised } = await Topic.findOne(
     { _id: topicId },
-    { isReviewed: 1 }
+    { isAppraised: 1 }
   );
-  const { _id: reviewId } = await ReviewGrade.findOne(
+  const { _id: appraiseId } = await AppraiseGrade.findOne(
     {
-      $and: [
-        { topicId: topicId },
-        { technologyScienceId: technologyScienceId },
-      ],
+      $and: [{ topicId: topicId }, { appraisalBoardId: appraisalBoardId }],
     },
     { _id: 1 }
   );
-  // Trường hợp 1 - Chưa tồn tại đánh giá nào
-  if (!isReviewed) {
-    await Topic.updateOne({ _id: topicId }, { $set: { isReviewed: true } });
-    await Topic.updateOne({ _id: topicId }, { $push: { reviews: reviewId } });
+  // Trường hợp 1 - Chưa tồn tại thẩm định nào
+  if (!isAppraised) {
+    await Topic.updateOne({ _id: topicId }, { $set: { isAppraised: true } });
+    await Topic.updateOne(
+      { _id: topicId },
+      { $push: { appraises: appraiseId } }
+    );
     return NextResponse.json(
-      { message: "Đã kiểm duyệt lần đầu tiên thành công!" },
+      { message: "Đã thẩm định lần đầu tiên thành công!" },
       { status: 200 }
     );
   }
 
-  // Trường hợp 2 - Đã tồn tại 1 đánh giá
-  if (isReviewed) {
-    await Topic.updateOne({ _id: topicId }, { $push: { reviews: reviewId } });
+  // Trường hợp 2 - Đã tồn tại 1 thẩm định
+  if (isAppraised) {
+    await Topic.updateOne(
+      { _id: topicId },
+      { $push: { appraises: appraiseId } }
+    );
     return NextResponse.json(
-      { message: "Đã kiểm duyệt thành công!" },
+      { message: "Đã thẩm định thành công!" },
       { status: 200 }
     );
   }
@@ -142,13 +137,11 @@ export async function POST(request) {
 export async function DELETE(request) {
   await mongooseConnect();
   const topicId = request.nextUrl.searchParams.get("topicId");
-  const technologyScienceId = request.nextUrl.searchParams.get(
-    "technologyScienceId"
-  );
+  const appraisalBoardId = request.nextUrl.searchParams.get("appraisalBoardId");
 
   if (
     !mongoose.isValidObjectId(topicId) ||
-    !mongoose.isValidObjectId(technologyScienceId)
+    !mongoose.isValidObjectId(appraisalBoardId)
   ) {
     return NextResponse.json(
       { message: "Sai định dạng Object Id!" },
@@ -157,34 +150,28 @@ export async function DELETE(request) {
   }
 
   if (
-    !(await ReviewGrade.findOne(
+    !(await AppraiseGrade.findOne(
       {
-        $and: [
-          { topicId: topicId },
-          { technologyScienceId: technologyScienceId },
-        ],
+        $and: [{ topicId: topicId }, { appraisalBoardId: appraisalBoardId }],
       },
       { _id: 1 }
     ))
   ) {
     return NextResponse.json(
-      { message: "Chưa kiểm duyệt đề tài này!" },
+      { message: "Chưa thẩm định đề tài này!" },
       { status: 409 }
     );
   }
 
-  const { _id: reviewId } = await ReviewGrade.findOne(
+  const { _id: appraiseId } = await AppraiseGrade.findOne(
     {
-      $and: [
-        { topicId: topicId },
-        { technologyScienceId: technologyScienceId },
-      ],
+      $and: [{ topicId: topicId }, { appraisalBoardId: appraisalBoardId }],
     },
     { _id: 1 }
   );
 
-  await ReviewGrade.findByIdAndDelete(reviewId);
-  await Topic.updateOne({ _id: topicId }, { $pull: { reviews: reviewId } });
+  await AppraiseGrade.findByIdAndDelete(appraiseId);
+  await Topic.updateOne({ _id: topicId }, { $pull: { reviews: appraiseId } });
   const topic = await Topic.findOne({ _id: topicId });
   if (topic.reviews.length === 0) {
     await Topic.updateOne({ _id: topicId }, { $set: { isReviewed: false } });

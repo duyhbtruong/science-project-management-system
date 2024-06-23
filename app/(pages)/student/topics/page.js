@@ -86,7 +86,6 @@ export default function TopicPage() {
         fetchUserData();
       });
   };
-  console.log(student);
 
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
