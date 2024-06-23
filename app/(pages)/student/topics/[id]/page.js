@@ -200,7 +200,7 @@ export default function TopicInformationPage({ params }) {
       setIsUploadOpen(false);
       return;
     }
-    const dateTime = giveCurrentDateTime();
+    // const dateTime = giveCurrentDateTime();
     const fileRef = ref(storage, `${student?.studentId}/${fileUpload[0].name}`);
     uploadBytes(fileRef, fileUpload[0]?.originFileObj)
       .then((snapshot) => {
@@ -376,13 +376,3 @@ export default function TopicInformationPage({ params }) {
     </div>
   );
 }
-
-export const giveCurrentDateTime = () => {
-  const today = new Date();
-  const date =
-    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-  const time =
-    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  const dateTime = date + " " + time;
-  return dateTime;
-};

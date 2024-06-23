@@ -1,10 +1,13 @@
 "use client";
 
+import { getAccountById } from "@/service/accountService";
+import { getStudentAccountById } from "@/service/studentService";
 import {
   deleteTopicById,
   getTopics,
   searchTopic,
 } from "@/service/topicService";
+import { exportTopicList } from "@/utils/export";
 import { dateFormat } from "@/utils/format";
 import {
   CheckCircleOutlined,
@@ -24,6 +27,7 @@ import {
   Tag,
   message,
 } from "antd";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 const { Search } = Input;
@@ -62,6 +66,16 @@ export default function TopicsManagePage() {
     if (event.target.value === "") {
       loadTopics();
     }
+  };
+
+  const handleExport = async () => {
+    let students = [];
+    for (const topic of topics) {
+      const student = await getStudentAccountById(topic.owner);
+      const account = await getAccountById(student.accountId);
+      students.push(account);
+    }
+    exportTopicList(topics, students);
   };
 
   useEffect(() => {
@@ -186,13 +200,24 @@ export default function TopicsManagePage() {
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
       <div className="flex flex-col mx-32 py-6">
-        <Search
-          className="w-[450px] mb-4"
-          placeholder="Tìm kiếm đề tài..."
-          enterButton
-          onSearch={handleSearchTopic}
-          onChange={handleSearchChange}
-        />
+        <div className="flex justify-between">
+          <Search
+            className="w-[450px] mb-4"
+            placeholder="Tìm kiếm đề tài..."
+            enterButton
+            onSearch={handleSearchTopic}
+            onChange={handleSearchChange}
+          />
+          <Button
+            loading={!topics}
+            onClick={handleExport}
+            icon={<ExportOutlined />}
+            type="primary"
+          >
+            Xuất danh sách
+          </Button>
+        </div>
+
         <Spin spinning={!topics}>
           <Table
             rowKey={(record) => record._id}
