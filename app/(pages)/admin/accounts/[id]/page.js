@@ -52,6 +52,7 @@ export default function UpdateAccount({ params }) {
       appraisalBoardId: appraise?.appraisalBoardId,
       instructorId: instructor?.instructorId,
       faculty: student?.faculty ?? instructor?.faculty,
+      academicRank: instructor?.academicRank,
       educationProgram: student?.educationProgram,
     });
   }, [account]);
@@ -324,6 +325,27 @@ export default function UpdateAccount({ params }) {
                   ]}
                 >
                   <Input disabled placeholder="Nhập mã số Giảng viên..." />
+                </Form.Item>
+
+                <Form.Item
+                  label="Học hàm, học vị"
+                  name="academicRank"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Chọn học hàm, học vị của GVHD...",
+                    },
+                  ]}
+                >
+                  <Select
+                    placeholder="Chọn học hàm, học vị..."
+                    options={[
+                      { title: "ThS", value: "ThS" },
+                      { title: "TS", value: "TS" },
+                      { title: "GS.TS", value: "GS.TS" },
+                      { title: "PGS.TS", value: "PGS.TS" },
+                    ]}
+                  />
                 </Form.Item>
 
                 <Form.Item

@@ -361,6 +361,27 @@ export default function CreateAccount() {
               </Form.Item>
 
               <Form.Item
+                label="Học hàm, học vị"
+                name="academicRank"
+                rules={[
+                  {
+                    required: true,
+                    message: "Chọn học hàm, học vị của GVHD...",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Chọn học hàm, học vị..."
+                  options={[
+                    { title: "ThS", value: "ThS" },
+                    { title: "TS", value: "TS" },
+                    { title: "GS.TS", value: "GS.TS" },
+                    { title: "PGS.TS", value: "PGS.TS" },
+                  ]}
+                />
+              </Form.Item>
+
+              <Form.Item
                 label="Khoa"
                 name="faculty"
                 rules={[{ required: true, message: "Chưa chọn khoa." }]}

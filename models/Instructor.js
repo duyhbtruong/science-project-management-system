@@ -4,6 +4,7 @@ import mongoose, { model, models, Schema } from "mongoose";
 const instructorSchema = new Schema({
   instructorId: { type: String, required: true, unique: true }, // Mã số giảng viên
   faculty: { type: String, required: true }, // Khoa của giảng viên
+  academicRank: { type: String, required: true },
   accountId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Account",

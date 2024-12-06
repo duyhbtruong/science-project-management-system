@@ -6,8 +6,16 @@ import { Instructor } from "@/models/Instructor";
 
 export async function POST(request) {
   await mongooseConnect();
-  const { instructorId, faculty, name, email, phone, password, role } =
-    await request.json();
+  const {
+    instructorId,
+    faculty,
+    academicRank,
+    name,
+    email,
+    phone,
+    password,
+    role,
+  } = await request.json();
 
   if (await Account.findOne({ email })) {
     return NextResponse.json(
@@ -36,6 +44,7 @@ export async function POST(request) {
   await Instructor.create({
     instructorId,
     faculty,
+    academicRank,
     accountId: createdAccountId,
   });
 

@@ -60,6 +60,7 @@ export async function PUT(request, { params }) {
     password: password,
     faculty: faculty,
     educationProgram: educationProgram,
+    academicRank: academicRank,
   } = await request.json();
 
   // Trường hợp cập nhật mật khẩu
@@ -79,6 +80,7 @@ export async function PUT(request, { params }) {
       const iId = await Instructor.findOne({ accountId: id }, { _id: 1 });
       await Instructor.findByIdAndUpdate(iId, {
         faculty,
+        academicRank,
       });
     }
 
@@ -106,6 +108,7 @@ export async function PUT(request, { params }) {
       const iId = await Instructor.findOne({ accountId: id }, { _id: 1 });
       await Instructor.findByIdAndUpdate(iId, {
         faculty,
+        academicRank,
       });
     }
 
