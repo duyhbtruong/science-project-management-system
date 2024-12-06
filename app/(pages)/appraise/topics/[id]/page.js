@@ -196,7 +196,7 @@ export default function ReviewTopicPage({ params }) {
         </Button>
       </div>
       <Spin spinning={!topic}>
-        <div className="flex gap-4 relative">
+        <div className="relative flex gap-4">
           <Form
             form={form}
             onFinish={onFinish}
@@ -459,7 +459,7 @@ export default function ReviewTopicPage({ params }) {
           </Button>
         }
       >
-        <div className="space-y-4 mt-4">
+        <div className="mt-4 space-y-4">
           <Descriptions
             title="Thông tin đề tài"
             bordered

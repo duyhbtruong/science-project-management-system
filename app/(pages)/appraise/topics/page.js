@@ -143,7 +143,7 @@ export default function AppraiseTopicPage() {
 
   return (
     <div className="min-h-[calc(100vh-45.8px)] bg-gray-100">
-      <div className="flex flex-col mx-32 py-6">
+      <div className="flex flex-col py-6 mx-32">
         <Search
           className="w-[450px] mb-4"
           placeholder="Tìm kiếm đề tài..."
