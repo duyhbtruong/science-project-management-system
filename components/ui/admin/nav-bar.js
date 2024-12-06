@@ -40,15 +40,12 @@ const NavigationBar = () => {
   });
 
   return (
-    <>
-      <Menu
-        className="px-32 items-center"
-        onClick={(e) => setCurrent(e.key)}
-        mode="horizontal"
-        selectedKeys={[current]}
-        items={items}
-      />
-    </>
+    <Menu
+      onClick={(e) => setCurrent(e.key)}
+      mode="inline"
+      selectedKeys={[current]}
+      items={items}
+    />
   );
 };
 

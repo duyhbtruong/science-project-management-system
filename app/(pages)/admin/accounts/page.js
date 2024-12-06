@@ -5,12 +5,7 @@ import { useEffect, useState } from "react";
 
 import { Button, Space, Table, Tag, Input, Modal } from "antd";
 const { Search } = Input;
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   deleteAccountById,
   getAccounts,
@@ -59,7 +54,7 @@ const AccountsPage = () => {
 
   return (
     <>
-      <div className="w-screen min-h-[calc(100vh-45.8px)] px-32 pt-6 bg-gray-100">
+      <div className="min-h-[calc(100vh-45.8px)] px-32 pt-6 bg-gray-100">
         <div className="flex flex-col gap-y-4">
           <div className="flex justify-between">
             <Search
