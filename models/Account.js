@@ -1,22 +1,16 @@
 import { model, models, Schema } from "mongoose";
 
-// Model cho Class Account
+// Model cho Tài khoản
 const accountSchema = new Schema(
   {
-    // Tên của user
-    name: { type: String, required: true },
-    // Email của user
-    email: { type: String, required: true, unique: true },
-    // Số điện thoại của user
-    phone: { type: String },
-    // Mật khẩu của user
-    password: { type: String, required: true },
-    // Quyền của user
-    role: { type: String, required: true },
+    name: { type: String, required: true }, // Tên của người dùn
+    email: { type: String, required: true, unique: true }, // Email của người dùng
+    phone: { type: String }, // Số điện thoại của người dùng
+    password: { type: String, required: true }, // Mật khẩu của người dùng
+    role: { type: String, required: true }, // Quyền của người dùn
   },
   {
-    // Thời điểm tạo account
-    timestamps: true,
+    timestamps: true, // Thời điểm tạo tài khoản
   }
 );
 
