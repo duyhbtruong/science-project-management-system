@@ -19,6 +19,7 @@ export default function UpdateAccount({ params }) {
   const [student, setStudent] = useState();
   const [technologyScience, setTechnologyScience] = useState();
   const [appraise, setAppraise] = useState();
+  const [instructor, setInstructor] = useState();
   const [role, setRole] = useState();
   const [form] = Form.useForm();
 
@@ -31,6 +32,7 @@ export default function UpdateAccount({ params }) {
     setStudent(response.student);
     setTechnologyScience(response.technologyScience);
     setAppraise(response.appraise);
+    setInstructor(response.instructor);
   };
 
   useEffect(() => {
@@ -48,7 +50,8 @@ export default function UpdateAccount({ params }) {
       studentId: student?.studentId,
       technologyScienceId: technologyScience?.technologyScienceId,
       appraisalBoardId: appraise?.appraisalBoardId,
-      faculty: student?.faculty,
+      instructorId: instructor?.instructorId,
+      faculty: student?.faculty ?? instructor?.faculty,
       educationProgram: student?.educationProgram,
     });
   }, [account]);
@@ -182,6 +185,10 @@ export default function UpdateAccount({ params }) {
                 options={[
                   { value: "student", label: "Sinh viên" },
                   {
+                    value: "instructor",
+                    label: "Giảng viên",
+                  },
+                  {
                     value: "technologyScience",
                     label: "Phòng Khoa học Công nghệ",
                   },
@@ -299,6 +306,59 @@ export default function UpdateAccount({ params }) {
                   <Input
                     disabled
                     placeholder="Nhập mã số Phòng Khoa học Công nghệ..."
+                  />
+                </Form.Item>
+              </>
+            )}
+
+            {role === "instructor" && (
+              <>
+                <Form.Item
+                  label="Mã số Giảng viên"
+                  name="instructorId"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Chưa nhập Mã số Giảng viên.",
+                    },
+                  ]}
+                >
+                  <Input disabled placeholder="Nhập mã số Giảng viên..." />
+                </Form.Item>
+
+                <Form.Item
+                  label="Khoa"
+                  name="faculty"
+                  rules={[{ required: true, message: "Chưa chọn khoa." }]}
+                >
+                  <Select
+                    placeholder="Chọn khoa..."
+                    options={[
+                      {
+                        value: "Công nghệ Phần mềm",
+                        label: "Công nghệ Phần mềm",
+                      },
+                      {
+                        value: "Hệ thống Thông tin",
+                        label: "Hệ thống Thông tin",
+                      },
+                      {
+                        value: "Kỹ thuật Máy tính",
+                        label: "Kỹ thuật Máy tính",
+                      },
+                      {
+                        value: "Mạng Máy tính và Truyền thông",
+                        label: "Mạng Máy tính và Truyền thông",
+                      },
+                      {
+                        value: "Khoa học Máy tính",
+                        label: "Khoa học Máy tính",
+                      },
+                      {
+                        value: "Khoa học và Kỹ thuật Thông tin",
+                        label: "Khoa học và Kỹ thuật Thông tin",
+                      },
+                    ]}
                   />
                 </Form.Item>
               </>

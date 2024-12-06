@@ -245,13 +245,14 @@ export default function TopicInformationPage({ params }) {
   //   );
   // }, [topic]);
   // console.log(topic);
-  console.log(fileUpload[0]?.originFileObj);
+  // console.log(fileUpload[0]?.originFileObj);
+  // console.log(">>> topic: ", topic);
 
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-56px)]">
-      <div className="mx-32 py-6">
-        <div className="flex justify-between mb-6 bg-white rounded-md p-4">
-          <span className="flex text-lg font-semibold justify-center">
+      <div className="py-6 mx-32">
+        <div className="flex justify-between p-4 mb-6 bg-white rounded-md">
+          <span className="flex justify-center text-lg font-semibold">
             Quản lý Đề tài cá nhân
           </span>
           <Button
@@ -272,7 +273,7 @@ export default function TopicInformationPage({ params }) {
         <div className="flex flex-col gap-4">
           {/* Thông tin Đề tài */}
           <Spin spinning={!topic}>
-            <div className="flex flex-col gap-4 p-4 rounded-md bg-white">
+            <div className="flex flex-col gap-4 p-4 bg-white rounded-md">
               <Descriptions
                 column={2}
                 bordered
@@ -314,7 +315,7 @@ export default function TopicInformationPage({ params }) {
 
           <div className="flex gap-4">
             {/* Thông tin chủ nhiệm đề tài */}
-            <div className="flex flex-grow flex-col p-4 rounded-md bg-white">
+            <div className="flex flex-col flex-grow p-4 bg-white rounded-md">
               <Spin className="w-[500px]" spinning={!account || !student}>
                 <Descriptions
                   column={1}
@@ -326,7 +327,7 @@ export default function TopicInformationPage({ params }) {
             </div>
 
             {/* Thông tin GVHD */}
-            <div className="flex flex-grow flex-col p-4 rounded-md bg-white">
+            <div className="flex flex-col flex-grow p-4 bg-white rounded-md">
               <Spin className="flex flex-row" spinning={!topic}>
                 <Descriptions
                   column={1}

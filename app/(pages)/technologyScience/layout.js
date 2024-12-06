@@ -1,6 +1,6 @@
 import NavigationBar from "@/components/ui/technologyScience/nav-bar";
 
-export default function AdminLayout({ children }) {
+export default function TechnologyScienceLayout({ children }) {
   return (
     <>
       <NavigationBar />

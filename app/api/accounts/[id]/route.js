@@ -6,6 +6,7 @@ import { AppraisalBoard } from "@/models/AppraisalBoard";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { Instructor } from "@/models/Instructor";
 
 export async function GET(request, { params }) {
   await mongooseConnect();
@@ -30,6 +31,11 @@ export async function GET(request, { params }) {
   if (account.role === "student") {
     const student = await Student.findOne({ accountId: id });
     return NextResponse.json({ account, student }, { status: 200 });
+  }
+
+  if (account.role === "instructor") {
+    const instructor = await Instructor.findOne({ accountId: id });
+    return NextResponse.json({ account, instructor }, { status: 200 });
   }
 
   if (account.role === "technologyScience") {
@@ -69,6 +75,13 @@ export async function PUT(request, { params }) {
       });
     }
 
+    if (role === "instructor") {
+      const iId = await Instructor.findOne({ accountId: id }, { _id: 1 });
+      await Instructor.findByIdAndUpdate(iId, {
+        faculty,
+      });
+    }
+
     await Account.findByIdAndUpdate(id, {
       name,
       phone,
@@ -86,6 +99,13 @@ export async function PUT(request, { params }) {
       await Student.findByIdAndUpdate(sId, {
         faculty,
         educationProgram,
+      });
+    }
+
+    if (role === "instructor") {
+      const iId = await Instructor.findOne({ accountId: id }, { _id: 1 });
+      await Instructor.findByIdAndUpdate(iId, {
+        faculty,
       });
     }
 

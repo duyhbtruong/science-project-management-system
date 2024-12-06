@@ -91,8 +91,8 @@ export default function TopicPage() {
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
       {/* Column */}
       {contextHolder}
-      <div className="mx-32 py-6">
-        <div className="flex justify-center text-xl font-semibold pb-6">
+      <div className="py-6 mx-32">
+        <div className="flex justify-center pb-6 text-xl font-semibold">
           Đăng ký Đề tài
         </div>
         <Spin spinning={student ? false : true}>

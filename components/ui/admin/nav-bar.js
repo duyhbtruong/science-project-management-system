@@ -2,15 +2,16 @@
 
 import { logout } from "@/app/(pages)/auth/login/page";
 import { AppLogo } from "@/components/logo";
-import { LogoutOutlined } from "@ant-design/icons";
-import { Button, Menu } from "antd";
+import { LogoutOutlined, BarChartOutlined } from "@ant-design/icons";
+import { Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { TeamOutlined } from "@ant-design/icons";
 
 const items = [
   {
-    label: <AppLogo fontSize={`text-md`} className="w-[300px]" />,
+    label: <AppLogo fontSize={`text-md`} />,
     key: "logo",
     disabled: true,
     className: "hover:cursor-default",
@@ -18,18 +19,13 @@ const items = [
   {
     label: <Link href="/admin/accounts">Quản lý tài khoản</Link>,
     key: "accounts",
+    icon: <TeamOutlined />,
   },
   {
-    label: "Hồ sơ",
-    key: "profile",
-    children: [
-      {
-        label: "Đăng xuất",
-        key: "logout",
-        icon: <LogoutOutlined />,
-        onClick: async () => await logout(),
-      },
-    ],
+    label: "Đăng xuất",
+    key: "logout",
+    icon: <LogoutOutlined />,
+    onClick: async () => await logout(),
   },
 ];
 
@@ -42,6 +38,7 @@ const NavigationBar = () => {
   return (
     <Menu
       onClick={(e) => setCurrent(e.key)}
+      theme="dark"
       mode="inline"
       selectedKeys={[current]}
       items={items}

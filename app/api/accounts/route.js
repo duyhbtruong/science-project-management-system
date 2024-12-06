@@ -4,6 +4,7 @@ import { Student } from "@/models/Student";
 import { AppraisalBoard } from "@/models/AppraisalBoard";
 import { TechnologyScience } from "@/models/TechnologyScience";
 import { NextResponse } from "next/server";
+import { Instructor } from "@/models/Instructor";
 
 export async function GET(request) {
   await mongooseConnect();
@@ -74,6 +75,15 @@ export async function DELETE(request) {
     const studentId = await Student.findOne({ accountId: id }, { _id: 1 });
     await Account.findByIdAndDelete(id);
     await Student.findByIdAndDelete(studentId);
+  }
+
+  if (role === "instructor") {
+    const instructorId = await Instructor.findOne(
+      { accountId: id },
+      { _id: 1 }
+    );
+    await Account.findByIdAndDelete(id);
+    await Instructor.findByIdAndDelete(instructorId);
   }
 
   if (role === "technologyScience") {

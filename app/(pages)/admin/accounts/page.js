@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 
 import { Button, Space, Table, Tag, Input, Modal } from "antd";
 const { Search } = Input;
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import {
   deleteAccountById,
   getAccounts,
@@ -54,7 +59,7 @@ const AccountsPage = () => {
 
   return (
     <>
-      <div className="min-h-[calc(100vh-45.8px)] px-32 pt-6 bg-gray-100">
+      <div className="h-screen py-6 bg-gray-100">
         <div className="flex flex-col gap-y-4">
           <div className="flex justify-between">
             <Search
@@ -73,9 +78,9 @@ const AccountsPage = () => {
               >
                 Tạo tài khoản
               </Button>
-              {/* <Button type="default" icon={<UploadOutlined />}>
+              <Button type="default" icon={<UploadOutlined />}>
                 Nhập danh sách
-              </Button> */}
+              </Button>
             </div>
           </div>
 
@@ -118,9 +123,15 @@ const AccountsPage = () => {
                   return <Tag color="cyan">Phòng Thẩm định</Tag>;
                 if (record.role === "admin")
                   return <Tag color="red">Quản trị viên</Tag>;
+                if (record.role === "instructor")
+                  return <Tag color="purple">Giảng viên</Tag>;
               }}
               filters={[
                 { text: "Sinh viên", value: "student" },
+                {
+                  text: "Giảng viên",
+                  value: "instructor",
+                },
                 {
                   text: "Phòng Khoa học Công nghệ",
                   value: "technologyScience",

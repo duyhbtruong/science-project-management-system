@@ -19,6 +19,6 @@ export default async function Home() {
   }
   // TODO: Create a page for instructors
   if (session.user.role === "instructor") {
-    redirect("/instructor/");
+    redirect("/instructor/topics");
   }
 }
