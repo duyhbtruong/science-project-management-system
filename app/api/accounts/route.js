@@ -1,69 +1,32 @@
 import { mongooseConnect } from "@/lib/mongoose";
-import { Account } from "@/models/Account";
-import { Student } from "@/models/Student";
-import { AppraisalBoard } from "@/models/AppraisalBoard";
-import { TechnologyScience } from "@/models/TechnologyScience";
+import { Account } from "@/models/users/Account";
+import { Student } from "@/models/users/Student";
+import { AppraisalBoard } from "@/models/users/AppraisalBoard";
+import { TechnologyScience } from "@/models/users/TechnologyScience";
 import { NextResponse } from "next/server";
-import { Instructor } from "@/models/Instructor";
+import { Instructor } from "@/models/users/Instructor";
 
 export async function GET(request) {
-  await mongooseConnect();
+  try {
+    await mongooseConnect();
 
-  // Trường hợp tìm kiếm tài khoản
-  const search = request.nextUrl.searchParams.get("search");
-  if (search) {
-    const accounts = await Account.find({
-      name: { $regex: ".*" + search + ".*" },
-    });
+    const searchParams = request.nextUrl.searchParams;
+    const searchKeywords = searchParams.get("search");
+
+    const filter = {};
+
+    if (searchKeywords) {
+      filter.name = { $regex: searchKeywords, $options: "i" };
+    }
+
+    const accounts = await Account.find(filter);
+
     return NextResponse.json(accounts, { status: 200 });
+  } catch (error) {
+    return new NextResponse("Lỗi lấy tài khoản " + error.message, {
+      status: 500,
+    });
   }
-
-  // Trường hợp tìm tài khoản bằng email
-  const email = request.nextUrl.searchParams.get("email");
-  if (email) {
-    const account = await Account.findOne({ email });
-
-    if (!account) {
-      return NextResponse.json(
-        { message: "Tài khoản không tồn tại!" },
-        { status: 200 }
-      );
-    }
-
-    if (account.role === "student") {
-      const student = await Student.findOne({ accountId: account._id });
-      return NextResponse.json({ account, student }, { status: 200 });
-    }
-
-    if (account.role === "technologyScience") {
-      const technologyScience = await TechnologyScience.findOne({
-        accountId: account._id,
-      });
-      return NextResponse.json({ account, technologyScience }, { status: 200 });
-    }
-
-    if (account.role === "appraise") {
-      const appraise = await AppraisalBoard.findOne({ accountId: account._id });
-      return NextResponse.json({ account, appraise }, { status: 200 });
-    }
-
-    if (account.role === "admin") {
-      return NextResponse.json(
-        { message: "Chưa được ủy quyền Admin!" },
-        { status: 200 }
-      );
-    }
-  }
-
-  if (email === "") {
-    return NextResponse.json(
-      { message: "Chưa được ủy quyền Admin!" },
-      { status: 200 }
-    );
-  }
-
-  // Trường hợp lấy tất cả tài khoản
-  return NextResponse.json(await Account.find());
 }
 
 export async function DELETE(request) {

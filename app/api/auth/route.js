@@ -1,5 +1,5 @@
 import { mongooseConnect } from "@/lib/mongoose";
-import { Account } from "@/models/Account";
+import { Account } from "@/models/users/Account";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {

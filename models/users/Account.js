@@ -3,7 +3,7 @@ import { model, models, Schema } from "mongoose";
 // Model cho Tài khoản
 const accountSchema = new Schema(
   {
-    name: { type: String, required: true }, // Tên của người dùn
+    name: { type: String, required: true }, // Tên của người dùng
     email: { type: String, required: true, unique: true }, // Email của người dùng
     phone: { type: String }, // Số điện thoại của người dùng
     password: { type: String, required: true }, // Mật khẩu của người dùng

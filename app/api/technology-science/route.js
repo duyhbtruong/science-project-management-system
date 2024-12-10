@@ -2,21 +2,13 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/users/Account";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { Instructor } from "@/models/users/Instructor";
+import { TechnologyScience } from "@/models/users/TechnologyScience";
 
 export async function POST(request) {
   try {
     await mongooseConnect();
-    const {
-      instructorId,
-      faculty,
-      academicRank,
-      name,
-      email,
-      phone,
-      password,
-      role,
-    } = await request.json();
+    const { technologyScienceId, name, email, phone, password, role } =
+      await request.json();
 
     if (await Account.findOne({ email })) {
       return NextResponse.json(
@@ -25,7 +17,7 @@ export async function POST(request) {
       );
     }
 
-    if (await Instructor.findOne({ instructorId })) {
+    if (await TechnologyScience.findOne({ technologyScienceId })) {
       return NextResponse.json(
         { message: "Mã số phòng Khoa học Công nghệ đã tồn tại!" },
         { status: 409 }
@@ -45,20 +37,19 @@ export async function POST(request) {
       { email: email },
       { _id: 1 }
     );
-    await Instructor.create({
-      instructorId,
-      faculty,
-      academicRank,
+    await TechnologyScience.create({
+      technologyScienceId,
       accountId: createdAccountId,
     });
 
     return NextResponse.json(
-      { message: "Tài khoản giảng viên đã được tạo thành công!" },
+      { message: "Tài khoản phòng Khoa học Công nghệ đã được tạo thành công!" },
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi tạo tài khoản giảng viên " + error, {
-      status: 500,
-    });
+    return new NextResponse(
+      "Lỗi tạo tài khoản phòng Khoa học Công nghệ " + error,
+      { status: 500 }
+    );
   }
 }

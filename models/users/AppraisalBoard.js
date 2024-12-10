@@ -1,15 +1,13 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-// Model cho Appraisal Board
+// Model cho Cán bộ Hội đồng Thẩm định
 export const appraisalBoardSchema = new Schema({
-  // Mã số của phòng Thẩm định
-  appraisalBoardId: { type: String, required: true, unique: true },
-  // ID liên kết với tài khoản sinh viên
+  appraisalBoardId: { type: String, required: true, unique: true }, // Mã số của Cán bộ
   accountId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Account",
     required: true,
-  },
+  }, // ID Tài khoản
 });
 
 export const AppraisalBoard =

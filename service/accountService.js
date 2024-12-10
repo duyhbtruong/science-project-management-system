@@ -30,24 +30,24 @@ export const getAccountById = async (id) => {
   }
 };
 
-export const getAccountByEmail = async (email) => {
-  try {
-    const res = await fetch(
-      `http://localhost:3000/api/accounts?email=${email}`,
-      {
-        cache: "no-store",
-      }
-    );
+// export const getAccountByEmail = async (email) => {
+//   try {
+//     const res = await fetch(
+//       `http://localhost:3000/api/accounts?email=${email}`,
+//       {
+//         cache: "no-store",
+//       }
+//     );
 
-    if (!res.ok) {
-      throw new Error("Failed to get account.");
-    }
+//     if (!res.ok) {
+//       throw new Error("Failed to get account.");
+//     }
 
-    return res.json();
-  } catch (error) {
-    console.log("Error: ", error);
-  }
-};
+//     return res.json();
+//   } catch (error) {
+//     console.log("Error: ", error);
+//   }
+// };
 
 export const searchAccounts = async (searchValues) => {
   try {

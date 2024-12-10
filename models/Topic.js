@@ -1,12 +1,6 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-const intructorSchema = new Schema({
-  email: { type: String, required: true },
-  name: { type: String, required: true },
-  academicRank: { type: String, required: true },
-});
-
-// Model cho Class Topic
+// Model cho Đề tài
 const topicSchema = new Schema(
   {
     vietnameseName: { type: String, required: true }, // Tên tiếng Việt
@@ -16,17 +10,34 @@ const topicSchema = new Schema(
     reference: { type: [String], required: true }, // Tham khảo đề tài
     expectedResult: { type: String, required: true }, // Kết quả dự đoán
     participants: { type: [String], required: true }, // Danh sách thành viên
-    isReviewed: { type: Boolean, default: false, required: true }, // Trạng thái đánh giá đề tài: Chưa đánh giá | Đã đánh giá
-    reviews: { type: [mongoose.SchemaTypes.ObjectId] }, // Danh sách kết quả kiểm duyệt
-    isAppraised: { type: Boolean, default: false, required: true }, // Trạng thái kiểm duyệt: Chưa kiểm duyệt | Đã kiểm duyệt
-    appraises: { type: [mongoose.SchemaTypes.ObjectId] }, // Danh sách kết quả nghiệm thu
-    fileRef: { type: String, default: null }, // fileRef
+
+    reviewInstructor: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: "Instructor",
+    }, // Giảng viên chịu trách nhiệm kiểm duyệt
+    reviews: { type: [mongoose.SchemaTypes.ObjectId], ref: "ReviewGrade" }, // Danh sách kết quả kiểm duyệt
+
+    appraiseStaff: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: "AppraisalBoard",
+    }, // Cán bộ chịu trách nhiệm thẩm định
+    appraises: { type: [mongoose.SchemaTypes.ObjectId], ref: "AppraiseGrade" }, // Danh sách kết quả thẩm định
+
+    contractFile: { type: String, default: null }, // File hợp đồng
+    submitFile: { type: String, default: null }, // File nghiệm thu
+    registerFile: { type: String, default: null }, // File hồ sơ lúc đăng ký
+    paymentFile: { type: String, default: null }, // File quyết toán tài chính
+
     owner: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Student",
       required: true,
     }, // Chủ sở hữu đề tài
-    instructor: intructorSchema, // GVHD
+    instructor: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Instructor",
+      required: true,
+    }, // Giảng viên hướng dẫn
   },
   {
     timestamps: true, // Thời gian đăng ký đề tài

@@ -1,12 +1,12 @@
 import { mongooseConnect } from "@/lib/mongoose";
-import { Account } from "@/models/Account";
-import { Student } from "@/models/Student";
-import { TechnologyScience } from "@/models/TechnologyScience";
-import { AppraisalBoard } from "@/models/AppraisalBoard";
+import { Account } from "@/models/users/Account";
+import { Student } from "@/models/users/Student";
+import { TechnologyScience } from "@/models/users/TechnologyScience";
+import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-import { Instructor } from "@/models/Instructor";
+import { Instructor } from "@/models/users/Instructor";
 
 export async function GET(request, { params }) {
   await mongooseConnect();

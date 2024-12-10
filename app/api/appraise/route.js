@@ -1,6 +1,6 @@
 import { mongooseConnect } from "@/lib/mongoose";
-import { Account } from "@/models/Account";
-import { AppraisalBoard } from "@/models/AppraisalBoard";
+import { Account } from "@/models/users/Account";
+import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 

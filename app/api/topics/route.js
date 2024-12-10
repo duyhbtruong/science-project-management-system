@@ -1,6 +1,6 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { ReviewGrade } from "@/models/ReviewGrade";
-import { Student } from "@/models/Student";
+import { Student } from "@/models/users/Student";
 import { Topic } from "@/models/Topic";
 import { NextResponse } from "next/server";
 
