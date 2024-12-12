@@ -1,6 +1,6 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/users/Account";
-import { Student } from "@/models/users/Student";
+import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
@@ -15,12 +15,12 @@ export async function GET(request) {
       filter.$match = {
         $or: [
           { "account.name": { $regex: searchKeywords, $options: "i" } },
-          { studentId: { $regex: searchKeywords, $options: "i" } },
+          { appraisalBoardId: { $regex: searchKeywords, $options: "i" } },
         ],
       };
     }
 
-    const students = await Student.aggregate([
+    const appraisalBoards = await AppraisalBoard.aggregate([
       {
         $lookup: {
           from: Account.collection.name,
@@ -29,31 +29,26 @@ export async function GET(request) {
           as: "account",
         },
       },
-      { $unwind: "$account" },
+      {
+        $unwind: "$account",
+      },
       filter,
     ]);
 
-    return NextResponse.json(students, { status: 200 });
+    return NextResponse.json(appraisalBoards, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy danh sách sinh viên " + error, {
-      status: 500,
-    });
+    return new NextResponse(
+      "Lỗi lấy danh sách tài khoản cán bộ hội đồng " + error,
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request) {
   try {
     await mongooseConnect();
-    const {
-      studentId,
-      faculty,
-      educationProgram,
-      name,
-      email,
-      phone,
-      password,
-      role,
-    } = await request.json();
+    const { appraisalBoardId, name, email, phone, password, role } =
+      await request.json();
 
     if (await Account.findOne({ email })) {
       return NextResponse.json(
@@ -62,9 +57,9 @@ export async function POST(request) {
       );
     }
 
-    if (await Student.findOne({ studentId })) {
+    if (await AppraisalBoard.findOne({ appraisalBoardId })) {
       return NextResponse.json(
-        { message: "Mã số sinh viên đã tồn tại!" },
+        { message: "Mã số phòng Thẩm định đã tồn tại!" },
         { status: 409 }
       );
     }
@@ -82,20 +77,19 @@ export async function POST(request) {
       { email: email },
       { _id: 1 }
     );
-    await Student.create({
-      studentId,
-      faculty,
-      educationProgram,
+    await AppraisalBoard.create({
+      appraisalBoardId,
       accountId: createdAccountId,
     });
 
     return NextResponse.json(
-      { message: "Tài khoản sinh viên đã được tạo thành công!" },
+      { message: "Tài khoản phòng Thẩm định đã được tạo thành công!" },
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi tạo tài khoản sinh viên " + error, {
-      status: 500,
-    });
+    return new NextResponse(
+      "Lỗi tạo tài khoản cán bộ hội đồng thẩm định " + error,
+      { status: 500 }
+    );
   }
 }

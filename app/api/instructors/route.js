@@ -1,8 +1,47 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/users/Account";
+import { Instructor } from "@/models/users/Instructor";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { Instructor } from "@/models/users/Instructor";
+
+export async function GET(request) {
+  try {
+    await mongooseConnect();
+    const searchParams = request.nextUrl.searchParams;
+    const searchKeywords = searchParams.get("search");
+    var filter = { $match: {} };
+
+    if (searchKeywords) {
+      filter.$match = {
+        $or: [
+          { "account.name": { $regex: searchKeywords, $options: "i" } },
+          { instructorId: { $regex: searchKeywords, $options: "i" } },
+        ],
+      };
+    }
+
+    const instructors = await Instructor.aggregate([
+      {
+        $lookup: {
+          from: Account.collection.name,
+          localField: "accountId",
+          foreignField: "_id",
+          as: "account",
+        },
+      },
+      {
+        $unwind: "$account",
+      },
+      filter,
+    ]);
+
+    return NextResponse.json(instructors, { status: 200 });
+  } catch (error) {
+    return new NextResponse("Lỗi lấy danh sách tài khoản giảng viên " + error, {
+      status: 500,
+    });
+  }
+}
 
 export async function POST(request) {
   try {
