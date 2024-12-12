@@ -4,6 +4,45 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { TechnologyScience } from "@/models/users/TechnologyScience";
 
+export async function GET(request) {
+  try {
+    await mongooseConnect();
+    const searchParams = request.nextUrl.searchParams;
+    const searchKeywords = searchParams.get("search");
+    var filter = { $match: {} };
+
+    if (searchKeywords) {
+      filter.$match = {
+        $or: [
+          { "account.name": { $regex: searchKeywords, $options: "i" } },
+          { technologyScienceId: { $regex: searchKeywords, $options: "i" } },
+        ],
+      };
+    }
+
+    const technologySciences = await TechnologyScience.aggregate([
+      {
+        $lookup: {
+          from: Account.collection.name,
+          localField: "accountId",
+          foreignField: "_id",
+          as: "account",
+        },
+      },
+      {
+        $unwind: "$account",
+      },
+      filter,
+    ]);
+
+    return NextResponse.json(technologySciences, { status: 200 });
+  } catch (error) {
+    return new NextResponse("Lỗi lấy danh sách tài khoản phòng KHCN " + error, {
+      status: 500,
+    });
+  }
+}
+
 export async function POST(request) {
   try {
     await mongooseConnect();
