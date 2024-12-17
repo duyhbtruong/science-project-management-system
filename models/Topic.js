@@ -11,6 +11,12 @@ const topicSchema = new Schema(
     expectedResult: { type: String, required: true }, // Kết quả dự đoán
     participants: { type: [String], required: true }, // Danh sách thành viên
 
+    registrationPeriod: {
+      type: [mongoose.SchemaTypes.Objectid],
+      ref: "RegistrationPeriod",
+      required: true,
+    }, // Thuộc đợt đăng ký nào
+
     reviewInstructor: {
       type: [mongoose.SchemaTypes.ObjectId],
       ref: "Instructor",
