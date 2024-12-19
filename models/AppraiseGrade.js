@@ -1,4 +1,3 @@
-import { Double } from "mongodb";
 import mongoose, { model, models, Schema } from "mongoose";
 
 const appraiseGradeSchema = new Schema(

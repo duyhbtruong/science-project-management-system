@@ -12,20 +12,22 @@ const topicSchema = new Schema(
     participants: { type: [String], required: true }, // Danh sách thành viên
 
     registrationPeriod: {
-      type: [mongoose.SchemaTypes.Objectid],
+      type: mongoose.SchemaTypes.ObjectId,
       ref: "RegistrationPeriod",
       required: true,
     }, // Thuộc đợt đăng ký nào
 
     reviewInstructor: {
-      type: [mongoose.SchemaTypes.ObjectId],
+      type: mongoose.SchemaTypes.ObjectId,
       ref: "Instructor",
+      default: null,
     }, // Giảng viên chịu trách nhiệm kiểm duyệt
     reviews: { type: [mongoose.SchemaTypes.ObjectId], ref: "ReviewGrade" }, // Danh sách kết quả kiểm duyệt
 
     appraiseStaff: {
-      type: [mongoose.SchemaTypes.ObjectId],
+      type: mongoose.SchemaTypes.ObjectId,
       ref: "AppraisalBoard",
+      default: null,
     }, // Cán bộ chịu trách nhiệm thẩm định
     appraises: { type: [mongoose.SchemaTypes.ObjectId], ref: "AppraiseGrade" }, // Danh sách kết quả thẩm định
 
