@@ -91,7 +91,10 @@ export async function PUT(request, { params }) {
 
     await mongooseConnect();
 
-    const topic = await Topic.findOne({ _id: id });
+    const topic = await Topic.findOne({ _id: id }).populate({
+      path: "registrationPeriod",
+      select: "reviewDeadline",
+    });
 
     if (!topic) {
       return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
@@ -170,10 +173,20 @@ export async function DELETE(request, { params }) {
 
     await mongooseConnect();
 
-    const topic = await Topic.findOne({ _id: id });
+    const topic = await Topic.findOne({ _id: id }).populate({
+      path: "registrationPeriod",
+      select: "endDate",
+    });
 
     if (!topic) {
       return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+    }
+
+    const today = new Date();
+    if (today > topic.registrationPeriod.endDate) {
+      return new NextResponse("Đã hết hạn hủy đăng ký đề tài.", {
+        status: 400,
+      });
     }
 
     await Topic.findByIdAndDelete({ _id: id });

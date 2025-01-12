@@ -3,38 +3,32 @@ import mongoose, { model, models, Schema } from "mongoose";
 // Model cho Class Review Grade
 const reviewGradeSchema = new Schema(
   {
-    // Mã đề tài
     topicId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Topic",
       required: true,
-    },
-    // Mã phòng KHCN
-    technologyScienceId: {
+    }, // Mã đề tài
+    instructorId: {
       type: mongoose.SchemaTypes.ObjectId,
-      ref: "TechnologyScience",
+      ref: "Instructor",
       required: true,
-    },
-    // Điểm từng tiêu chí
+    }, // Mã giảng viên kiểm duyệt
     criteria: {
       type: [Number],
       required: true,
-    },
-    // Điểm CHUNG
+    }, // Điểm tiêu chí
     grade: {
       type: Number,
       required: true,
-    },
-    // Đạt chuẩn Euraka?
+    }, // Điểm tổng
     isEureka: {
       type: String,
       required: true,
-    },
-    // Note
+    }, // Đạt Eureka hay không
     note: {
       type: String,
       required: true,
-    },
+    }, // Ghi chú
   },
   {
     timestamps: true,

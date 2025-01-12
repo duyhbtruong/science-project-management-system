@@ -39,6 +39,8 @@ export async function GET(request) {
       filter.registrationPeriod = period;
     }
 
+    await mongooseConnect();
+
     const topics = await Topic.find(filter)
       .populate({
         path: "instructor",
