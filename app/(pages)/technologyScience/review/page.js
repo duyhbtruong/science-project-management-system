@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteReviewByTopicId } from "@/service/reviewService";
+import { deleteReviewById } from "@/service/reviewService";
 import { getTopics, searchTopic } from "@/service/topicService";
 import { dateFormat } from "@/utils/format";
 import {
@@ -34,7 +34,7 @@ export default function ReviewPage() {
   };
 
   const deleteReview = async (topicId, technologyScienceId) => {
-    const res = await deleteReviewByTopicId(topicId, technologyScienceId);
+    const res = await deleteReviewById(topicId, technologyScienceId);
     const { message } = res;
     if (message === "Chưa kiểm duyệt đề tài này!") {
       messageApi.open({

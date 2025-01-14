@@ -7,7 +7,7 @@ const { Header, Content, Footer, Sider } = Layout;
 export default function AdminLayout({ children }) {
   return (
     <Layout hasSider>
-      <Sider theme="dark" className="relative" collapsible>
+      <Sider theme="light" className="relative">
         <NavigationBar />
       </Sider>
       <Layout className="px-6">

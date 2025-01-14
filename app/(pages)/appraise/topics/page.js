@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { storage } from "@/lib/firebase";
 import { getDownloadURL, ref } from "firebase/storage";
 import Link from "next/link";
-import { deleteAppraiseGradeByTopicId } from "@/service/appraiseGradeService";
+import { deleteAppraiseById } from "@/service/appraiseGradeService";
 
 export default function AppraiseTopicPage() {
   const session = useSession();
@@ -47,7 +47,7 @@ export default function AppraiseTopicPage() {
   };
 
   const deleteAppraiseGrade = async (topicId, appraisalBoardId) => {
-    const res = await deleteAppraiseGradeByTopicId(topicId, appraisalBoardId);
+    const res = await deleteAppraiseById(topicId, appraisalBoardId);
     const { message } = res;
     if (message === "Chưa thẩm định đề tài này!") {
       messageApi.open({

@@ -39,7 +39,6 @@ const NavigationBar = () => {
       <Menu
         onClick={(e) => setCurrent(e.key)}
         mode="inline"
-        theme="dark"
         selectedKeys={[current]}
         items={items}
       />

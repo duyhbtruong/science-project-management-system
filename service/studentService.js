@@ -1,35 +1,103 @@
-export const getStudentAccountByAccountId = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/students?id=${id}`, {
-    method: "GET",
-  });
-  if (res) {
-    return res.json();
-  }
-};
-
-export const getStudentAccountById = async (id) => {
+export const getAllStudents = async () => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/students?studentId=${id}`,
-      {
-        method: "GET",
-      }
-    );
-    if (res) {
-      return res.json();
+    const res = await fetch(`http://localhost:3000/api/students`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch students.");
     }
+
+    return res.json();
   } catch (error) {
     return error;
   }
 };
 
-export const postStudentAccount = async (values) => {
-  const res = await fetch(`http://localhost:3000/api/students/`, {
-    method: "POST",
-    body: JSON.stringify(values),
-  });
+export const searchStudents = async (searchValues) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/students?search=${searchValues}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
 
-  if (res) {
-    return res;
+    if (!res.ok) {
+      throw new Error("Failed to fetch students.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getStudentById = async (id) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const createStudent = async (values) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/students`, {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+
+    if (!res) {
+      throw new Error("Failed to create student.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const updateStudentById = async (id, values) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(values),
+    });
+
+    if (!res) {
+      throw new Error("Failed to update student.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const deleteStudentById = async (id) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res) {
+      throw new Error("Failed to delete student.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
   }
 };

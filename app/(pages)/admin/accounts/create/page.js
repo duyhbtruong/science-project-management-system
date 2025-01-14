@@ -1,9 +1,9 @@
 "use client";
 
-import { postAppraiseAccount } from "@/service/appraiseService";
-import { postInstructorAccount } from "@/service/instructorService";
-import { postStudentAccount } from "@/service/studentService";
-import { postTechnologyScienceAccount } from "@/service/technologyScienceService";
+import { createAppraisalBoard } from "@/service/appraiseService";
+import { createInstructor } from "@/service/instructorService";
+import { createStudent } from "@/service/studentService";
+import { createTechnologyScience } from "@/service/technologyScienceService";
 import {
   CodeOutlined,
   IdcardOutlined,
@@ -25,7 +25,7 @@ export default function CreateAccount() {
     try {
       switch (role) {
         case "student": {
-          const res = await postStudentAccount(values);
+          const res = await createStudent(values);
           if (res.status === 201) {
             const { message } = await res.json();
             messageApi
@@ -45,7 +45,7 @@ export default function CreateAccount() {
           break;
         }
         case "instructor": {
-          const res = await postInstructorAccount(values);
+          const res = await createInstructor(values);
           if (res.status === 201) {
             const { message } = await res.json();
             messageApi
@@ -65,7 +65,7 @@ export default function CreateAccount() {
           break;
         }
         case "technologyScience": {
-          const res = await postTechnologyScienceAccount(values);
+          const res = await createTechnologyScience(values);
           if (res.status === 201) {
             const { message } = await res.json();
             messageApi
@@ -85,7 +85,7 @@ export default function CreateAccount() {
           break;
         }
         case "appraise": {
-          const res = await postAppraiseAccount(values);
+          const res = await createAppraisalBoard(values);
           if (res.status === 201) {
             const { message } = await res.json();
             messageApi

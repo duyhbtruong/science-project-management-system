@@ -1,6 +1,7 @@
 export const getAccounts = async () => {
   try {
     const res = await fetch(`http://localhost:3000/api/accounts`, {
+      method: "GET",
       cache: "no-store",
     });
 
@@ -14,41 +15,6 @@ export const getAccounts = async () => {
   }
 };
 
-export const getAccountById = async (id) => {
-  try {
-    const res = await fetch(`http://localhost:3000/api/accounts/${id}`, {
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to get account.");
-    }
-
-    return res.json();
-  } catch (error) {
-    console.log("Error: ", error);
-  }
-};
-
-// export const getAccountByEmail = async (email) => {
-//   try {
-//     const res = await fetch(
-//       `http://localhost:3000/api/accounts?email=${email}`,
-//       {
-//         cache: "no-store",
-//       }
-//     );
-
-//     if (!res.ok) {
-//       throw new Error("Failed to get account.");
-//     }
-
-//     return res.json();
-//   } catch (error) {
-//     console.log("Error: ", error);
-//   }
-// };
-
 export const searchAccounts = async (searchValues) => {
   try {
     const res = await fetch(
@@ -58,38 +24,12 @@ export const searchAccounts = async (searchValues) => {
         cache: "no-store",
       }
     );
-    if (res) {
-      return res.json();
+
+    if (!res) {
+      throw new Error("Failed to search accounts.");
     }
-  } catch (error) {
-    return error;
-  }
-};
 
-export const updateAccountById = async (id, values) => {
-  try {
-    const res = await fetch(`http://localhost:3000/api/accounts/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(values),
-    });
-
-    if (res.ok) {
-      return res.json();
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const deleteAccountById = async (id) => {
-  try {
-    const res = await fetch(`http://localhost:3000/api/accounts?id=${id}`, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to delete account!");
-    }
+    return res.json();
   } catch (error) {
     console.log("Error: ", error);
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { getAccountById } from "@/service/accountService";
-import { getStudentAccountById } from "@/service/studentService";
+import { getStudentById } from "@/service/studentService";
 import {
   deleteTopicById,
   getTopics,
@@ -71,7 +71,7 @@ export default function TopicsManagePage() {
   const handleExport = async () => {
     let students = [];
     for (const topic of topics) {
-      const student = await getStudentAccountById(topic.owner);
+      const student = await getStudentById(topic.owner);
       const account = await getAccountById(student.accountId);
       students.push(account);
     }

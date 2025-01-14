@@ -7,7 +7,7 @@ const { Header, Content, Footer, Sider } = Layout;
 export default function StudentLayout({ children }) {
   return (
     <Layout hasSider>
-      <Sider theme="dark" className="relative" collapsible>
+      <Sider className="relative" collapsible>
         <NavigationBar />
       </Sider>
       <Layout className="px-6">

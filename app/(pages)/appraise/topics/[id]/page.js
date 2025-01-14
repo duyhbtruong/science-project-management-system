@@ -2,9 +2,9 @@
 
 import {
   createAppraise,
-  getAppraiseGradeByTopicId,
+  getAppraisesByTopicId,
 } from "@/service/appraiseGradeService";
-import { getStudentAccountById } from "@/service/studentService";
+import { getStudentById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
 import { ExportOutlined, InfoOutlined, LinkOutlined } from "@ant-design/icons";
 import {
@@ -125,7 +125,7 @@ export default function ReviewTopicPage({ params }) {
   };
 
   const loadAppraiseGrade = async () => {
-    setAppraise(await getAppraiseGradeByTopicId(topicId, userId));
+    setAppraise(await getAppraisesByTopicId(topicId, userId));
   };
 
   useEffect(() => {

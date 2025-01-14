@@ -1,7 +1,7 @@
 "use client";
 
-import { createReview, getReviewByTopicId } from "@/service/reviewService";
-import { getStudentAccountById } from "@/service/studentService";
+import { createReview, getReviewsByTopicId } from "@/service/reviewService";
+import { getStudentById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
 import { ExportOutlined, InfoOutlined, LinkOutlined } from "@ant-design/icons";
 import {
@@ -126,7 +126,7 @@ export default function ReviewTopicPage({ params }) {
   };
 
   const loadReview = async () => {
-    setReview(await getReviewByTopicId(topicId, userId));
+    setReview(await getReviewsByTopicId(topicId, userId));
   };
 
   useEffect(() => {
