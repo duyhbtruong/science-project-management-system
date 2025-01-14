@@ -27,7 +27,9 @@ const AccountsPage = () => {
   const [modal, modalContextHolder] = Modal.useModal();
 
   const loadAccounts = async () => {
-    setAccounts(await getAccounts());
+    var res = await getAccounts();
+    res = await res.json();
+    setAccounts(res);
   };
 
   const deleteAccount = async (id) => {
@@ -79,9 +81,9 @@ const AccountsPage = () => {
                 Tạo tài khoản
               </Button>
               {/* TODO: Add import list of students through a spreadsheet file */}
-              <Button type="default" icon={<UploadOutlined />}>
+              {/* <Button type="default" icon={<UploadOutlined />}>
                 Nhập danh sách
-              </Button>
+              </Button> */}
             </div>
           </div>
 
@@ -104,6 +106,7 @@ const AccountsPage = () => {
               render={(_, record) => {
                 return (
                   <Link
+                    target="_blank"
                     href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.email}`}
                   >
                     {record.email}
@@ -156,6 +159,7 @@ const AccountsPage = () => {
             <Column
               title="Hành động"
               key="action"
+              align="right"
               render={(_, record) => {
                 const isAdmin = record.role === "admin" ? true : false;
 

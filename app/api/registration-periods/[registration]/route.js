@@ -9,9 +9,12 @@ export async function GET(request, { params }) {
     const id = params.registration;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -19,16 +22,22 @@ export async function GET(request, { params }) {
     const period = await RegistrationPeriod.findOne({ _id: id });
 
     if (!period) {
-      return new NextResponse("Không tìm thấy thông tin đợt đăng ký.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy thông tin đợt đăng ký." },
+        {
+          status: 404,
+        }
+      );
     }
 
     return NextResponse.json(period, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy thông tin đợt đăng ký " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy thông tin đợt đăng ký " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -45,9 +54,12 @@ export async function PUT(request, { params }) {
     } = await request.json();
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     const start = new Date(startDate);
@@ -57,29 +69,35 @@ export async function PUT(request, { params }) {
     const appraise = new Date(appraiseDeadline);
 
     if (start >= end) {
-      return new NextResponse(
-        "Ngày mở đăng ký phải trước ngày kết thúc đăng ký.",
+      return NextResponse.json(
+        { message: "Ngày mở đăng ký phải trước ngày kết thúc đăng ký." },
         { status: 400 }
       );
     }
 
     if (end >= review) {
-      return new NextResponse(
-        "Ngày kết thúc đăng ký phải trước ngày kiểm duyệt đề tài.",
+      return NextResponse.json(
+        { message: "Ngày kết thúc đăng ký phải trước ngày kiểm duyệt đề tài." },
         { status: 400 }
       );
     }
 
     if (review >= submit) {
-      return new NextResponse(
-        "Ngày kiểm duyệt đề tài phải trước ngày nộp hồ sơ nghiệm thu.",
+      return NextResponse.json(
+        {
+          message:
+            "Ngày kiểm duyệt đề tài phải trước ngày nộp hồ sơ nghiệm thu.",
+        },
         { status: 400 }
       );
     }
 
     if (submit >= appraise) {
-      return new NextResponse(
-        "Ngày nộp hồ sơ nghiệm thu phải trước ngày thẩm định đề tài.",
+      return NextResponse.json(
+        {
+          message:
+            "Ngày nộp hồ sơ nghiệm thu phải trước ngày thẩm định đề tài.",
+        },
         { status: 400 }
       );
     }
@@ -89,9 +107,12 @@ export async function PUT(request, { params }) {
     const registrationPeriod = await RegistrationPeriod.findOne({ _id: id });
 
     if (!registrationPeriod) {
-      return new NextResponse("Không tìm thấy thông tin đợt đăng ký.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy thông tin đợt đăng ký." },
+        {
+          status: 404,
+        }
+      );
     }
 
     const periods = await RegistrationPeriod.find(
@@ -104,8 +125,8 @@ export async function PUT(request, { params }) {
     });
 
     if (isOverlapping) {
-      return new NextResponse(
-        "Thời gian đăng ký trùng với các thời gian đăng ký khác.",
+      return NextResponse.json(
+        { message: "Thời gian đăng ký trùng với các thời gian đăng ký khác." },
         { status: 409 }
       );
     }
@@ -127,9 +148,12 @@ export async function PUT(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi cập nhật thông tin đợt đăng ký " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi cập nhật thông tin đợt đăng ký " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -138,9 +162,12 @@ export async function DELETE(request, { params }) {
     const id = params.registration;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     const today = new Date();
@@ -150,14 +177,17 @@ export async function DELETE(request, { params }) {
     const period = await RegistrationPeriod.findOne({ _id: id });
 
     if (!period) {
-      return new NextResponse("Không tìm thấy thông tin đợt đăng ký.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy thông tin đợt đăng ký." },
+        {
+          status: 404,
+        }
+      );
     }
 
     if (period.startDate <= today) {
-      return new NextResponse(
-        "Không thể xóa đợt đăng ký đã bắt đầu hoặc đã kết thúc.",
+      return NextResponse.json(
+        { message: "Không thể xóa đợt đăng ký đã bắt đầu hoặc đã kết thúc." },
         {
           status: 409,
         }
@@ -171,8 +201,11 @@ export async function DELETE(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi xóa thông tin đợt đăng ký " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi xóa thông tin đợt đăng ký " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

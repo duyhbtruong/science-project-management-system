@@ -10,9 +10,12 @@ export async function GET(request, { params }) {
     const id = params.technology;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -22,16 +25,22 @@ export async function GET(request, { params }) {
     }).populate("accountId");
 
     if (!technologyScience) {
-      return new NextResponse("Không tìm thấy tài khoản phòng KHCN.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản phòng KHCN." },
+        {
+          status: 404,
+        }
+      );
     }
 
     return NextResponse.json(technologyScience, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy tài khoản phòng KHCN " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy tài khoản phòng KHCN " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -44,9 +53,12 @@ export async function PUT(request, { params }) {
     const accountUpdate = { name, phone };
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -71,9 +83,12 @@ export async function PUT(request, { params }) {
     ]).then((result) => result[0]);
 
     if (!technologyScience) {
-      return new NextResponse("Không tìm thấy tài khoản phòng KHCN.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản phòng KHCN." },
+        {
+          status: 404,
+        }
+      );
     }
 
     if (password) {
@@ -118,9 +133,12 @@ export async function PUT(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi cập nhật tài khoản phòng KHCN " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi cập nhật tài khoản phòng KHCN " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -129,9 +147,12 @@ export async function DELETE(request, { params }) {
     const id = params.technology;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -139,15 +160,21 @@ export async function DELETE(request, { params }) {
     const technologyScience = await TechnologyScience.findOne({ _id: id });
 
     if (!technologyScience) {
-      return new NextResponse("Không tìm thấy phòng KHCN.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy phòng KHCN." },
+        { status: 404 }
+      );
     }
 
     const account = await Account.findOne({ _id: technologyScience.accountId });
 
     if (!account) {
-      return new NextResponse("Không tìm thấy tài khoản phòng KHCN.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản phòng KHCN." },
+        {
+          status: 404,
+        }
+      );
     }
 
     await TechnologyScience.findByIdAndDelete({ _id: id });
@@ -158,8 +185,11 @@ export async function DELETE(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi xóa tài khoản phòng KHCN " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi xóa tài khoản phòng KHCN " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

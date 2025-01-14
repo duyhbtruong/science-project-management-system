@@ -11,9 +11,12 @@ export async function GET(request, { params }) {
     const topicId = request.nextUrl.searchParams.get("topicId");
 
     if (!topicId || !mongoose.isValidObjectId(topicId)) {
-      return new NextResponse("Thiếu topic id hoặc topic id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu topic id hoặc topic id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -21,7 +24,10 @@ export async function GET(request, { params }) {
     const topic = await Topic.findOne({ _id: topicId });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài." },
+        { status: 404 }
+      );
     }
 
     const reviews = await ReviewGrade.find({ topicId: topicId })
@@ -40,9 +46,12 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(reviews, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy danh sách đánh giá " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy danh sách đánh giá " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -57,9 +66,12 @@ export async function POST(request) {
       !instructorId ||
       !mongoose.isValidObjectId(instructorId)
     ) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -67,18 +79,24 @@ export async function POST(request) {
     const topic = await Topic.findOne({ _id: topicId });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài." },
+        { status: 404 }
+      );
     }
 
     const instructor = await Instructor.findOne({ _id: instructorId });
 
     if (!instructor) {
-      return new NextResponse("Không tìm thấy giảng viên.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy giảng viên." },
+        { status: 404 }
+      );
     }
 
     if (!instructor._id.equals(topic.reviewInstructor)) {
-      return new NextResponse(
-        "Giảng viên không phải người kiểm duyệt đề tài.",
+      return NextResponse.json(
+        { message: "Giảng viên không phải người kiểm duyệt đề tài." },
         {
           status: 409,
         }
@@ -86,9 +104,12 @@ export async function POST(request) {
     }
 
     if (topic.reviews.length > 0) {
-      return new NextResponse("Đề tài đã được đánh giá", {
-        status: 409,
-      });
+      return NextResponse.json(
+        { message: "Đề tài đã được đánh giá" },
+        {
+          status: 409,
+        }
+      );
     }
 
     const createdReview = await ReviewGrade.create({
@@ -112,8 +133,11 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi tạo đánh giá đề tài " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi tạo đánh giá đề tài " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

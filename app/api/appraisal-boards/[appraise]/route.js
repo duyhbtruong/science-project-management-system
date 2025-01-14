@@ -10,9 +10,12 @@ export async function GET(request, { params }) {
     const id = params.appraise;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -29,8 +32,8 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(appraisalBoard, { status: 200 });
   } catch (error) {
-    return new NextResponse(
-      "Lỗi lấy tài khoản cán bộ hội đồng thẩm định " + error,
+    return NextResponse.json(
+      { message: "Lỗi lấy tài khoản cán bộ hội đồng thẩm định " + error },
       { status: 500 }
     );
   }
@@ -45,9 +48,12 @@ export async function PUT(request, { params }) {
     const accountUpdate = { name, phone };
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -72,9 +78,12 @@ export async function PUT(request, { params }) {
     ]).then((result) => result[0]);
 
     if (!appraisalBoard) {
-      return new NextResponse("Không tìm thấy tài khoản cán bộ hội đồng.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản cán bộ hội đồng." },
+        {
+          status: 404,
+        }
+      );
     }
 
     if (password) {
@@ -116,8 +125,8 @@ export async function PUT(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse(
-      "Lỗi cập nhật tài khoản cán bộ hội đồng thẩm định " + error,
+    return NextResponse.json(
+      { message: "Lỗi cập nhật tài khoản cán bộ hội đồng thẩm định " + error },
       { status: 500 }
     );
   }
@@ -128,9 +137,12 @@ export async function DELETE(request, { params }) {
     const id = params.appraise;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -138,17 +150,23 @@ export async function DELETE(request, { params }) {
     const appraisalBoard = await AppraisalBoard.findOne({ _id: id });
 
     if (!appraisalBoard) {
-      return new NextResponse("Không tìm thấy cán bộ hội đồng.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy cán bộ hội đồng." },
+        {
+          status: 404,
+        }
+      );
     }
 
     const account = await Account.findOne({ _id: appraisalBoard.accountId });
 
     if (!account) {
-      return new NextResponse("Không tìm thấy tài khoản cán bộ hội đồng.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản cán bộ hội đồng." },
+        {
+          status: 404,
+        }
+      );
     }
 
     await AppraisalBoard.findByIdAndDelete({ _id: id });
@@ -159,8 +177,11 @@ export async function DELETE(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi xóa tài khoản cán bộ hội đồng " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi xóa tài khoản cán bộ hội đồng " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

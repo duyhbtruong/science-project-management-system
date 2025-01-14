@@ -37,9 +37,12 @@ export async function GET(request) {
 
     return NextResponse.json(instructors, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy danh sách tài khoản giảng viên " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy danh sách tài khoản giảng viên " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -96,8 +99,11 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi tạo tài khoản giảng viên " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi tạo tài khoản giảng viên " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

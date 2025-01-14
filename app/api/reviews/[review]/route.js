@@ -9,9 +9,12 @@ export async function GET(request, { params }) {
     const reviewId = params.review;
 
     if (!reviewId || !mongoose.isValidObjectId(reviewId)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -19,14 +22,20 @@ export async function GET(request, { params }) {
     const review = await ReviewGrade.findOne({ _id: reviewId });
 
     if (!review) {
-      return new NextResponse("Không tìm thấy đánh giá.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đánh giá." },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(review, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy thông tin đánh giá " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy thông tin đánh giá " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -36,9 +45,12 @@ export async function PUT(request, { params }) {
     const { criteria, grade, isEureka, note } = await request.json();
 
     if (!reviewId || !mongoose.isValidObjectId(reviewId)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -46,7 +58,10 @@ export async function PUT(request, { params }) {
     const review = await ReviewGrade.findOne({ _id: reviewId });
 
     if (!review) {
-      return new NextResponse("Không tìm thấy đánh giá.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đánh giá." },
+        { status: 404 }
+      );
     }
 
     await ReviewGrade.findByIdAndUpdate(reviewId, {
@@ -61,9 +76,12 @@ export async function PUT(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi cập nhật thông tin đánh giá " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi cập nhật thông tin đánh giá " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -72,9 +90,12 @@ export async function DELETE(request, { params }) {
     const reviewId = params.review;
 
     if (!reviewId || !mongoose.isValidObjectId(reviewId)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -82,7 +103,10 @@ export async function DELETE(request, { params }) {
     const review = await ReviewGrade.findOne({ _id: reviewId });
 
     if (!review) {
-      return new NextResponse("Không tìm thấy đánh giá.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đánh giá." },
+        { status: 404 }
+      );
     }
 
     const topic = await Topic.findOne({
@@ -90,7 +114,10 @@ export async function DELETE(request, { params }) {
     });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài" },
+        { status: 404 }
+      );
     }
 
     await Topic.findByIdAndUpdate({ _id: topic._id }, { reviews: [] });
@@ -102,6 +129,9 @@ export async function DELETE(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi xóa đánh giá " + error, { status: 500 });
+    return NextResponse.json(
+      { message: "Lỗi xóa đánh giá " + error },
+      { status: 500 }
+    );
   }
 }

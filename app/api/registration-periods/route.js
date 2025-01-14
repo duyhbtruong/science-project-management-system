@@ -19,9 +19,12 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(periods, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy danh sách đợt đăng ký " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy danh sách đợt đăng ký " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -45,35 +48,44 @@ export async function POST(request, { params }) {
     const appraise = new Date(appraiseDeadline);
 
     if (yesterday > start) {
-      return new NextResponse("Ngày mở đăng ký phải từ ngày hôm nay trở đi.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Ngày mở đăng ký phải từ ngày hôm nay trở đi." },
+        {
+          status: 400,
+        }
+      );
     }
 
     if (start >= end) {
-      return new NextResponse(
-        "Ngày mở đăng ký phải trước ngày kết thúc đăng ký.",
+      return NextResponse.json(
+        { message: "Ngày mở đăng ký phải trước ngày kết thúc đăng ký." },
         { status: 400 }
       );
     }
 
     if (end >= review) {
-      return new NextResponse(
-        "Ngày kết thúc đăng ký phải trước ngày kiểm duyệt đề tài.",
+      return NextResponse.json(
+        { message: "Ngày kết thúc đăng ký phải trước ngày kiểm duyệt đề tài." },
         { status: 400 }
       );
     }
 
     if (review >= submit) {
-      return new NextResponse(
-        "Ngày kiểm duyệt đề tài phải trước ngày nộp hồ sơ nghiệm thu.",
+      return NextResponse.json(
+        {
+          message:
+            "Ngày kiểm duyệt đề tài phải trước ngày nộp hồ sơ nghiệm thu.",
+        },
         { status: 400 }
       );
     }
 
     if (submit >= appraise) {
-      return new NextResponse(
-        "Ngày nộp hồ sơ nghiệm thu phải trước ngày thẩm định đề tài.",
+      return NextResponse.json(
+        {
+          message:
+            "Ngày nộp hồ sơ nghiệm thu phải trước ngày thẩm định đề tài.",
+        },
         { status: 400 }
       );
     }
@@ -95,8 +107,8 @@ export async function POST(request, { params }) {
     });
 
     if (isOverlapping) {
-      return new NextResponse(
-        "Thời gian đăng ký trùng với các thời gian đăng ký khác.",
+      return NextResponse.json(
+        { message: "Thời gian đăng ký trùng với các thời gian đăng ký khác." },
         { status: 409 }
       );
     }
@@ -115,6 +127,9 @@ export async function POST(request, { params }) {
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi tạo đợt đăng ký " + error, { status: 500 });
+    return NextResponse.json(
+      { message: "Lỗi tạo đợt đăng ký " + error },
+      { status: 500 }
+    );
   }
 }

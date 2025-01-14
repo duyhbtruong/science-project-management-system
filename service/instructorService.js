@@ -9,7 +9,7 @@ export const getAllInstructors = async () => {
       throw new Error("Failed to fetch instructors.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -29,7 +29,7 @@ export const searchInstructors = async (searchValues) => {
       throw new Error("Failed to fetch instructors.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -46,7 +46,7 @@ export const getInstructorById = async (id) => {
       throw new Error("Failed to fetch");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -63,7 +63,7 @@ export const createInstructor = async (values) => {
       throw new Error("Failed to craete instructor.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -80,7 +80,7 @@ export const updateInstructorById = async (id, values) => {
       throw new Error("Failed to update instructor.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -96,7 +96,7 @@ export const deleteInstructorById = async (id) => {
       throw new Error("Failed to delete instructor.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }

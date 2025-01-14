@@ -6,7 +6,7 @@ export const createTopic = async (formData) => {
     });
 
     if (res.status === 201) {
-      return res.json();
+      return res;
     }
   } catch (error) {
     console.log(error);
@@ -24,7 +24,7 @@ export const getTopics = async () => {
       throw new Error("Failed to get topics.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -41,7 +41,7 @@ export const getTopicById = async (id) => {
       throw new Error("Failed to get topic info.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -60,7 +60,7 @@ export const searchTopic = async (searchValue) => {
       throw new Error("Failed to search topics.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -77,7 +77,7 @@ export const updateTopicById = async (id, values) => {
       throw new Error("Failed to update topic info.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -96,7 +96,7 @@ export const assignReviewInstructor = async (topicId, instructorId) => {
       throw new Error("Failed to assign review instructor.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -113,7 +113,7 @@ export const assignAppraisalBoard = async (topicId, appraisalBoardId) => {
       throw new Error("Failed to assign appraisal board.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -129,7 +129,7 @@ export const deleteTopicById = async (id) => {
       throw new Error("Failed to delete topic.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }

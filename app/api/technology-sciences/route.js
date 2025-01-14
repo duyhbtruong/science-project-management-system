@@ -37,9 +37,12 @@ export async function GET(request) {
 
     return NextResponse.json(technologySciences, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy danh sách tài khoản phòng KHCN " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy danh sách tài khoản phòng KHCN " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -86,8 +89,8 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse(
-      "Lỗi tạo tài khoản phòng Khoa học Công nghệ " + error,
+    return NextResponse.json(
+      { message: "Lỗi tạo tài khoản phòng Khoa học Công nghệ " + error },
       { status: 500 }
     );
   }

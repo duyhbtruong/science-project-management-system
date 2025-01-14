@@ -9,7 +9,7 @@ export const getAllStudents = async () => {
       throw new Error("Failed to fetch students.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -29,7 +29,7 @@ export const searchStudents = async (searchValues) => {
       throw new Error("Failed to fetch students.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -46,7 +46,7 @@ export const getStudentById = async (id) => {
       throw new Error("Failed to fetch");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -63,7 +63,7 @@ export const createStudent = async (values) => {
       throw new Error("Failed to create student.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -80,7 +80,7 @@ export const updateStudentById = async (id, values) => {
       throw new Error("Failed to update student.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -96,7 +96,7 @@ export const deleteStudentById = async (id) => {
       throw new Error("Failed to delete student.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }

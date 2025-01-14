@@ -10,9 +10,12 @@ export async function GET(request, { params }) {
     const id = params.instructor;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -22,16 +25,22 @@ export async function GET(request, { params }) {
     );
 
     if (!instructor) {
-      return new NextResponse("Không tìm thấy tài khoản giảng viên.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản giảng viên." },
+        {
+          status: 404,
+        }
+      );
     }
 
     return NextResponse.json(instructor, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy tài khoản giảng viên " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy tài khoản giảng viên " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -51,9 +60,12 @@ export async function PUT(request, { params }) {
     const accountUpdate = { name, phone };
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     const instructor = await Instructor.aggregate([
@@ -76,9 +88,12 @@ export async function PUT(request, { params }) {
     ]).then((result) => result[0]);
 
     if (!instructor) {
-      return new NextResponse("Không tìm thấy tài khoản giảng viên.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản giảng viên." },
+        {
+          status: 404,
+        }
+      );
     }
 
     if (password) {
@@ -120,9 +135,12 @@ export async function PUT(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi cập nhật tài khoản giảng viên " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi cập nhật tài khoản giảng viên " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -131,9 +149,12 @@ export async function DELETE(request, { params }) {
     const id = params.instructor;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -141,15 +162,21 @@ export async function DELETE(request, { params }) {
     const instructor = await Instructor.findOne({ _id: id });
 
     if (!instructor) {
-      return new NextResponse("Không tìm thấy giảng viên.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy giảng viên." },
+        { status: 404 }
+      );
     }
 
     const account = await Account.findOne({ _id: instructor.accountId });
 
     if (!account) {
-      return new NextResponse("Không tìm thấy tài khoản giảng viên.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản giảng viên." },
+        {
+          status: 404,
+        }
+      );
     }
 
     await Instructor.findByIdAndDelete({ _id: id });
@@ -160,8 +187,11 @@ export async function DELETE(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi xóa tài khoản giảng viên " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi xóa tài khoản giảng viên " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

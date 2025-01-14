@@ -9,7 +9,7 @@ export const getAllAppraisalBoards = async () => {
       throw new Error("Failed to get all appraisal boards.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -29,7 +29,7 @@ export const searchAppraisalBoards = async (searchValues) => {
       throw new Error("Failed to search appraisal boards.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -49,7 +49,7 @@ export const getAppraisalBoardById = async (id) => {
       throw new Error("Failed to fetch appraisal board info.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -66,7 +66,7 @@ export const createAppraisalBoard = async (values) => {
       throw new Error("Failed to create appraisal board.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -86,7 +86,7 @@ export const updateAppraisalBoardById = async (id, values) => {
       throw new Error("Failed to update appraisal board.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -105,7 +105,7 @@ export const deleteAppraisalBoardById = async (id) => {
       throw new Error("Failed to delete appraisal board.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }

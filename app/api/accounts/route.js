@@ -24,9 +24,12 @@ export async function GET(request) {
 
     return NextResponse.json(accounts, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy tài khoản " + error.message, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy tài khoản " + error.message },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -57,8 +60,11 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi tạo tài khoản admin " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi tạo tài khoản admin " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

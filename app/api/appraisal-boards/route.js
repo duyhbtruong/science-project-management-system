@@ -37,7 +37,7 @@ export async function GET(request) {
 
     return NextResponse.json(appraisalBoards, { status: 200 });
   } catch (error) {
-    return new NextResponse(
+    return NextResponse.json({message:
       "Lỗi lấy danh sách tài khoản cán bộ hội đồng " + error,
       { status: 500 }
     );
@@ -87,7 +87,7 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse(
+    return NextResponse.json({message:
       "Lỗi tạo tài khoản cán bộ hội đồng thẩm định " + error,
       { status: 500 }
     );

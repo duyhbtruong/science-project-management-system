@@ -15,9 +15,12 @@ export async function GET(request, { params }) {
     const id = params.topic;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -56,14 +59,20 @@ export async function GET(request, { params }) {
       });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài." },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(topic, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy thông tin đề tài " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy thông tin đề tài " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -84,9 +93,12 @@ export async function PUT(request, { params }) {
     const appraiseStaff = searchParams.get("appraise");
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -97,7 +109,10 @@ export async function PUT(request, { params }) {
     });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài." },
+        { status: 404 }
+      );
     }
 
     const updatedTopic = {
@@ -114,15 +129,21 @@ export async function PUT(request, { params }) {
       if (reviewInstructor === "Không có") {
         updatedTopic.reviewInstructor = null;
       } else if (!mongoose.isValidObjectId(reviewInstructor)) {
-        return new NextResponse("Id giảng viên kiểm duyệt không hợp lệ.", {
-          status: 400,
-        });
+        return NextResponse.json(
+          { message: "Id giảng viên kiểm duyệt không hợp lệ." },
+          {
+            status: 400,
+          }
+        );
       } else {
         const instructor = await Instructor.findOne({ _id: reviewInstructor });
         if (!instructor) {
-          return new NextResponse("Không tìm thấy giảng viên kiểm duyệt.", {
-            status: 404,
-          });
+          return NextResponse.json(
+            { message: "Không tìm thấy giảng viên kiểm duyệt." },
+            {
+              status: 404,
+            }
+          );
         }
         updatedTopic.reviewInstructor = reviewInstructor;
       }
@@ -132,17 +153,23 @@ export async function PUT(request, { params }) {
       if (appraiseStaff === "Không có") {
         updatedTopic.appraiseStaff = null;
       } else if (!mongoose.isValidObjectId(appraiseStaff)) {
-        return new NextResponse("Id cán bộ thẩm định không hợp lệ.", {
-          status: 400,
-        });
+        return NextResponse.json(
+          { message: "Id cán bộ thẩm định không hợp lệ." },
+          {
+            status: 400,
+          }
+        );
       } else {
         const appraisalBoard = await AppraisalBoard.findOne({
           _id: appraiseStaff,
         });
         if (!appraisalBoard) {
-          return new NextResponse("Không tìm thấy cán bộ thẩm định.", {
-            status: 404,
-          });
+          return NextResponse.json(
+            { message: "Không tìm thấy cán bộ thẩm định." },
+            {
+              status: 404,
+            }
+          );
         }
         updatedTopic.appraiseStaff = appraiseStaff;
       }
@@ -155,9 +182,12 @@ export async function PUT(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi cập nhật thông tin đề tài " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi cập nhật thông tin đề tài " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -166,9 +196,12 @@ export async function DELETE(request, { params }) {
     const id = params.topic;
 
     if (!id || !mongoose.isValidObjectId(id)) {
-      return new NextResponse("Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -179,14 +212,20 @@ export async function DELETE(request, { params }) {
     });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài." },
+        { status: 404 }
+      );
     }
 
     const today = new Date();
     if (today > topic.registrationPeriod.endDate) {
-      return new NextResponse("Đã hết hạn hủy đăng ký đề tài.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Đã hết hạn hủy đăng ký đề tài." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await Topic.findByIdAndDelete({ _id: id });
@@ -196,8 +235,11 @@ export async function DELETE(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi hủy đăng ký đề tài " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi hủy đăng ký đề tài " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

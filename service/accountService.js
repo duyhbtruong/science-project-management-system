@@ -9,9 +9,25 @@ export const getAccounts = async () => {
       throw new Error("Failed to fetch accounts.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     console.log("Error: ", error);
+  }
+};
+
+export const getAccountById = async (accountId) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/accounts/${accountId}`, {
+      method: "GET",
+    });
+
+    if (!res) {
+      throw new Error("Failed to get account info.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
   }
 };
 
@@ -29,8 +45,24 @@ export const searchAccounts = async (searchValues) => {
       throw new Error("Failed to search accounts.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     console.log("Error: ", error);
+  }
+};
+
+export const deleteAccountById = async (accountId) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/accounts/${accountId}`, {
+      method: "DELETE",
+    });
+
+    if (!res) {
+      throw new Error("Failed to delete account.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
   }
 };

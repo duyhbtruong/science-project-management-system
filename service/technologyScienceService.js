@@ -9,7 +9,7 @@ export const getAllTechnologyScience = async () => {
       throw new Error("Failed to fetch technology sciences.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -29,7 +29,7 @@ export const searchTechnologySciences = async (searchValues) => {
       throw new Error("Failed to search technology sciences.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -45,7 +45,7 @@ export const getTechnologyScienceById = async (id) => {
       throw new Error("Failed to fetch technology science info.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -62,7 +62,7 @@ export const createTechnologyScience = async (values) => {
       throw new Error("Failed to create technology science.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -82,7 +82,7 @@ export const updateTechnologyScienceById = async (id, values) => {
       throw new Error("Failed to update student.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -101,7 +101,7 @@ export const deleteTechnologyScienceById = async (id) => {
       throw new Error("Failed to delete technology science.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }

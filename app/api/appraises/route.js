@@ -21,7 +21,7 @@ export async function GET(request) {
     const topic = Topic.findOne({ _id: topicId });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json({message:"Không tìm thấy đề tài.", { status: 404 });
     }
 
     const appraises = await AppraiseGrade.find({ topicId: topicId })
@@ -40,7 +40,7 @@ export async function GET(request) {
 
     return NextResponse.json(appraises, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy danh sách thẩm định " + error, {
+    return NextResponse.json({message:"Lỗi lấy danh sách thẩm định " + error, {
       status: 500,
     });
   }
@@ -68,7 +68,7 @@ export async function POST(request) {
     const topic = await Topic.findOne({ _id: topicId });
 
     if (!topic) {
-      return new NextResponse("Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json({message:"Không tìm thấy đề tài.", { status: 404 });
     }
 
     const appraiseStaff = await AppraisalBoard.findOne({
@@ -76,19 +76,19 @@ export async function POST(request) {
     });
 
     if (!appraiseStaff) {
-      return new NextResponse("Không tìm thấy cán bộ thẩm định.", {
+      return NextResponse.json({message:"Không tìm thấy cán bộ thẩm định.", {
         status: 404,
       });
     }
 
     if (!appraiseStaff._id.equals(topic.appraiseStaff)) {
-      return new NextResponse("Cán bộ không phải người thẩm định đề tài.", {
+      return NextResponse.json({message:"Cán bộ không phải người thẩm định đề tài.", {
         status: 409,
       });
     }
 
     if (topic.appraises.length > 0) {
-      return new NextResponse("Đề tài đã được thẩm định.", {
+      return NextResponse.json({message:"Đề tài đã được thẩm định.", {
         status: 409,
       });
     }
@@ -112,7 +112,7 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi tạo kết quả thẩm định " + error, {
+    return NextResponse.json({message:"Lỗi tạo kết quả thẩm định " + error, {
       status: 500,
     });
   }

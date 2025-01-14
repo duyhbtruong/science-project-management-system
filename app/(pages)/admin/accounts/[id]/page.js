@@ -1,6 +1,10 @@
 "use client";
 
-import { getAccountById, updateAccountById } from "@/service/accountService";
+import { getAccountById } from "@/service/accountService";
+import { updateAppraisalBoardById } from "@/service/appraiseService";
+import { updateInstructorById } from "@/service/instructorService";
+import { updateStudentById } from "@/service/studentService";
+import { updateTechnologyScienceById } from "@/service/technologyScienceService";
 import { validatePhoneNumber } from "@/utils/validator";
 import {
   LockOutlined,
@@ -9,10 +13,13 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Form, Button, Input, message, Card, Select, Spin } from "antd";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function UpdateAccount({ params }) {
+  // const { data } = useSession();
+  // console.log(">>> data: ", data);
   const id = params.id;
   const [messageApi, contextHolder] = message.useMessage();
   const [account, setAccount] = useState();
@@ -26,7 +33,8 @@ export default function UpdateAccount({ params }) {
   const router = useRouter();
 
   const loadAccount = async () => {
-    const response = await getAccountById(id);
+    var response = await getAccountById(id);
+    response = await response.json();
     setAccount(response.account);
     setRole(response.account.role);
     setStudent(response.student);
@@ -58,19 +66,46 @@ export default function UpdateAccount({ params }) {
   }, [account]);
 
   const onFinish = async (values) => {
-    const res = await updateAccountById(id, values);
-    const { message } = res;
-    messageApi
-      .open({
-        type: "success",
+    var res;
+    if (account.role === "student") {
+      res = await updateStudentById(student._id, values);
+    }
+
+    if (account.role === "instructor") {
+      res = await updateInstructorById(instructor._id, values);
+    }
+
+    if (account.role === "technologyScience") {
+      res = await updateTechnologyScienceById(technologyScience._id, values);
+    }
+
+    if (account.role === "appraise") {
+      res = await updateAppraisalBoardById(appraise._id, values);
+    }
+
+    const { message } = await res.json();
+
+    if (res.status === 200) {
+      messageApi
+        .open({
+          type: "success",
+          content: message,
+          duration: 2,
+        })
+        .then(() => router.push(`/admin/accounts`));
+    } else {
+      messageApi.open({
+        type: "error",
         content: message,
         duration: 2,
-      })
-      .then(() => router.push("/admin/accounts"));
+      });
+    }
   };
 
+  // console.log(">>> account: ", account);
+
   return (
-    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[calc(100vh-45.8px)]">
+    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[100vh]">
       {contextHolder}
       <div className="text-lg font-semibold">Cập nhật tài khoản</div>
       <Card className="shadow-md">
@@ -118,7 +153,6 @@ export default function UpdateAccount({ params }) {
               <Input
                 prefix={<MailOutlined className="text-border" />}
                 placeholder="Nhập email..."
-                disabled
               />
             </Form.Item>
 
@@ -209,7 +243,7 @@ export default function UpdateAccount({ params }) {
                   ]}
                   hasFeedback
                 >
-                  <Input placeholder="Nhập MSSV..." disabled />
+                  <Input placeholder="Nhập MSSV..." />
                 </Form.Item>
 
                 <Form.Item
@@ -287,7 +321,7 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập mã số Phòng thẩm định..." disabled />
+                  <Input placeholder="Nhập mã số Phòng thẩm định..." />
                 </Form.Item>
               </>
             )}
@@ -304,10 +338,7 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input
-                    disabled
-                    placeholder="Nhập mã số Phòng Khoa học Công nghệ..."
-                  />
+                  <Input placeholder="Nhập mã số Phòng Khoa học Công nghệ..." />
                 </Form.Item>
               </>
             )}
@@ -324,7 +355,7 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input disabled placeholder="Nhập mã số Giảng viên..." />
+                  <Input placeholder="Nhập mã số Giảng viên..." />
                 </Form.Item>
 
                 <Form.Item

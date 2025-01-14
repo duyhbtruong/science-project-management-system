@@ -27,14 +27,20 @@ export async function GET(request) {
 
     if (instructorId) {
       if (!mongoose.isValidObjectId(instructorId)) {
-        return new NextResponse("Id không hợp lệ.", { status: 400 });
+        return NextResponse.json(
+          { message: "Id không hợp lệ." },
+          { status: 400 }
+        );
       }
       filter.instructor = instructorId;
     }
 
     if (period) {
       if (!mongoose.isValidObjectId(period)) {
-        return new NextResponse("Id không hợp lệ.", { status: 400 });
+        return NextResponse.json(
+          { message: "Id không hợp lệ." },
+          { status: 400 }
+        );
       }
       filter.registrationPeriod = period;
     }
@@ -76,9 +82,12 @@ export async function GET(request) {
 
     return NextResponse.json(topics, { status: 200 });
   } catch (error) {
-    return new NextResponse("Lỗi lấy danh sách đề tài " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy danh sách đề tài " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -101,9 +110,12 @@ export async function POST(request) {
 
     // Kiểm tra tính hợp lệ của đợt đăng ký
     if (!registrationPeriod || !mongoose.isValidObjectId(registrationPeriod)) {
-      return new NextResponse("Thiếu id đợt đăng ký hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id đợt đăng ký hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     const period = await RegistrationPeriod.findOne({
@@ -111,21 +123,26 @@ export async function POST(request) {
     });
 
     if (!period) {
-      return new NextResponse("Không tìm thấy đợt đăng ký.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đợt đăng ký." },
+        { status: 404 }
+      );
     }
 
     const today = new Date();
     if (today < period.startDate || today > period.endDate) {
-      return new NextResponse(
-        "Chưa tới thời gian đăng ký hoặc đã hết thời gian đăng ký.",
+      return NextResponse.json(
+        {
+          message: "Chưa tới thời gian đăng ký hoặc đã hết thời gian đăng ký.",
+        },
         { status: 409 }
       );
     }
 
     // Kiểm tra tính hợp lệ của sinh viên đăng ký
     if (!owner || !mongoose.isValidObjectId(owner)) {
-      return new NextResponse(
-        "Thiếu id chủ nhiệm đề tài hoặc id không hợp lệ.",
+      return NextResponse.json(
+        { message: "Thiếu id chủ nhiệm đề tài hoặc id không hợp lệ." },
         {
           status: 400,
         }
@@ -133,17 +150,23 @@ export async function POST(request) {
     }
 
     if (!(await Student.findOne({ _id: owner }))) {
-      return new NextResponse("Không tìm thấy sinh viên.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy sinh viên." },
+        { status: 404 }
+      );
     }
 
     if (await Topic.findOne({ owner: owner })) {
-      return new NextResponse("Sinh viên đã đăng ký đề tài.", { status: 409 });
+      return NextResponse.json(
+        { message: "Sinh viên đã đăng ký đề tài." },
+        { status: 409 }
+      );
     }
 
     // Kiểm tra tính hợp lệ của giảng viên hướng dẫn
     if (!instructor || !mongoose.isValidObjectId(instructor)) {
-      return new NextResponse(
-        "Thiếu id giảng viên hướng dẫn hoặc id không hợp lệ.",
+      return NextResponse.json(
+        { message: "Thiếu id giảng viên hướng dẫn hoặc id không hợp lệ." },
         {
           status: 400,
         }
@@ -151,9 +174,12 @@ export async function POST(request) {
     }
 
     if (!(await Instructor.findOne({ _id: instructor }))) {
-      return new NextResponse("Không tìm thấy giảng viên hướng dẫn.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy giảng viên hướng dẫn." },
+        {
+          status: 404,
+        }
+      );
     }
 
     // Lưu thông tin đăng ký
@@ -175,6 +201,9 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (error) {
-    return new NextResponse("Lỗi đăng ký đề tài " + error, { status: 500 });
+    return NextResponse.json(
+      { message: "Lỗi đăng ký đề tài " + error },
+      { status: 500 }
+    );
   }
 }

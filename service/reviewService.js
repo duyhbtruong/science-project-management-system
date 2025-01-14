@@ -9,7 +9,7 @@ export const getReviewById = async (id) => {
       throw new Error("Failed to get reviews by review id.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -28,7 +28,7 @@ export const getReviewsByTopicId = async (topicId) => {
       throw new Error("Failed to get reviews by topic id.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -45,7 +45,7 @@ export const updateReviewById = async (reviewId, values) => {
       throw new Error("Failed to update review.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -62,7 +62,7 @@ export const createReview = async (values) => {
       throw new Error("Failed to create review.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -78,7 +78,7 @@ export const deleteReviewById = async (reviewId) => {
       throw new Error("Failed to delete review.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }

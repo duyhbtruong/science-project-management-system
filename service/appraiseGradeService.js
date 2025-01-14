@@ -12,7 +12,7 @@ export const getAppraiseById = async (appraiseId) => {
       throw new Error("Failed to get appraise by appraise id.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -29,7 +29,7 @@ export const getAppraisesByTopicId = async (topicId) => {
     );
 
     if (!res) {
-      return res.json();
+      return res;
     }
   } catch (error) {
     return error;
@@ -47,7 +47,7 @@ export const createAppraise = async (values) => {
       throw new Error("Failed to create appraise.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -67,7 +67,7 @@ export const updateAppraise = async (appraiseId, values) => {
       throw new Error("Failed to update appraise.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
@@ -86,7 +86,7 @@ export const deleteAppraiseById = async (appraiseId) => {
       throw new Error("Failed to delete appraise.");
     }
 
-    return res.json();
+    return res;
   } catch (error) {
     return error;
   }
