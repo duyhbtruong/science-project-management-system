@@ -39,7 +39,9 @@ export default function TopicsManagePage() {
   const [modal, modalContextHolder] = Modal.useModal();
 
   const loadTopics = async () => {
-    setTopics(await getTopics());
+    var res = await getTopics();
+    res = await res.json();
+    setTopics(res);
   };
 
   const deleteTopic = async (id) => {
@@ -58,7 +60,8 @@ export default function TopicsManagePage() {
   };
 
   const handleSearchTopic = async (searchValue) => {
-    const res = await searchTopic(searchValue);
+    var res = await searchTopic(searchValue);
+    res = await res.json();
     setTopics(res);
   };
 
@@ -71,11 +74,13 @@ export default function TopicsManagePage() {
   const handleExport = async () => {
     let students = [];
     for (const topic of topics) {
-      const student = await getStudentById(topic.owner);
-      const account = await getAccountById(student.accountId);
-      students.push(account);
+      var res = await getStudentById(topic.owner);
+      // res = await res.json();
+      console.log(">>> res: ", res);
+      // const account = res.account;
+      // students.push(account);
     }
-    exportTopicList(topics, students);
+    // exportTopicList(topics, students);
   };
 
   useEffect(() => {
@@ -197,9 +202,11 @@ export default function TopicsManagePage() {
     },
   ];
 
+  console.log(">>> topics: ", topics);
+
   return (
-    <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
-      <div className="flex flex-col mx-32 py-6">
+    <div className="bg-gray-100 min-h-[100vh]">
+      <div className="flex flex-col py-6 mx-32">
         <div className="flex justify-between">
           <Search
             className="w-[450px] mb-4"

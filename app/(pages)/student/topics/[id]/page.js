@@ -249,7 +249,7 @@ export default function TopicInformationPage({ params }) {
   // console.log(">>> topic: ", topic);
 
   return (
-    <div className="bg-gray-100 min-h-[calc(100vh-56px)]">
+    <div className="bg-gray-100 min-h-[100vh]">
       <div className="py-6 mx-32">
         <div className="flex justify-between p-4 mb-6 bg-white rounded-md">
           <span className="flex justify-center text-lg font-semibold">

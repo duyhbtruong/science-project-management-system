@@ -30,7 +30,9 @@ export default function ReviewPage() {
   };
 
   const loadTopics = async () => {
-    setTopics(await getTopics());
+    var res = await getTopics();
+    res = await res.json();
+    setTopics(res);
   };
 
   const deleteReview = async (topicId, technologyScienceId) => {
@@ -135,7 +137,7 @@ export default function ReviewPage() {
 
   return (
     <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
-      <div className="flex flex-col mx-32 py-6">
+      <div className="flex flex-col py-6 mx-32">
         <Search
           className="w-[450px] mb-4"
           placeholder="Tìm kiếm đề tài..."

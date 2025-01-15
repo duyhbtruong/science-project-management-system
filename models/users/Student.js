@@ -5,6 +5,11 @@ export const studentSchema = new Schema({
   studentId: { type: String, required: true, unique: true }, // Mã số của Sinh viên
   faculty: { type: String, required: true }, // Khoa của Sinh viên
   educationProgram: { type: String, required: true }, // Chương trình đào tạo của Sinh viên
+  topicId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "Topic",
+    default: null,
+  },
   accountId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Account",

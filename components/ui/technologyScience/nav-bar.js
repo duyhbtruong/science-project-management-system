@@ -5,7 +5,11 @@ import { Button, Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LogoutOutlined } from "@ant-design/icons";
+import {
+  FileTextOutlined,
+  LogoutOutlined,
+  UnorderedListOutlined,
+} from "@ant-design/icons";
 import { AppLogo } from "@/components/logo";
 
 const items = [
@@ -18,22 +22,24 @@ const items = [
   {
     label: <Link href="/technologyScience/topics">Quản lý đề tài</Link>,
     key: "topics",
+    icon: <UnorderedListOutlined />,
+  },
+  {
+    label: (
+      <Link href="/technologyScience/registration">Quản lý đợt đăng ký</Link>
+    ),
+    key: "registration",
+    icon: <FileTextOutlined />,
   },
   {
     label: <Link href="/technologyScience/review">Kiểm duyệt đề tài</Link>,
     key: "review",
   },
   {
-    label: "Hồ sơ",
-    key: "profile",
-    children: [
-      {
-        label: "Đăng xuất",
-        key: "logout",
-        icon: <LogoutOutlined />,
-        onClick: async () => await logout(),
-      },
-    ],
+    label: "Đăng xuất",
+    key: "logout",
+    icon: <LogoutOutlined />,
+    onClick: async () => await logout(),
   },
 ];
 
@@ -42,14 +48,13 @@ const NavigationBar = () => {
   const [current, setCurrent] = useState(() => {
     if (pathname.includes("topics")) return "topics";
     if (pathname.includes("review")) return "review";
+    if (pathname.includes("registration")) return "registration";
   });
 
   return (
     <>
       <Menu
-        className="px-32 items-center"
         onClick={(e) => setCurrent(e.key)}
-        mode="horizontal"
         selectedKeys={[current]}
         items={items}
       />

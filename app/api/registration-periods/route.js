@@ -15,7 +15,7 @@ export async function GET(request, { params }) {
 
     await mongooseConnect();
 
-    const periods = await RegistrationPeriod.find({}, filter);
+    const periods = await RegistrationPeriod.find(filter);
 
     return NextResponse.json(periods, { status: 200 });
   } catch (error) {

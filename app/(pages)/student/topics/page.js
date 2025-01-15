@@ -25,8 +25,8 @@ import {
 } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getStudentAccountByAccountId } from "@/service/studentService";
 import { createTopic } from "@/service/topicService";
+import { getAccountById } from "@/service/accountService";
 
 export default function TopicPage() {
   const router = useRouter();
@@ -38,7 +38,9 @@ export default function TopicPage() {
   const [messageApi, contextHolder] = message.useMessage();
 
   async function fetchUserData() {
-    setStudent(await getStudentAccountByAccountId(account.id));
+    var res = await getAccountById(account.id);
+    res = await res.json();
+    setStudent(res.student);
   }
 
   useEffect(() => {
@@ -87,8 +89,11 @@ export default function TopicPage() {
       });
   };
 
+  console.log(">>> student: ", student);
+  console.log(">>> account: ", account);
+
   return (
-    <div className="bg-gray-100 min-h-[calc(100vh-45.8px)]">
+    <div className="bg-gray-100 min-h-[100vh]">
       {/* Column */}
       {contextHolder}
       <div className="py-6 mx-32">
