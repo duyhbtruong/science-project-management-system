@@ -5,11 +5,13 @@ export const createTopic = async (formData) => {
       body: JSON.stringify(formData),
     });
 
-    if (res.status === 201) {
-      return res;
+    if (!res) {
+      throw new Error("Failed to register topic.");
     }
+
+    return res;
   } catch (error) {
-    console.log(error);
+    return error;
   }
 };
 

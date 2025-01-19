@@ -191,6 +191,7 @@ export async function PUT(request, { params }) {
   }
 }
 
+// TODO: Delete file when unregister topic
 export async function DELETE(request, { params }) {
   try {
     const id = params.topic;

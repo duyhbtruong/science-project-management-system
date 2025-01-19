@@ -183,7 +183,7 @@ export async function POST(request) {
     }
 
     // Lưu thông tin đăng ký
-    await Topic.create({
+    const newTopicId = await Topic.create({
       vietnameseName,
       englishName,
       type,
@@ -194,10 +194,10 @@ export async function POST(request) {
       registrationPeriod,
       owner,
       instructor,
-    });
+    }).then((result) => result._id);
 
     return NextResponse.json(
-      { message: "Đăng ký đề tài thành công!" },
+      { newTopicId, message: "Đăng ký đề tài thành công!" },
       { status: 201 }
     );
   } catch (error) {

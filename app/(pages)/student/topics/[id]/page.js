@@ -30,7 +30,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { storage } from "@/lib/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { uploadFile } from "@/service/upload";
+import { uploadSubmitFile } from "@/service/upload";
 import Link from "next/link";
 
 export default function TopicInformationPage({ params }) {
@@ -41,7 +41,6 @@ export default function TopicInformationPage({ params }) {
   const [student, setStudent] = useState();
   const [topic, setTopic] = useState();
   const [fileUpload, setFileUpload] = useState([]);
-  // const [fileLink, setFileLink] = useState();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [modal, modalContextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -207,7 +206,7 @@ export default function TopicInformationPage({ params }) {
         const fileRef = snapshot.ref._location.path_;
         return getDownloadURL(ref(storage, fileRef));
       })
-      .then((downloadLink) => uploadFile(topic._id, downloadLink))
+      .then((downloadLink) => uploadSubmitFile(topic._id, downloadLink))
       .then((res) => {
         const { message } = res;
         messageApi.success(message);
@@ -236,17 +235,6 @@ export default function TopicInformationPage({ params }) {
   useEffect(() => {
     loadTopic();
   }, []);
-
-  // useEffect(() => {
-  //   if (!topic) return;
-  //   if (!topic.fileRef) return;
-  //   getDownloadURL(ref(storage, topic?.fileRef)).then((url) =>
-  //     setFileLink(url)
-  //   );
-  // }, [topic]);
-  // console.log(topic);
-  // console.log(fileUpload[0]?.originFileObj);
-  // console.log(">>> topic: ", topic);
 
   return (
     <div className="bg-gray-100 min-h-[100vh]">
