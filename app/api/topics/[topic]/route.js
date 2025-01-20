@@ -191,7 +191,6 @@ export async function PUT(request, { params }) {
   }
 }
 
-// TODO: Delete file when unregister topic
 export async function DELETE(request, { params }) {
   try {
     const id = params.topic;
@@ -230,6 +229,7 @@ export async function DELETE(request, { params }) {
     }
 
     await Topic.findByIdAndDelete({ _id: id });
+    await Student.updateOne({ topicId: id }, { $unset: { topicId: null } });
 
     return NextResponse.json(
       { message: "Hủy đăng ký đề tài thành công." },

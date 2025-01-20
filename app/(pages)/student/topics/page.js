@@ -178,11 +178,8 @@ export default function TopicPage() {
     if (fileList.length === 0) {
       return;
     }
-    // const dateTime = giveCurrentDateTime();
-    // console.log(">>> student: ", student);
-    // console.log(">>> fileList: ", fileList);
-    const fileRef = ref(storage, `${student?.studentId}/${fileList[0].name}`);
-    // console.log("fileRef: ", fileRef);
+    const periodDir = `${period.title}-${period.startDate}-${period.endDate}`
+    const fileRef = ref(storage, `${periodDir}/${student?.studentId}/${fileList[0].name}`);
     uploadBytes(fileRef, fileList[0]?.originFileObj)
       .then((snapshot) => {
         const fileRef = snapshot.ref._location.path_;
@@ -714,26 +711,6 @@ export default function TopicPage() {
           </Modal>
         </>
       )}
-
-      {/* <Modal
-        title="Không trong đợt đăng ký đề tài"
-        open={period ? (isDateWithinRange(period) ? false : true) : false}
-        closable={false}
-        footer={
-          [
-            // <Button
-            //   icon={<ArrowRightOutlined />}
-            //   key="link"
-            //   type="primary"
-            //   href={student ? `/student/topics/${student.topicId}` : ``}
-            // >
-            //   Đến trang Quản lý đề tài cá nhân
-            // </Button>,
-          ]
-        }
-      >
-        <p>Hiện tại đang không trong đợt đăng ký nào.</p>
-      </Modal> */}
     </div>
   );
 }
