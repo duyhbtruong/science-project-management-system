@@ -41,6 +41,7 @@ const topicSchema = new Schema(
       ref: "Student",
       required: true,
     }, // Chủ sở hữu đề tài
+
     instructor: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Instructor",

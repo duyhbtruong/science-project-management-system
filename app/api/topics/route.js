@@ -196,6 +196,11 @@ export async function POST(request) {
       instructor,
     }).then((result) => result._id);
 
+    await Student.findByIdAndUpdate(
+      { _id: owner },
+      { $set: { topicId: newTopicId } }
+    );
+
     return NextResponse.json(
       { newTopicId, message: "Đăng ký đề tài thành công!" },
       { status: 201 }
