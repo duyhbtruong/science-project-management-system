@@ -1,10 +1,10 @@
 "use client";
 
-import { getAccountById } from "@/service/accountService";
-import { getStudentById } from "@/service/studentService";
+import { getAllPeriods } from "@/service/registrationService";
 import {
   deleteTopicById,
   getTopics,
+  getTopicsByPeriod,
   searchTopic,
 } from "@/service/topicService";
 import { exportTopicList } from "@/utils/export";
@@ -21,27 +21,36 @@ import {
   Descriptions,
   Input,
   Modal,
+  Select,
   Space,
   Spin,
   Table,
   Tag,
   message,
 } from "antd";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 const { Search } = Input;
+const { Option } = Select;
 
 export default function TopicsManagePage() {
   const [topics, setTopics] = useState();
+  const [listPeriod, setListPeriod] = useState();
+  const [selectedPeriod, setSelectedPeriod] = useState();
   const [activeExpRow, setActiveExpRow] = useState([]);
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
 
   const loadTopics = async () => {
-    var res = await getTopics();
+    let res = await getTopicsByPeriod(selectedPeriod);
     res = await res.json();
     setTopics(res);
+  };
+
+  const loadPeriod = async () => {
+    let res = await getAllPeriods();
+    res = await res.json();
+    setListPeriod(res);
   };
 
   const deleteTopic = async (id) => {
@@ -49,13 +58,27 @@ export default function TopicsManagePage() {
       title: "Xóa đề tài",
       content: "Bạn có chắc chắn muốn xóa đề tài này không?",
     });
+
     if (confirmed) {
-      const res = await deleteTopicById(id);
-      messageApi.open({
-        type: "success",
-        content: "Bạn đã xóa thành công đề tài!",
-      });
-      loadTopics();
+      let res = await deleteTopicById(id);
+      res = await res.json();
+
+      if (res.status === 200) {
+        const { message } = res;
+        messageApi.open({
+          type: "success",
+          content: message,
+          duration: 2,
+        });
+        loadTopics();
+      } else {
+        const { message } = res;
+        messageApi.open({
+          type: "error",
+          content: message,
+          duration: 2,
+        });
+      }
     }
   };
 
@@ -74,18 +97,24 @@ export default function TopicsManagePage() {
   const handleExport = async () => {
     let students = [];
     for (const topic of topics) {
-      var res = await getStudentById(topic.owner);
-      // res = await res.json();
-      console.log(">>> res: ", res);
-      // const account = res.account;
-      // students.push(account);
+      students.push(topic.owner);
     }
-    // exportTopicList(topics, students);
+    exportTopicList(topics, students);
+  };
+
+  const handlePeriodChange = (value) => {
+    setSelectedPeriod(value);
   };
 
   useEffect(() => {
-    loadTopics();
+    loadPeriod();
   }, []);
+
+  useEffect(() => {
+    if (!selectedPeriod) return;
+
+    loadTopics();
+  }, [selectedPeriod]);
 
   const columns = [
     {
@@ -112,10 +141,11 @@ export default function TopicsManagePage() {
     },
     {
       title: "Trạng thái kiểm duyệt",
-      dataIndex: "isReviewed",
-      key: "isReviewed",
-      render: (_, { isReviewed }) => {
+      dataIndex: "reviews",
+      key: "reviews",
+      render: (_, { reviews }) => {
         let color, icon, text;
+        const isReviewed = reviews.length > 0;
         switch (isReviewed) {
           case true:
             color = "success";
@@ -149,10 +179,11 @@ export default function TopicsManagePage() {
     },
     {
       title: "Trạng thái thẩm định",
-      dataIndex: "isAppraised",
-      key: "isAppraised",
-      render: (_, { isAppraised }) => {
+      dataIndex: "appraises",
+      key: "appraises",
+      render: (_, { appraises }) => {
         let color, icon, text;
+        const isAppraised = appraises.length > 0;
         switch (isAppraised) {
           case true:
             color = "success";
@@ -202,19 +233,33 @@ export default function TopicsManagePage() {
     },
   ];
 
-  console.log(">>> topics: ", topics);
-
   return (
     <div className="bg-gray-100 min-h-[100vh]">
       <div className="flex flex-col py-6 mx-32">
         <div className="flex justify-between">
-          <Search
-            className="w-[450px] mb-4"
-            placeholder="Tìm kiếm đề tài..."
-            enterButton
-            onSearch={handleSearchTopic}
-            onChange={handleSearchChange}
-          />
+          <div className="space-x-4">
+            {listPeriod && (
+              <Select
+                className="w-64"
+                placeholder="Chọn đợt đăng ký..."
+                onChange={handlePeriodChange}
+                value={selectedPeriod}
+              >
+                {listPeriod.map((period) => (
+                  <Option value={period._id}>{period.title}</Option>
+                ))}
+              </Select>
+            )}
+
+            <Search
+              className="w-[450px] mb-4"
+              placeholder="Tìm kiếm đề tài..."
+              enterButton
+              onSearch={handleSearchTopic}
+              onChange={handleSearchChange}
+            />
+          </div>
+
           <Button
             loading={!topics}
             onClick={handleExport}
@@ -239,7 +284,7 @@ export default function TopicsManagePage() {
                     {
                       label: "Tên",
                       key: "name",
-                      children: <p>{record.instructor.name}</p>,
+                      children: <p>{record.instructor.accountId.name}</p>,
                     },
                     {
                       label: "Email",
@@ -250,7 +295,7 @@ export default function TopicsManagePage() {
                           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
                         >
                           <ExportOutlined className="mr-1" />
-                          {record.instructor.email}
+                          {record.instructor.accountId.email}
                         </Link>
                       ),
                     },

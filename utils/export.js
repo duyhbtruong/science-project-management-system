@@ -132,11 +132,11 @@ export const exportTopicList = (topics, students) => {
   for (let i = 0; i < topics.length; i++) {
     const dataRow = worksheet.addRow([
       rowNumber++,
-      students[i].account.name.toUpperCase(),
-      students[i].student.studentId,
+      students[i].accountId.name.toUpperCase(),
+      students[i].studentId,
       "",
-      students[i].student.faculty.toUpperCase(),
-      topics[i].instructor.name.toUpperCase(),
+      students[i].faculty.toUpperCase(),
+      topics[i].instructor.accountId.name.toUpperCase(),
       topics[i].vietnameseName.toUpperCase(),
       "",
       "",

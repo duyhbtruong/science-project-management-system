@@ -178,8 +178,15 @@ export default function TopicPage() {
     if (fileList.length === 0) {
       return;
     }
-    const periodDir = `${period.title}-${period.startDate}-${period.endDate}`
-    const fileRef = ref(storage, `${periodDir}/${student?.studentId}/${fileList[0].name}`);
+    let startDate = new Date(period.startDate);
+    let endDate = new Date(period.endDate);
+    startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
+    endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
+    const periodDir = `${period.title}-${startDate}-${endDate}`;
+    const fileRef = ref(
+      storage,
+      `${periodDir}/${student?.studentId}/${fileList[0].name}`
+    );
     uploadBytes(fileRef, fileList[0]?.originFileObj)
       .then((snapshot) => {
         const fileRef = snapshot.ref._location.path_;

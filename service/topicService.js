@@ -32,6 +32,26 @@ export const getTopics = async () => {
   }
 };
 
+export const getTopicsByPeriod = async (periodId) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/topics?period=${periodId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    if (!res) {
+      throw new Error("Failed to get topics by period.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getTopicById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics/${id}`, {

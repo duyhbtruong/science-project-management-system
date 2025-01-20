@@ -1,6 +1,5 @@
 "use client";
 
-import { getAccountById } from "@/service/accountService";
 import { deleteTopicById, getTopicById } from "@/service/topicService";
 import {
   CheckCircleOutlined,
@@ -15,7 +14,6 @@ import {
 import {
   Button,
   Descriptions,
-  Flex,
   Modal,
   Space,
   Spin,
@@ -25,7 +23,6 @@ import {
   message,
 } from "antd";
 const { Dragger } = Upload;
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { storage } from "@/lib/firebase";
@@ -35,12 +32,12 @@ import Link from "next/link";
 
 export default function TopicInformationPage({ params }) {
   const { id: topicId } = params;
-  const session = useSession();
-  const accountId = session?.data?.user?.id;
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();
+  const [instructor, setInstructor] = useState();
+  const [period, setPeriod] = useState();
   const [topic, setTopic] = useState();
-  const [fileUpload, setFileUpload] = useState([]);
+  const [fileList, setFileList] = useState([]);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [modal, modalContextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -127,14 +124,22 @@ export default function TopicInformationPage({ params }) {
       key: "5",
       label: "Trạng thái kiểm duyệt",
       children: (
-        <Tag
-          icon={
-            topic?.isReviewed ? <CheckCircleOutlined /> : <SyncOutlined spin />
-          }
-          color={topic?.isReviewed ? "success" : "default"}
-        >
-          {topic?.isReviewed ? "Đã kiểm duyệt" : "Chưa kiểm duyệt"}
-        </Tag>
+        <>
+          <Tag
+            icon={
+              topic?.reviews.length > 0 ? (
+                <CheckCircleOutlined />
+              ) : (
+                <SyncOutlined spin />
+              )
+            }
+            color={topic?.reviews.length > 0 ? "success" : "default"}
+          >
+            {topic?.reviews.length > 0 ? "Đã kiểm duyệt" : "Chưa kiểm duyệt"}
+          </Tag>
+
+          {topic?.reviews.length > 0 && <Button>Test</Button>}
+        </>
       ),
       span: 1,
     },
@@ -144,11 +149,15 @@ export default function TopicInformationPage({ params }) {
       children: (
         <Tag
           icon={
-            topic?.isAppraised ? <CheckCircleOutlined /> : <SyncOutlined spin />
+            topic?.appraises.length ? (
+              <CheckCircleOutlined />
+            ) : (
+              <SyncOutlined spin />
+            )
           }
-          color={topic?.isAppraised ? "success" : "default"}
+          color={topic?.appraises.length ? "success" : "default"}
         >
-          {topic?.isAppraised ? "Đã thẩm định" : "Chưa thẩm định"}
+          {topic?.appraises.length ? "Đã thẩm định" : "Chưa thẩm định"}
         </Tag>
       ),
       span: 1,
@@ -165,19 +174,24 @@ export default function TopicInformationPage({ params }) {
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
           <ExportOutlined className="mr-2" />
-          {topic?.instructor?.email}
+          {instructor?.accountId.email}
         </Link>
       ),
     },
     {
       key: "2",
       label: "Họ và tên",
-      children: <p>{topic?.instructor?.name}</p>,
+      children: <p>{instructor?.accountId.name}</p>,
     },
     {
       key: "3",
       label: "Học hàm, học vị",
-      children: <p>{topic?.instructor?.academicRank}</p>,
+      children: <p>{instructor?.academicRank}</p>,
+    },
+    {
+      key: "4",
+      label: "Khoa",
+      children: <p>{instructor?.faculty}</p>,
     },
   ];
 
@@ -190,18 +204,21 @@ export default function TopicInformationPage({ params }) {
     ),
   };
 
-  const handleChange = ({ fileList: newFile }) => {
-    setFileUpload(newFile);
+  const handleChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   const handleImageUpload = () => {
-    if (fileUpload.length === 0) {
+    if (fileList.length === 0) {
       setIsUploadOpen(false);
       return;
     }
-    // const dateTime = giveCurrentDateTime();
-    const fileRef = ref(storage, `${student?.studentId}/${fileUpload[0].name}`);
-    uploadBytes(fileRef, fileUpload[0]?.originFileObj)
+    const periodDir = `${period.title}-${startDate}-${endDate}`;
+    const fileRef = ref(
+      storage,
+      `${periodDir}/${student?.studentId}/${fileList[0].name}`
+    );
+    uploadBytes(fileRef, fileList[0]?.originFileObj)
       .then((snapshot) => {
         const fileRef = snapshot.ref._location.path_;
         return getDownloadURL(ref(storage, fileRef));
@@ -212,25 +229,19 @@ export default function TopicInformationPage({ params }) {
         messageApi.success(message);
         setIsUploadOpen(false);
         loadTopic();
-        setFileUpload([]);
+        setFileList([]);
       });
   };
 
-  const loadAccount = async () => {
-    const res = await getAccountById(accountId);
-    setAccount(res.account);
-    setStudent(res.student);
-  };
-
   const loadTopic = async () => {
-    const res = await getTopicById(topicId);
+    let res = await getTopicById(topicId);
+    res = await res.json();
     setTopic(res);
+    setStudent(res.owner);
+    setAccount(res.owner.accountId);
+    setInstructor(res.instructor);
+    setPeriod(res.registrationPeriod);
   };
-
-  useEffect(() => {
-    if (!accountId) return;
-    loadAccount();
-  }, [accountId]);
 
   useEffect(() => {
     loadTopic();
@@ -251,7 +262,7 @@ export default function TopicInformationPage({ params }) {
                 router.replace(`/student/topics`);
               }
             }}
-            disabled={!topic?.isReviewed ? false : true}
+            disabled={!topic?.reviews.length > 0 ? false : true}
             icon={<CloseOutlined />}
             danger
           >
@@ -269,11 +280,11 @@ export default function TopicInformationPage({ params }) {
                 items={topicItems}
                 extra={
                   <Space>
-                    {topic?.fileRef && (
+                    {topic?.submitFile && (
                       <Link
                         target="_blank"
                         className="mr-2"
-                        href={topic?.fileRef}
+                        href={topic?.submitFile}
                       >
                         <PaperClipOutlined className="mr-1" />
                         Tài liệu đã tải lên
@@ -337,7 +348,7 @@ export default function TopicInformationPage({ params }) {
         okText="Xác nhận"
         cancelText="Hủy"
         onCancel={() => {
-          setFileUpload([]);
+          setFileList([]);
           setIsUploadOpen(false);
         }}
       >
@@ -347,7 +358,7 @@ export default function TopicInformationPage({ params }) {
           multiple={false}
           maxCount={1}
           onChange={handleChange}
-          fileList={fileUpload}
+          fileList={fileList}
         >
           <p className="ant-upload-drag-icon">
             <InboxOutlined />

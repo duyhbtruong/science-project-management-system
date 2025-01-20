@@ -19,7 +19,7 @@ export const uploadSubmitFile = async (topicId, submitFile) => {
   try {
     const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {
       method: "PUT",
-      body: JSON.stringify(submitFile),
+      body: JSON.stringify({ submitFile }),
     });
 
     if (!res) {
@@ -36,7 +36,7 @@ export const uploadContractFile = async (topicId, contractFile) => {
   try {
     const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {
       method: "PUT",
-      body: JSON.stringify(contractFile),
+      body: JSON.stringify({ contractFile }),
     });
 
     if (!res) {
@@ -53,7 +53,7 @@ export const uploadPaymentFile = async (topicId, paymentFile) => {
   try {
     const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {
       method: "PUT",
-      body: JSON.stringify(paymentFile),
+      body: JSON.stringify({ paymentFile }),
     });
 
     if (!res) {
