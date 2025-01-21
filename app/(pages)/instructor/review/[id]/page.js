@@ -30,6 +30,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import emailjs from "@emailjs/browser";
 
 export default function ReviewTopicPage({ params }) {
   const { id: topicId } = params;
@@ -210,7 +211,8 @@ export default function ReviewTopicPage({ params }) {
             content: message,
             duration: 2,
           })
-          .then(() => router.push(`/instructor/review`));
+          .then(() => router.push(`/instructor/review`))
+          .then(() => sendEmail(formData));
       } else {
         res = await res.json();
         const { message } = res;
@@ -231,7 +233,8 @@ export default function ReviewTopicPage({ params }) {
             content: message,
             duration: 2,
           })
-          .then(() => router.push(`/instructor/review`));
+          .then(() => router.push(`/instructor/review`))
+          .then(() => sendEmail(formData));
       } else {
         res = await res.json();
         const { message } = res;
@@ -242,6 +245,41 @@ export default function ReviewTopicPage({ params }) {
         });
       }
     }
+  };
+
+  const sendEmail = (formValues) => {
+    const templateParams = {
+      student_name: topic?.owner?.accountId.name,
+      instructor_name: topic?.instructor?.accountId.name,
+      topic_title: topic?.vietnameseName,
+      criteria_1: formValues.criteriaOne,
+      criteria_2: formValues.criteriaTwo,
+      criteria_3: formValues.criteriaThree,
+      criteria_4: formValues.criteriaFour,
+      criteria_5: formValues.criteriaFive,
+      criteria_6: formValues.criteriaSix,
+      criteria_7: formValues.criteriaSeven,
+      criteria_8: formValues.criteriaEight,
+      grade: formValues.criteriaNine,
+      is_eureka: formValues.criteriaTen,
+      notes: formValues.criteriaEleven,
+    };
+
+    emailjs
+      .send(
+        "service_58b77bc",
+        "template_raalckx",
+        templateParams,
+        "csc_oEDcgGk9d_Gtc"
+      )
+      .then(
+        (result) => {
+          console.log("Email sent successfully:", result.text);
+        },
+        (error) => {
+          console.error("Error sending email:", error.text);
+        }
+      );
   };
 
   // console.log("review: ", review);
