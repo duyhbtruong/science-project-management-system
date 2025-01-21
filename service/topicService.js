@@ -111,6 +111,7 @@ export const assignReviewInstructor = async (topicId, instructorId) => {
       `http://localhost:3000/api/topics/${topicId}?review=${instructorId}`,
       {
         method: "PUT",
+        body: JSON.stringify({}),
       }
     );
 
@@ -128,7 +129,7 @@ export const assignAppraisalBoard = async (topicId, appraisalBoardId) => {
   try {
     const res = await fetch(
       `http://localhost:3000/api/topics/${topicId}?appraise=${appraisalBoardId}`,
-      { method: "PUT" }
+      { method: "PUT", body: JSON.stringify({}) }
     );
 
     if (!res) {

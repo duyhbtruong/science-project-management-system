@@ -1,7 +1,11 @@
 "use client";
 
+import { getAllAppraisalBoards } from "@/service/appraiseService";
+import { getAllInstructors } from "@/service/instructorService";
 import { getAllPeriods } from "@/service/registrationService";
 import {
+  assignAppraisalBoard,
+  assignReviewInstructor,
   deleteTopicById,
   getTopics,
   getTopicsByPeriod,
@@ -15,6 +19,7 @@ import {
   ExportOutlined,
   PaperClipOutlined,
   SyncOutlined,
+  UserAddOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -35,8 +40,14 @@ const { Option } = Select;
 
 export default function TopicsManagePage() {
   const [topics, setTopics] = useState();
+  const [assignedTopicId, setAssignedTopicId] = useState();
+  const [reviewIntructors, setReviewIntructors] = useState();
+  const [appraiseStaffs, setAppraiseStaffs] = useState();
   const [listPeriod, setListPeriod] = useState();
   const [selectedPeriod, setSelectedPeriod] = useState();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedInstructor, setSelectedInstructor] = useState(`Không có`);
+  const [selectedStaff, setSelectedStaff] = useState(`Không có`);
   const [activeExpRow, setActiveExpRow] = useState([]);
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
@@ -51,6 +62,18 @@ export default function TopicsManagePage() {
     let res = await getAllPeriods();
     res = await res.json();
     setListPeriod(res);
+  };
+
+  const loadReviewInstructors = async () => {
+    let res = await getAllInstructors();
+    res = await res.json();
+    setReviewIntructors(res);
+  };
+
+  const loadAppraiseStaffs = async () => {
+    let res = await getAllAppraisalBoards();
+    res = await res.json();
+    setAppraiseStaffs(res);
   };
 
   const deleteTopic = async (id) => {
@@ -106,8 +129,82 @@ export default function TopicsManagePage() {
     setSelectedPeriod(value);
   };
 
+  const showModal = (topic) => {
+    if (topic.reviewInstructor) {
+      setSelectedInstructor(topic.reviewInstructor._id);
+    }
+
+    if (topic.appraiseStaff) {
+      setSelectedStaff(topic.appraiseStaff._id);
+    }
+    setAssignedTopicId(topic._id);
+    setIsModalVisible(true);
+  };
+
+  const handleOk = async () => {
+    if (selectedInstructor) {
+      let res = await assignReviewInstructor(
+        assignedTopicId,
+        selectedInstructor
+      );
+
+      if (res.status === 200) {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "success",
+          content: message,
+          duration: 2,
+        });
+      } else {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "error",
+          content: message,
+          duration: 2,
+        });
+      }
+    }
+
+    if (selectedStaff) {
+      let res = await assignAppraisalBoard(assignedTopicId, selectedStaff);
+      if (res.status === 200) {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "success",
+          content: message,
+          duration: 2,
+        });
+      } else {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "error",
+          content: message,
+          duration: 2,
+        });
+      }
+    }
+    // console.log("Topic:", assignedTopicId);
+    // console.log("Instructor:", selectedInstructor);
+    // console.log("Staff:", selectedStaff);
+    setAssignedTopicId(null);
+    setSelectedInstructor(`Không có`);
+    setSelectedStaff(`Không có`);
+    loadTopics();
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   useEffect(() => {
     loadPeriod();
+    loadAppraiseStaffs();
+    loadReviewInstructors();
   }, []);
 
   useEffect(() => {
@@ -223,6 +320,11 @@ export default function TopicsManagePage() {
         return (
           <Space size="middle">
             <Button
+              onClick={() => showModal(record)}
+              icon={<UserAddOutlined />}
+            />
+
+            <Button
               onClick={() => deleteTopic(record._id)}
               danger
               icon={<DeleteOutlined />}
@@ -245,8 +347,13 @@ export default function TopicsManagePage() {
                 onChange={handlePeriodChange}
                 value={selectedPeriod}
               >
-                {listPeriod.map((period) => (
-                  <Option value={period._id}>{period.title}</Option>
+                {listPeriod.map((period, index) => (
+                  <Option
+                    key={`registration-period-${index}`}
+                    value={period._id}
+                  >
+                    {period.title}
+                  </Option>
                 ))}
               </Select>
             )}
@@ -304,6 +411,11 @@ export default function TopicsManagePage() {
                       key: "academicRank",
                       children: <p>{record.instructor.academicRank}</p>,
                     },
+                    {
+                      label: "Khoa",
+                      key: "faculty",
+                      children: <p>{record.instructor.faculty}</p>,
+                    },
                   ];
 
                   const topicDataItems = [
@@ -336,19 +448,76 @@ export default function TopicsManagePage() {
                       key: "appraise",
                       children: <p>{record.appraises.length}</p>,
                     },
+                  ];
+
+                  const reviewInstructorItems = [
                     {
-                      label: "Tài liệu",
-                      key: "fileRef",
+                      label: "Tên",
+                      key: "name",
                       children: (
-                        <div>
-                          {!record.fileRef && "Chưa có"}
-                          {record.fileRef && (
-                            <Link target="_blank" href={record.fileRef}>
-                              <PaperClipOutlined className="mr-1" />
-                              Tài liệu đã nộp
-                            </Link>
-                          )}
-                        </div>
+                        <p>
+                          {record.reviewInstructor &&
+                            record.reviewInstructor.accountId.name}
+                          {!record.reviewInstructor && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                    {
+                      label: "Email",
+                      key: "email",
+                      children: (
+                        <p>
+                          {record.reviewInstructor &&
+                            record.reviewInstructor.accountId.email}
+                          {!record.reviewInstructor && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                    {
+                      label: "Học hàm, học vị",
+                      key: "academicRank",
+                      children: (
+                        <p>
+                          {record.reviewInstructor &&
+                            record.reviewInstructor.academicRank}
+                          {!record.reviewInstructor && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                    {
+                      label: "Khoa",
+                      key: "faculty",
+                      children: (
+                        <p>
+                          {record.reviewInstructor &&
+                            record.reviewInstructor.faculty}
+                          {!record.reviewInstructor && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                  ];
+
+                  const appraiseStaffItems = [
+                    {
+                      label: "Tên",
+                      key: "name",
+                      children: (
+                        <p>
+                          {record.appraiseStaff &&
+                            record.appraiseStaff.accountId.name}
+                          {!record.appraiseStaff && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                    {
+                      label: "Email",
+                      key: "email",
+                      children: (
+                        <p>
+                          {record.appraiseStaff &&
+                            record.appraiseStaff.accountId.email}
+                          {!record.appraiseStaff && "Chưa có"}
+                        </p>
                       ),
                     },
                   ];
@@ -363,6 +532,14 @@ export default function TopicsManagePage() {
                         title="Thông tin Đề tài"
                         items={topicDataItems}
                         column={2}
+                      />
+                      <Descriptions
+                        title="Thông tin Giảng viên kiểm duyệt"
+                        items={reviewInstructorItems}
+                      />
+                      <Descriptions
+                        title="Thông tin cán bộ thẩm định"
+                        items={appraiseStaffItems}
                       />
                     </div>
                   );
@@ -380,6 +557,62 @@ export default function TopicsManagePage() {
           />
         </Spin>
       </div>
+
+      <Modal
+        title="Phân công Công việc"
+        open={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Xác nhận"
+        cancelText="Hủy bỏ"
+        className="p-4"
+      >
+        <div className="flex flex-col space-y-4">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Giảng viên kiểm duyệt
+            </label>
+            <Select
+              placeholder="Select an instructor"
+              className="w-full"
+              value={selectedInstructor}
+              onChange={(value) => setSelectedInstructor(value)}
+            >
+              <Option value={`Không có`}>Không có</Option>
+              {reviewIntructors?.map((instructor, index) => (
+                <Option
+                  key={`review-instructor-${index}`}
+                  value={instructor._id}
+                >
+                  {instructor.account.name}
+                </Option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Cán bộ thẩm định
+            </label>
+            <Select
+              placeholder="Select a staff member"
+              className="w-full"
+              value={selectedStaff}
+              onChange={(value) => setSelectedStaff(value)}
+            >
+              <Option value={`Không có`}>Không có</Option>
+              {appraiseStaffs?.map((appraisalStaff, index) => (
+                <Option
+                  key={`appraisal-staff-${index}`}
+                  value={appraisalStaff._id}
+                >
+                  {appraisalStaff.account.name}
+                </Option>
+              ))}
+            </Select>
+          </div>
+        </div>
+      </Modal>
       {messageContextHolder}
       {modalContextHolder}
     </div>

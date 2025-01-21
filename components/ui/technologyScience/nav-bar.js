@@ -31,10 +31,10 @@ const items = [
     key: "registration",
     icon: <FileTextOutlined />,
   },
-  {
-    label: <Link href="/technologyScience/review">Kiểm duyệt đề tài</Link>,
-    key: "review",
-  },
+  // {
+  //   label: <Link href="/technologyScience/review">Kiểm duyệt đề tài</Link>,
+  //   key: "review",
+  // },
   {
     label: "Đăng xuất",
     key: "logout",
@@ -49,6 +49,7 @@ const NavigationBar = () => {
     if (pathname.includes("topics")) return "topics";
     if (pathname.includes("review")) return "review";
     if (pathname.includes("registration")) return "registration";
+    if (pathname.includes("assign")) return "assign";
   });
 
   return (
