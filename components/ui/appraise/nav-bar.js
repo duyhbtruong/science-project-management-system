@@ -5,7 +5,7 @@ import { Button, Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LogoutOutlined } from "@ant-design/icons";
+import { EditOutlined, LogoutOutlined } from "@ant-design/icons";
 import { AppLogo } from "@/components/logo";
 
 const items = [
@@ -18,18 +18,13 @@ const items = [
   {
     label: <Link href="/appraise/topics">Thẩm định đề tài</Link>,
     key: "topics",
+    icon: <EditOutlined />,
   },
   {
-    label: "Hồ sơ",
-    key: "profile",
-    children: [
-      {
-        label: "Đăng xuất",
-        key: "logout",
-        icon: <LogoutOutlined />,
-        onClick: async () => await logout(),
-      },
-    ],
+    label: "Đăng xuất",
+    key: "logout",
+    icon: <LogoutOutlined />,
+    onClick: async () => await logout(),
   },
 ];
 
@@ -42,9 +37,7 @@ const NavigationBar = () => {
   return (
     <>
       <Menu
-        className="px-32 items-center"
         onClick={(e) => setCurrent(e.key)}
-        mode="horizontal"
         selectedKeys={[current]}
         items={items}
       />

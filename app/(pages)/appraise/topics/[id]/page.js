@@ -1,8 +1,10 @@
 "use client";
 
+import { getAccountById } from "@/service/accountService";
 import {
   createAppraise,
   getAppraisesByTopicId,
+  updateAppraise,
 } from "@/service/appraiseGradeService";
 import { getStudentById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
@@ -29,6 +31,8 @@ export default function ReviewTopicPage({ params }) {
   const session = useSession();
   const userId = session?.data?.user?.id;
   const [topic, setTopic] = useState();
+  const [account, setAccount] = useState();
+  const [appraisalBoard, setAppraisalBoard] = useState();
   const [appraise, setAppraise] = useState();
   const [value, setValue] = useState("Có");
   const [form] = Form.useForm();
@@ -41,6 +45,10 @@ export default function ReviewTopicPage({ params }) {
   };
 
   const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
     setIsModalOpen(false);
   };
 
@@ -98,7 +106,7 @@ export default function ReviewTopicPage({ params }) {
     {
       key: "1",
       label: "Tên",
-      children: topic?.instructor?.name,
+      children: topic?.instructor?.accountId.name,
     },
     {
       key: "2",
@@ -106,10 +114,11 @@ export default function ReviewTopicPage({ params }) {
       children: (
         <Link
           className="space-x-1"
+          target="_blank"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
           <ExportOutlined className="mr-1" />
-          <span>{topic?.instructor?.email}</span>
+          <span>{topic?.instructor?.accountId.email}</span>
         </Link>
       ),
     },
@@ -121,11 +130,22 @@ export default function ReviewTopicPage({ params }) {
   ];
 
   const loadTopic = async () => {
-    setTopic(await getTopicById(topicId));
+    let res = await getTopicById(topicId);
+    res = await res.json();
+    setTopic(res);
+  };
+
+  const loadAccount = async () => {
+    let res = await getAccountById(userId);
+    res = await res.json();
+    setAccount(res.account);
+    setAppraisalBoard(res.appraise);
   };
 
   const loadAppraiseGrade = async () => {
-    setAppraise(await getAppraisesByTopicId(topicId, userId));
+    let res = await getAppraisesByTopicId(topicId);
+    res = await res.json();
+    setAppraise(res);
   };
 
   useEffect(() => {
@@ -135,6 +155,7 @@ export default function ReviewTopicPage({ params }) {
   useEffect(() => {
     if (!topicId || !userId) return;
     loadAppraiseGrade();
+    loadAccount();
   }, [topicId, userId]);
 
   useEffect(() => {
@@ -167,23 +188,59 @@ export default function ReviewTopicPage({ params }) {
         formData.criteriaEight,
       ],
       topicId: topicId,
-      appraisalBoardId: userId,
+      appraisalBoardId: appraisalBoard._id,
       grade: formData.criteriaNine,
       isEureka: formData.criteriaTen,
       note: formData.criteriaEleven,
     };
-    const res = await createAppraise(values);
-    const { message } = res;
-    messageApi
-      .open({
-        type: "success",
-        content: message,
-      })
-      .then(() => router.push(`/appraise/topics`));
+
+    if (!appraise) {
+      let res = await createAppraise(values);
+      if (res.status === 201) {
+        res = await res.json();
+        const { message } = res;
+        messageApi
+          .open({
+            type: "success",
+            content: message,
+            duration: 2,
+          })
+          .then(() => router.push(`/appraise/topics`));
+      } else {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "error",
+          content: message,
+          duration: 2,
+        });
+      }
+    } else {
+      let res = await updateAppraise(appraise._id, values);
+      if (res.status === 200) {
+        res = await res.json();
+        const { message } = res;
+        messageApi
+          .open({
+            type: "success",
+            content: message,
+            duration: 2,
+          })
+          .then(() => router.push(`/appraise/topics`));
+      } else {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "error",
+          content: message,
+          duration: 2,
+        });
+      }
+    }
   };
 
   return (
-    <div className="min-h-[calc(100vh-45.8px)] bg-gray-100 px-32">
+    <div className="min-h-[100vh] bg-gray-100 px-32">
       <div className="flex justify-between py-4">
         <span className="text-lg font-semibold">Thẩm định đề tài</span>
         <Button

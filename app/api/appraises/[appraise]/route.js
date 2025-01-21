@@ -10,9 +10,12 @@ export async function GET(request, { params }) {
     const appraiseId = params.appraise;
 
     if (!appraiseId || !mongoose.isValidObjectId(appraiseId)) {
-      return NextResponse.json({message:"Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -20,16 +23,22 @@ export async function GET(request, { params }) {
     const appraise = await AppraiseGrade.findOne({ _id: appraiseId });
 
     if (!appraise) {
-      return NextResponse.json({message:"Không tìm thấy kết quả thẩm định.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy kết quả thẩm định." },
+        {
+          status: 404,
+        }
+      );
     }
 
     return NextResponse.json(appraise, { status: 200 });
   } catch (error) {
-    return NextResponse.json({message:"Lỗi lấy thông tin thẩm định " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy thông tin thẩm định " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -39,9 +48,12 @@ export async function PUT(request, { params }) {
     const { criteria, grade, isEureka, note } = await request.json();
 
     if (!appraiseId || !mongoose.isValidObjectId(appraiseId)) {
-      return NextResponse.json({message:"Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -49,9 +61,12 @@ export async function PUT(request, { params }) {
     const appraise = await AppraiseGrade.findOne({ _id: appraiseId });
 
     if (!appraise) {
-      return NextResponse.json({message:"Không tìm thấy kết quả thẩm định.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy kết quả thẩm định." },
+        {
+          status: 404,
+        }
+      );
     }
 
     await AppraiseGrade.findByIdAndUpdate(appraiseId, {
@@ -66,9 +81,12 @@ export async function PUT(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return NextResponse.json({message:"Lỗi cập nhật kết quả thẩm định " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi cập nhật kết quả thẩm định " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -77,9 +95,12 @@ export async function DELETE(request, { params }) {
     const appraiseId = params.appraise;
 
     if (!appraiseId || !mongoose.isValidObjectId(appraiseId)) {
-      return NextResponse.json({message:"Thiếu id hoặc id không hợp lệ.", {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
     }
 
     await mongooseConnect();
@@ -87,9 +108,12 @@ export async function DELETE(request, { params }) {
     const appraise = await AppraiseGrade.findOne({ _id: appraiseId });
 
     if (!appraise) {
-      return NextResponse.json({message:"Không tìm thấy kết quả thẩm định.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy kết quả thẩm định." },
+        {
+          status: 404,
+        }
+      );
     }
 
     const topic = await Topic.findOne({
@@ -97,7 +121,10 @@ export async function DELETE(request, { params }) {
     });
 
     if (!topic) {
-      return NextResponse.json({message:"Không tìm thấy đề tài", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài" },
+        { status: 404 }
+      );
     }
 
     await Topic.findByIdAndUpdate({ _id: topic._id }, { appraises: [] });
@@ -109,6 +136,9 @@ export async function DELETE(request, { params }) {
       { status: 200 }
     );
   } catch (error) {
-    return NextResponse.json({message:"Lỗi xóa kết quả thẩm định ", { status: 500 });
+    return NextResponse.json(
+      { message: "Lỗi xóa kết quả thẩm định " },
+      { status: 500 }
+    );
   }
 }

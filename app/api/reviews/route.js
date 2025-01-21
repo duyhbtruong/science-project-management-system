@@ -131,7 +131,7 @@ export async function POST(request) {
 
     return NextResponse.json(
       { message: "Tạo đánh giá thành công!" },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (error) {
     return NextResponse.json(

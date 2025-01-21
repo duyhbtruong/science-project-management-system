@@ -201,7 +201,7 @@ export default function ReviewTopicPage({ params }) {
 
     if (!review) {
       let res = await createReview(values);
-      if (res.status === 200) {
+      if (res.status === 201) {
         res = await res.json();
         const { message } = res;
         messageApi

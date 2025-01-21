@@ -21,10 +21,14 @@ export async function GET(request) {
     const topic = Topic.findOne({ _id: topicId });
 
     if (!topic) {
-      return NextResponse.json({message:"Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài." },
+        { status: 404 }
+      );
     }
 
-    const appraises = await AppraiseGrade.find({ topicId: topicId })
+    // TODO: Replace find() with findOne()
+    const appraises = await AppraiseGrade.findOne({ topicId: topicId })
       .populate({
         path: "topicId",
         select:
@@ -40,9 +44,12 @@ export async function GET(request) {
 
     return NextResponse.json(appraises, { status: 200 });
   } catch (error) {
-    return NextResponse.json({message:"Lỗi lấy danh sách thẩm định " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi lấy danh sách thẩm định " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -68,7 +75,10 @@ export async function POST(request) {
     const topic = await Topic.findOne({ _id: topicId });
 
     if (!topic) {
-      return NextResponse.json({message:"Không tìm thấy đề tài.", { status: 404 });
+      return NextResponse.json(
+        { message: "Không tìm thấy đề tài." },
+        { status: 404 }
+      );
     }
 
     const appraiseStaff = await AppraisalBoard.findOne({
@@ -76,21 +86,30 @@ export async function POST(request) {
     });
 
     if (!appraiseStaff) {
-      return NextResponse.json({message:"Không tìm thấy cán bộ thẩm định.", {
-        status: 404,
-      });
+      return NextResponse.json(
+        { message: "Không tìm thấy cán bộ thẩm định." },
+        {
+          status: 404,
+        }
+      );
     }
 
     if (!appraiseStaff._id.equals(topic.appraiseStaff)) {
-      return NextResponse.json({message:"Cán bộ không phải người thẩm định đề tài.", {
-        status: 409,
-      });
+      return NextResponse.json(
+        { message: "Cán bộ không phải người thẩm định đề tài." },
+        {
+          status: 409,
+        }
+      );
     }
 
     if (topic.appraises.length > 0) {
-      return NextResponse.json({message:"Đề tài đã được thẩm định.", {
-        status: 409,
-      });
+      return NextResponse.json(
+        { message: "Đề tài đã được thẩm định." },
+        {
+          status: 409,
+        }
+      );
     }
 
     const createdAppraise = await AppraiseGrade.create({
@@ -109,11 +128,14 @@ export async function POST(request) {
 
     return NextResponse.json(
       { message: "Tạo thẩm định thành công!" },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (error) {
-    return NextResponse.json({message:"Lỗi tạo kết quả thẩm định " + error, {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Lỗi tạo kết quả thẩm định " + error },
+      {
+        status: 500,
+      }
+    );
   }
 }

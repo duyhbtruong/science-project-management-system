@@ -16,6 +16,7 @@ export async function GET(request) {
     const searchKeywords = searchParams.get("search");
     const instructorId = searchParams.get("instructor");
     const reviewInstructorId = searchParams.get("reviewInstructor");
+    const appraisalBoardId = searchParams.get("staffId");
     const period = searchParams.get("period");
     const filter = {};
 
@@ -44,6 +45,16 @@ export async function GET(request) {
         );
       }
       filter.reviewInstructor = reviewInstructorId;
+    }
+
+    if (appraisalBoardId) {
+      if (!mongoose.isValidObjectId(appraisalBoardId)) {
+        return NextResponse.json(
+          { message: "Id không hợp lệ." },
+          { status: 400 }
+        );
+      }
+      filter.appraiseStaff = appraisalBoardId;
     }
 
     if (period) {

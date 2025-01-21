@@ -112,6 +112,29 @@ export const getTopicsByReviewInstructorId = async (
   }
 };
 
+export const getTopicsByAppraisalBoardStaffId = async (
+  selectedPeriod,
+  staffId
+) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/topics?staffId=${staffId}&period=${selectedPeriod}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    if (!res) {
+      throw new Error("Failed to get topics by review instructor.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const searchTopic = async (selectedPeriod, searchValue) => {
   try {
     const res = await fetch(

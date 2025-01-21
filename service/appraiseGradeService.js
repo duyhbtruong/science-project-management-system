@@ -29,8 +29,10 @@ export const getAppraisesByTopicId = async (topicId) => {
     );
 
     if (!res) {
-      return res;
+      throw new Error("Failed to get appraises by topic id.");
     }
+
+    return res;
   } catch (error) {
     return error;
   }
