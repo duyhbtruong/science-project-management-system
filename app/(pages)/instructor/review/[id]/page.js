@@ -1,9 +1,19 @@
 "use client";
 
-import { createReview, getReviewsByTopicId } from "@/service/reviewService";
+import { getAccountById } from "@/service/accountService";
+import {
+  createReview,
+  getReviewsByTopicId,
+  updateReviewById,
+} from "@/service/reviewService";
 import { getStudentById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
-import { ExportOutlined, InfoOutlined, LinkOutlined } from "@ant-design/icons";
+import {
+  CompassOutlined,
+  ExportOutlined,
+  InfoOutlined,
+  LinkOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Descriptions,
@@ -25,6 +35,8 @@ export default function ReviewTopicPage({ params }) {
   const { id: topicId } = params;
   const session = useSession();
   const userId = session?.data?.user?.id;
+  const [account, setAccount] = useState();
+  const [instructor, setInstructor] = useState();
   const [topic, setTopic] = useState();
   const [review, setReview] = useState();
   const [value, setValue] = useState("Có");
@@ -99,7 +111,7 @@ export default function ReviewTopicPage({ params }) {
     {
       key: "1",
       label: "Tên",
-      children: topic?.instructor?.name,
+      children: topic?.instructor?.accountId.name,
     },
     {
       key: "2",
@@ -110,7 +122,7 @@ export default function ReviewTopicPage({ params }) {
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
           <ExportOutlined className="mr-1" />
-          <span>{topic?.instructor?.email}</span>
+          <span>{topic?.instructor?.accountId.email}</span>
         </Link>
       ),
     },
@@ -122,11 +134,22 @@ export default function ReviewTopicPage({ params }) {
   ];
 
   const loadTopic = async () => {
-    setTopic(await getTopicById(topicId));
+    let res = await getTopicById(topicId);
+    res = await res.json();
+    setTopic(res);
+  };
+
+  const loadAccount = async () => {
+    let res = await getAccountById(userId);
+    res = await res.json();
+    setAccount(res.account);
+    setInstructor(res.instructor);
   };
 
   const loadReview = async () => {
-    setReview(await getReviewsByTopicId(topicId, userId));
+    let res = await getReviewsByTopicId(topicId, userId);
+    res = await res.json();
+    setReview(res);
   };
 
   useEffect(() => {
@@ -136,10 +159,12 @@ export default function ReviewTopicPage({ params }) {
   useEffect(() => {
     if (!topicId || !userId) return;
     loadReview();
+    loadAccount();
   }, [topicId, userId]);
 
   useEffect(() => {
     if (!review) return;
+
     form.setFieldsValue({
       criteriaOne: review?.criteria[0],
       criteriaTwo: review?.criteria[1],
@@ -168,20 +193,58 @@ export default function ReviewTopicPage({ params }) {
         formData.criteriaEight,
       ],
       topicId: topicId,
-      technologyScienceId: userId,
+      instructorId: instructor._id,
       grade: formData.criteriaNine,
       isEureka: formData.criteriaTen,
       note: formData.criteriaEleven,
     };
-    const res = await createReview(values);
-    const { message } = res;
-    messageApi
-      .open({
-        type: "success",
-        content: message,
-      })
-      .then(() => router.push(`/technologyScience/review`));
+
+    if (!review) {
+      let res = await createReview(values);
+      if (res.status === 200) {
+        res = await res.json();
+        const { message } = res;
+        messageApi
+          .open({
+            type: "success",
+            content: message,
+            duration: 2,
+          })
+          .then(() => router.push(`/instructor/review`));
+      } else {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "error",
+          content: message,
+          duration: 2,
+        });
+      }
+    } else {
+      let res = await updateReviewById(review._id, values);
+      if (res.status === 200) {
+        res = await res.json();
+        const { message } = res;
+        messageApi
+          .open({
+            type: "success",
+            content: message,
+            duration: 2,
+          })
+          .then(() => router.push(`/instructor/review`));
+      } else {
+        res = await res.json();
+        const { message } = res;
+        messageApi.open({
+          type: "error",
+          content: message,
+          duration: 2,
+        });
+      }
+    }
   };
+
+  // console.log("review: ", review);
 
   return (
     <div className="min-h-[calc(100vh-45.8px)] bg-gray-100 px-32">
@@ -197,7 +260,7 @@ export default function ReviewTopicPage({ params }) {
         </Button>
       </div>
       <Spin spinning={!topic}>
-        <div className="flex gap-4 relative">
+        <div className="relative flex gap-4">
           <Form
             form={form}
             onFinish={onFinish}
@@ -457,7 +520,7 @@ export default function ReviewTopicPage({ params }) {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <div className="space-y-4 mt-4">
+        <div className="mt-4 space-y-4">
           <Descriptions
             title="Thông tin đề tài"
             bordered

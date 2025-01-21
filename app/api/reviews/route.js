@@ -30,7 +30,8 @@ export async function GET(request, { params }) {
       );
     }
 
-    const reviews = await ReviewGrade.find({ topicId: topicId })
+    // TODO: Replace findOne() with find()
+    const reviews = await ReviewGrade.findOne({ topicId: topicId })
       .populate({
         path: "topicId",
         select:

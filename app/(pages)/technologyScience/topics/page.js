@@ -106,7 +106,7 @@ export default function TopicsManagePage() {
   };
 
   const handleSearchTopic = async (searchValue) => {
-    var res = await searchTopic(searchValue);
+    var res = await searchTopic(selectedPeriod, searchValue);
     res = await res.json();
     setTopics(res);
   };
@@ -335,11 +335,13 @@ export default function TopicsManagePage() {
     },
   ];
 
+  console.log(">>> topics: ", topics);
+
   return (
     <div className="bg-gray-100 min-h-[100vh]">
       <div className="flex flex-col py-6 mx-32">
         <div className="flex justify-between">
-          <div className="space-x-4">
+          <div className="mb-4 space-x-4">
             {listPeriod && (
               <Select
                 className="w-64"
@@ -358,13 +360,15 @@ export default function TopicsManagePage() {
               </Select>
             )}
 
-            <Search
-              className="w-[450px] mb-4"
-              placeholder="Tìm kiếm đề tài..."
-              enterButton
-              onSearch={handleSearchTopic}
-              onChange={handleSearchChange}
-            />
+            {selectedPeriod && (
+              <Search
+                className="w-[450px] "
+                placeholder="Tìm kiếm đề tài..."
+                enterButton
+                onSearch={handleSearchTopic}
+                onChange={handleSearchChange}
+              />
+            )}
           </div>
 
           <Button
@@ -447,6 +451,66 @@ export default function TopicsManagePage() {
                       label: "Số lượng thẩm định",
                       key: "appraise",
                       children: <p>{record.appraises.length}</p>,
+                    },
+                    {
+                      label: "Hồ sơ đăng ký",
+                      key: "registerFile",
+                      children: (
+                        <p>
+                          {record.registerFile && (
+                            <Link target="_blank" href={record.registerFile}>
+                              <PaperClipOutlined className="mr-1" />
+                              Tài liệu đính kèm
+                            </Link>
+                          )}
+                          {!record.registerFile && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                    {
+                      label: "Tài liệu nộp bài",
+                      key: "submitFile",
+                      children: (
+                        <p>
+                          {record.submitFile && (
+                            <Link target="_blank" href={record.submitFile}>
+                              <PaperClipOutlined className="mr-1" />
+                              Tài liệu đính kèm
+                            </Link>
+                          )}
+                          {!record.submitFile && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                    {
+                      label: "Hợp đồng đề tài",
+                      key: "contractFile",
+                      children: (
+                        <p>
+                          {record.contractFile && (
+                            <Link target="_blank" href={record.contractFile}>
+                              <PaperClipOutlined className="mr-1" />
+                              Tài liệu đính kèm
+                            </Link>
+                          )}
+                          {!record.contractFile && "Chưa có"}
+                        </p>
+                      ),
+                    },
+                    {
+                      label: "Hợp đồng tài chính",
+                      key: "paymentFile",
+                      children: (
+                        <p>
+                          {record.paymentFile && (
+                            <Link target="_blank" href={record.paymentFile}>
+                              <PaperClipOutlined className="mr-1" />
+                              Tài liệu đính kèm
+                            </Link>
+                          )}
+                          {!record.paymentFile && "Chưa có"}
+                        </p>
+                      ),
                     },
                   ];
 

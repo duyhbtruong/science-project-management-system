@@ -113,7 +113,7 @@ export default function CreateAccount() {
   };
 
   return (
-    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[calc(100vh-45.8px)]">
+    <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[100vh]">
       {contextHolder}
       <div className="text-lg font-semibold">Tạo mới tài khoản</div>
       <Card className="shadow-md">

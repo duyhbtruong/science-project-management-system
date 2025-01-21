@@ -697,27 +697,26 @@ export default function TopicPage() {
               </div>
             </Spin>
           </div>
-
-          <Modal
-            title="Đăng ký đề tài"
-            open={student ? (student.topicId === null ? false : true) : false}
-            closable={false}
-            footer={[
-              <Button
-                icon={<ArrowRightOutlined />}
-                key="link"
-                type="primary"
-                href={student ? `/student/topics/${student.topicId}` : ``}
-              >
-                Đến trang Quản lý đề tài cá nhân
-              </Button>,
-            ]}
-          >
-            <p>Bạn đã đăng ký đề tài Nghiên cứu khoa học!</p>
-            <p>Vui lòng đến trang Quản lý đề tài cá nhân.</p>
-          </Modal>
         </>
       )}
+      <Modal
+        title="Đăng ký đề tài"
+        open={student ? (student.topicId === null ? false : true) : false}
+        closable={false}
+        footer={[
+          <Button
+            icon={<ArrowRightOutlined />}
+            key="link"
+            type="primary"
+            href={student ? `/student/topics/${student.topicId}` : ``}
+          >
+            Đến trang Quản lý đề tài cá nhân
+          </Button>,
+        ]}
+      >
+        <p>Bạn đã đăng ký đề tài Nghiên cứu khoa học!</p>
+        <p>Vui lòng đến trang Quản lý đề tài cá nhân.</p>
+      </Modal>
     </div>
   );
 }

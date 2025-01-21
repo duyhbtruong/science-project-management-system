@@ -5,7 +5,11 @@ import { Button, Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LogoutOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  LogoutOutlined,
+  UnorderedListOutlined,
+} from "@ant-design/icons";
 import { AppLogo } from "@/components/logo";
 
 const items = [
@@ -16,24 +20,20 @@ const items = [
     className: "hover:cursor-default",
   },
   {
-    label: <Link href="/technologyScience/topics">Quản lý đề tài</Link>,
+    label: <Link href="/instructor/topics">Hướng dẫn đề tài</Link>,
     key: "topics",
+    icon: <UnorderedListOutlined />,
   },
   {
-    label: <Link href="/technologyScience/review">Kiểm duyệt đề tài</Link>,
+    label: <Link href="/instructor/review">Kiểm duyệt đề tài</Link>,
     key: "review",
+    icon: <EditOutlined />,
   },
   {
-    label: "Hồ sơ",
-    key: "profile",
-    children: [
-      {
-        label: "Đăng xuất",
-        key: "logout",
-        icon: <LogoutOutlined />,
-        onClick: async () => await logout(),
-      },
-    ],
+    label: "Đăng xuất",
+    key: "logout",
+    icon: <LogoutOutlined />,
+    onClick: async () => await logout(),
   },
 ];
 
@@ -47,9 +47,7 @@ const NavigationBar = () => {
   return (
     <>
       <Menu
-        className="items-center px-32"
         onClick={(e) => setCurrent(e.key)}
-        mode="horizontal"
         selectedKeys={[current]}
         items={items}
       />

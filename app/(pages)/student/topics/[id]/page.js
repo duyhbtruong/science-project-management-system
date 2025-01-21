@@ -138,7 +138,7 @@ export default function TopicInformationPage({ params }) {
             {topic?.reviews.length > 0 ? "Đã kiểm duyệt" : "Chưa kiểm duyệt"}
           </Tag>
 
-          {topic?.reviews.length > 0 && <Button>Test</Button>}
+          {/* {topic?.reviews.length > 0 && <Button>Test</Button>} */}
         </>
       ),
       span: 1,
@@ -213,6 +213,10 @@ export default function TopicInformationPage({ params }) {
       setIsUploadOpen(false);
       return;
     }
+    let startDate = new Date(period.startDate);
+    let endDate = new Date(period.endDate);
+    startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
+    endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
     const periodDir = `${period.title}-${startDate}-${endDate}`;
     const fileRef = ref(
       storage,
@@ -298,7 +302,7 @@ export default function TopicInformationPage({ params }) {
                       }
                     >
                       <Button
-                        disabled={topic?.isReviewed ? false : true}
+                        disabled={topic?.reviews.length > 0 ? false : true}
                         type="primary"
                         icon={<UploadOutlined />}
                         onClick={() => setIsUploadOpen(true)}

@@ -69,10 +69,53 @@ export const getTopicById = async (id) => {
   }
 };
 
-export const searchTopic = async (searchValue) => {
+export const getTopicsByInstructorId = async (selectedPeriod, instructorId) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/topics?search=${searchValue.toUpperCase()}`,
+      `http://localhost:3000/api/topics?instructor=${instructorId}&period=${selectedPeriod}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    if (!res) {
+      throw new Error("Failed to get topics by instructor.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const getTopicsByReviewInstructorId = async (
+  selectedPeriod,
+  instructorId
+) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/topics?reviewInstructor=${instructorId}&period=${selectedPeriod}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    if (!res) {
+      throw new Error("Failed to get topics by review instructor.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const searchTopic = async (selectedPeriod, searchValue) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/topics?search=${searchValue.toUpperCase()}&period=${selectedPeriod}`,
       {
         method: "GET",
         cache: "no-store",
