@@ -36,6 +36,9 @@ export default function ReviewTopicPage({ params }) {
   const { id: topicId } = params;
   const session = useSession();
   const userId = session?.data?.user?.id;
+  // const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+  // const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID_APPRAISE;
+  // const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
   const [account, setAccount] = useState();
   const [instructor, setInstructor] = useState();
   const [topic, setTopic] = useState();

@@ -122,7 +122,7 @@ export default function AppraiseTopicPage() {
   }, [userId]);
 
   useEffect(() => {
-    if (!selectedPeriod) return;
+    if (!selectedPeriod || !appraisalBoard) return;
 
     loadTopics();
   }, [selectedPeriod]);

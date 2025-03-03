@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   FileTextOutlined,
+  LineChartOutlined,
   LogoutOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
@@ -31,10 +32,11 @@ const items = [
     key: "registration",
     icon: <FileTextOutlined />,
   },
-  // {
-  //   label: <Link href="/technologyScience/review">Kiểm duyệt đề tài</Link>,
-  //   key: "review",
-  // },
+  {
+    label: <Link href="/technologyScience/dashboard">Thống kê đề tài</Link>,
+    key: "dashboard",
+    icon: <LineChartOutlined />,
+  },
   {
     label: "Đăng xuất",
     key: "logout",
@@ -49,7 +51,7 @@ const NavigationBar = () => {
     if (pathname.includes("topics")) return "topics";
     if (pathname.includes("review")) return "review";
     if (pathname.includes("registration")) return "registration";
-    if (pathname.includes("assign")) return "assign";
+    if (pathname.includes("dashboard")) return "dashboard";
   });
 
   return (

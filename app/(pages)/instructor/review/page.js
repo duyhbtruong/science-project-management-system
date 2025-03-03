@@ -121,7 +121,7 @@ export default function ReviewPage() {
   }, [userId]);
 
   useEffect(() => {
-    if (!selectedPeriod) return;
+    if (!selectedPeriod || !instructor) return;
 
     loadTopics();
   }, [selectedPeriod]);

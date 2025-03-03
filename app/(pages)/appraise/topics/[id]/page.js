@@ -29,6 +29,9 @@ import emailjs from "@emailjs/browser";
 
 export default function ReviewTopicPage({ params }) {
   const { id: topicId } = params;
+  // const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+  // const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID_INSTRUCTOR;
+  // const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
   const session = useSession();
   const userId = session?.data?.user?.id;
   const [topic, setTopic] = useState();
