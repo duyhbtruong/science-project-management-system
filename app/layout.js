@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
     <ConfigProvider
       theme={{
         token: {
-          fontFamily: "Inter",
+          fontFamily: inter.style.fontFamily,
         },
       }}
     >
