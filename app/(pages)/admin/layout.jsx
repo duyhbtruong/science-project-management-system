@@ -1,16 +1,16 @@
 "use client";
 
-import NavigationBar from "@/components/ui/admin/nav-bar";
 import { Layout } from "antd";
-const { Header, Content, Footer, Sider } = Layout;
+import NavigationBar from "./nav-bar";
+const { Content, Sider } = Layout;
 
 export default function AdminLayout({ children }) {
   return (
-    <Layout hasSider>
-      <Sider theme="light" className="relative">
+    <Layout hasSider={true}>
+      <Sider collapsible theme="light" className="h-screen">
         <NavigationBar />
       </Sider>
-      <Layout className="px-6">
+      <Layout className="h-screen px-6 overflow-y-auto">
         <Content>{children}</Content>
       </Layout>
     </Layout>

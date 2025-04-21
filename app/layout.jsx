@@ -12,18 +12,18 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          fontFamily: inter.style.fontFamily,
-        },
-      }}
-    >
-      <SessionProvider>
-        <html lang="en">
-          <body className={inter.className}>{children}</body>
-        </html>
-      </SessionProvider>
-    </ConfigProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        <ConfigProvider
+          theme={{
+            token: {
+              fontFamily: inter.style.fontFamily,
+            },
+          }}
+        >
+          <SessionProvider>{children}</SessionProvider>
+        </ConfigProvider>
+      </body>
+    </html>
   );
 }

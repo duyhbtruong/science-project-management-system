@@ -13,14 +13,18 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Form, Button, Input, message, Card, Select, Spin } from "antd";
-import { useSession } from "next-auth/react";
+import {
+  IdCardIcon,
+  LockIcon,
+  MailIcon,
+  PhoneIcon,
+  User2Icon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function UpdateAccount({ params }) {
-  // const { data } = useSession();
-  // console.log(">>> data: ", data);
-  const id = params.id;
+  const id = params.documentId;
   const [messageApi, contextHolder] = message.useMessage();
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();
@@ -102,8 +106,6 @@ export default function UpdateAccount({ params }) {
     }
   };
 
-  // console.log(">>> account: ", account);
-
   return (
     <div className="py-6 flex flex-col gap-6 items-center justify-center bg-gray-100 min-h-[100vh]">
       {contextHolder}
@@ -131,7 +133,7 @@ export default function UpdateAccount({ params }) {
               hasFeedback
             >
               <Input
-                prefix={<UserOutlined className="text-border" />}
+                prefix={<User2Icon className="mr-1 text-border size-4" />}
                 placeholder="Nhập tên tài khoản..."
               />
             </Form.Item>
@@ -151,7 +153,7 @@ export default function UpdateAccount({ params }) {
               ]}
             >
               <Input
-                prefix={<MailOutlined className="text-border" />}
+                prefix={<MailIcon className="mr-1 text-border size-4" />}
                 placeholder="Nhập email..."
               />
             </Form.Item>
@@ -177,7 +179,7 @@ export default function UpdateAccount({ params }) {
               hasFeedback
             >
               <Input
-                prefix={<PhoneOutlined rotate={90} className="text-border" />}
+                prefix={<PhoneIcon className="mr-1 text-border size-4" />}
                 placeholder="Nhập số điện thoại..."
               />
             </Form.Item>
@@ -200,7 +202,7 @@ export default function UpdateAccount({ params }) {
               hasFeedback
             >
               <Input.Password
-                prefix={<LockOutlined className="text-border" />}
+                prefix={<LockIcon className="mr-1 text-border size-4" />}
               />
             </Form.Item>
 
@@ -243,7 +245,10 @@ export default function UpdateAccount({ params }) {
                   ]}
                   hasFeedback
                 >
-                  <Input placeholder="Nhập MSSV..." />
+                  <Input
+                    prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
+                    placeholder="Nhập MSSV..."
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -321,7 +326,10 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập mã số Phòng thẩm định..." />
+                  <Input
+                    prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
+                    placeholder="Nhập mã số Phòng thẩm định..."
+                  />
                 </Form.Item>
               </>
             )}
@@ -338,7 +346,10 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập mã số Phòng Khoa học Công nghệ..." />
+                  <Input
+                    prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
+                    placeholder="Nhập mã số Phòng Khoa học Công nghệ..."
+                  />
                 </Form.Item>
               </>
             )}
@@ -355,7 +366,10 @@ export default function UpdateAccount({ params }) {
                     },
                   ]}
                 >
-                  <Input placeholder="Nhập mã số Giảng viên..." />
+                  <Input
+                    prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
+                    placeholder="Nhập mã số Giảng viên..."
+                  />
                 </Form.Item>
 
                 <Form.Item

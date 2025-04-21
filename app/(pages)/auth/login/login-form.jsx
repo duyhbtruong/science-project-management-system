@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Alert, Button, Form, Input } from "antd";
 import { login } from "@/app/(pages)/auth/login/page";
-import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { LockIcon, MailIcon } from "lucide-react";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -33,7 +33,7 @@ export const LoginForm = () => {
           onFocus={() => setLoginError()}
         >
           <Input
-            prefix={<MailOutlined className="text-border" />}
+            prefix={<MailIcon className="mr-1 text-border size-4" />}
             placeholder="Nhập tên tài khoản..."
             disabled={isPending}
           />
@@ -58,7 +58,7 @@ export const LoginForm = () => {
           onFocus={() => setLoginError()}
         >
           <Input.Password
-            prefix={<LockOutlined className="text-border" />}
+            prefix={<LockIcon className="mr-1 text-border size-4" />}
             placeholder="Nhập mật khẩu..."
             disabled={isPending}
           />

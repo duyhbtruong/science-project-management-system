@@ -4,15 +4,14 @@ import { createAppraisalBoard } from "@/service/appraiseService";
 import { createInstructor } from "@/service/instructorService";
 import { createStudent } from "@/service/studentService";
 import { createTechnologyScience } from "@/service/technologyScienceService";
-import {
-  CodeOutlined,
-  IdcardOutlined,
-  LockOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
 import { Button, Card, Form, Input, Select, message } from "antd";
+import {
+  IdCardIcon,
+  LockIcon,
+  MailIcon,
+  PhoneIcon,
+  User2Icon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -138,7 +137,7 @@ export default function CreateAccount() {
             hasFeedback
           >
             <Input
-              prefix={<UserOutlined className="text-border" />}
+              prefix={<User2Icon className="mr-1 text-border size-4" />}
               placeholder="Nhập tên tài khoản..."
             />
           </Form.Item>
@@ -159,14 +158,14 @@ export default function CreateAccount() {
             hasFeedback
           >
             <Input
-              prefix={<MailOutlined className="text-border" />}
+              prefix={<MailIcon className="mr-1 text-border size-4" />}
               placeholder="Nhập email..."
             />
           </Form.Item>
 
           <Form.Item label="Số điện thoại" name="phone" hasFeedback>
             <Input
-              prefix={<PhoneOutlined rotate={90} className="text-border" />}
+              prefix={<PhoneIcon className="mr-1 text-border size-4" />}
               placeholder="Nhập số điện thoại..."
             />
           </Form.Item>
@@ -192,7 +191,10 @@ export default function CreateAccount() {
             ]}
             hasFeedback
           >
-            <Input.Password prefix={<LockOutlined className="text-border" />} />
+            <Input.Password
+              className="text-border"
+              prefix={<LockIcon className="mr-1 text-border size-4" />}
+            />
           </Form.Item>
 
           <Form.Item
@@ -231,7 +233,7 @@ export default function CreateAccount() {
                 hasFeedback
               >
                 <Input
-                  prefix={<IdcardOutlined className="text-border" />}
+                  prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
                   placeholder="Nhập MSSV..."
                 />
               </Form.Item>
@@ -313,7 +315,7 @@ export default function CreateAccount() {
                 hasFeedback
               >
                 <Input
-                  prefix={<IdcardOutlined className="text-border" />}
+                  prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
                   placeholder="Nhập mã số Phòng Thẩm định..."
                 />
               </Form.Item>
@@ -334,7 +336,7 @@ export default function CreateAccount() {
                 hasFeedback
               >
                 <Input
-                  prefix={<IdcardOutlined className="text-border" />}
+                  prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
                   placeholder="Nhập mã số Phòng Khoa học Công nghệ..."
                 />
               </Form.Item>
@@ -355,7 +357,7 @@ export default function CreateAccount() {
                 hasFeedback
               >
                 <Input
-                  prefix={<IdcardOutlined className="text-border" />}
+                  prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
                   placeholder="Nhập mã số Giảng viên..."
                 />
               </Form.Item>

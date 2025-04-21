@@ -1,13 +1,13 @@
 "use client";
 
-import { logout } from "@/app/(pages)/auth/login/page";
+import { useState } from "react";
 import { AppLogo } from "@/components/logo";
-import { LogoutOutlined, BarChartOutlined } from "@ant-design/icons";
+import { logout } from "@/app/(pages)/auth/login/page";
+import { usePathname } from "next/navigation";
 import { Menu } from "antd";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { TeamOutlined } from "@ant-design/icons";
+import Image from "next/image";
+import { LogOutIcon, UsersIcon } from "lucide-react";
 
 const items = [
   {
@@ -15,16 +15,17 @@ const items = [
     key: "logo",
     disabled: true,
     className: "hover:cursor-default",
+    icon: <Image src="/logo.svg" width={24} height={24} />,
   },
   {
     label: <Link href="/admin/accounts">Quản lý tài khoản</Link>,
     key: "accounts",
-    icon: <TeamOutlined />,
+    icon: <UsersIcon className="size-4" />,
   },
   {
     label: "Đăng xuất",
     key: "logout",
-    icon: <LogoutOutlined />,
+    icon: <LogOutIcon className="size-4" />,
     onClick: async () => await logout(),
   },
 ];
