@@ -1,4 +1,5 @@
-import NextAuth from "next-auth";
+import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 import { authConfig } from "@/auth.config";
 import {
   DEFAULT_LOGIN_REDIRECT,
@@ -6,59 +7,63 @@ import {
   authRoutes,
   publicRoutes,
 } from "@/routes";
+import NextAuth from "next-auth";
 
 const { auth } = NextAuth(authConfig);
 
+const ROLE_DEFAULT_PATH = {
+  admin: "/admin/accounts",
+  student: "/student/topics",
+  instructor: "/instructor/topics",
+  technologyScience: "/technologyScience/dashboard",
+  appraise: "/appraise/topics",
+};
+
 export default auth(async (req) => {
-  const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
+  const { nextUrl: url } = req;
 
-  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  // 1) Let NextAuth handle its own API‐auth routes
+  if (url.pathname.startsWith(apiAuthPrefix)) {
+    return NextResponse.next();
+  }
 
-  if (isApiAuthRoute) return null;
+  // 2) Fetch token + derive login state & role
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  const isLoggedIn = !!token;
+  const userRole = token?.role;
 
-  // Lấy user role để điều hướng
-  const userRole = req.auth?.user.role;
-  let callbackUrl;
-  if (userRole) {
-    callbackUrl = new URL(`/${userRole}/dashboard`, nextUrl);
-
-    // Điều hướng đến trang admin
-    if (nextUrl.pathname.startsWith(`/admin`) && userRole !== "admin") {
-      return Response.redirect(new URL(`/admin/accounts`, nextUrl));
+  // 3) If visiting a NEXT‐AUTH page…
+  if (authRoutes.includes(url.pathname)) {
+    // → already logged in? send to dashboard
+    if (isLoggedIn) {
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, url));
     }
-    // Điều hướng đến trang student
-    if (nextUrl.pathname.startsWith(`/student`) && userRole !== "student") {
-      return Response.redirect(new URL(`/student/topics`, nextUrl));
+
+    // → else let them see login/register
+    return NextResponse.next();
+  }
+
+  // 4) If not logged in AND not a public page, force login
+  if (!isLoggedIn && !publicRoutes.includes(url.pathname)) {
+    return NextResponse.redirect(new URL("/auth/login", url));
+  }
+
+  // 5) If logged in AND has a role, ensure they’re inside their role‐area
+  if (isLoggedIn && userRole) {
+    if (url.pathname === "/") {
+      return NextResponse.next();
     }
-    // Điều hướng đến trang technology science
-    if (
-      nextUrl.pathname.startsWith(`/technologyScience`) &&
-      userRole !== "technologyScience"
-    ) {
-      return Response.redirect(callbackUrl);
-    }
-    // Điều hướng đến trang appraise
-    if (nextUrl.pathname.startsWith(`/appraise`) && userRole !== "appraise") {
-      return Response.redirect(callbackUrl);
+
+    const base = `/${userRole}`;
+    // If they’re outside of `/admin`, `/student`, etc.…
+    if (!url.pathname.startsWith(base)) {
+      // → send them to that role’s default path
+      const dest = ROLE_DEFAULT_PATH[userRole] ?? DEFAULT_LOGIN_REDIRECT;
+      return NextResponse.redirect(new URL(dest, url));
     }
   }
 
-  // Nếu đã đăng nhập mà điều hướng đến trang auth thì redirect đến trang chính
-  if (isAuthRoute) {
-    if (isLoggedIn)
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-    return null;
-  }
-
-  // Nếu chưa đăng nhập thì điều hướng đến trang đăng nhập
-  if (!isLoggedIn && !isPublicRoute) {
-    return Response.redirect(new URL("/auth/login", nextUrl));
-  }
-
-  return null;
+  return NextResponse.next();
 });
 
 // Tất cả url match với config thì middleware sẽ chạy
