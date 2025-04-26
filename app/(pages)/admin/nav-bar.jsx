@@ -15,7 +15,7 @@ const items = [
     key: "logo",
     disabled: true,
     className: "hover:cursor-default",
-    icon: <Image src="/logo.svg" width={24} height={24} />,
+    icon: <Image src="/logo.svg" alt="logo" width={24} height={24} />,
   },
   {
     label: <Link href="/admin/accounts">Quản lý tài khoản</Link>,

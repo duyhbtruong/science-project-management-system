@@ -6,32 +6,19 @@ import {
   getAppraisesByTopicId,
   updateAppraise,
 } from "@/service/appraiseGradeService";
-import { getStudentById } from "@/service/studentService";
 import { getTopicById } from "@/service/topicService";
-import { ExportOutlined, InfoOutlined, LinkOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Descriptions,
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Select,
-  Space,
-  Spin,
-  message,
-} from "antd";
+import { Button, Form, Input, Radio, Select, Space, Spin, message } from "antd";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import emailjs from "@emailjs/browser";
 
+import DetailModal from "./detail";
+import { InfoIcon } from "lucide-react";
+import { SubmitButton } from "@/components/submit-button";
+
 export default function ReviewTopicPage({ params }) {
   const { id: topicId } = params;
-  // const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-  // const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID_INSTRUCTOR;
-  // const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
   const session = useSession();
   const userId = session?.data?.user?.id;
   const [topic, setTopic] = useState();
@@ -52,86 +39,10 @@ export default function ReviewTopicPage({ params }) {
     setIsModalOpen(false);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
   const data = [];
   for (let i = 5; i <= 100; i += 5) {
     data.push({ value: i, label: `${i}` });
   }
-
-  const topicItems = [
-    {
-      key: "1",
-      label: "Tên tiếng Việt",
-      children: topic?.vietnameseName,
-    },
-    {
-      key: "2",
-      label: "Tên tiếng Anh",
-      children: topic?.englishName,
-    },
-    {
-      key: "3",
-      label: "Tóm tắt đề tài",
-      children: topic?.summary,
-    },
-    {
-      key: "4",
-      label: "Dự kiến kết quả",
-      children: topic?.expectedResult,
-    },
-    {
-      key: "5",
-      label: "Thành viên",
-      children: topic?.participants?.map((participant, index) => {
-        return (
-          <div key={`participants-${index}`} className="block">
-            • {participant}
-          </div>
-        );
-      }),
-    },
-    {
-      key: "6",
-      label: "Tài liệu tham khảo",
-      children: topic?.reference?.map((reference, index) => {
-        return (
-          <div key={`reference-${index}`} className="block">
-            • {reference}
-          </div>
-        );
-      }),
-    },
-  ];
-
-  const instructorItems = [
-    {
-      key: "1",
-      label: "Tên",
-      children: topic?.instructor?.accountId.name,
-    },
-    {
-      key: "2",
-      label: "Email",
-      children: (
-        <Link
-          className="space-x-1"
-          target="_blank"
-          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
-        >
-          <ExportOutlined className="mr-1" />
-          <span>{topic?.instructor?.accountId.email}</span>
-        </Link>
-      ),
-    },
-    {
-      key: "3",
-      label: "Học hàm, hoc vị",
-      children: topic?.instructor?.academicRank,
-    },
-  ];
 
   const loadTopic = async () => {
     let res = await getTopicById(topicId);
@@ -287,8 +198,9 @@ export default function ReviewTopicPage({ params }) {
         <Button
           onClick={showModal}
           loading={!topic}
-          icon={<InfoOutlined />}
+          icon={<InfoIcon className="size-4" />}
           type="primary"
+          className="flex items-center"
         >
           Thông tin chi tiết
         </Button>
@@ -479,18 +391,6 @@ export default function ReviewTopicPage({ params }) {
                 <Space direction="vertical">
                   <Radio value={"Có"}>Có</Radio>
                   <Radio value={"Không"}>Không</Radio>
-                  {/* <Radio value={"Khác"}>
-                    Khác...
-                    {value === "Khác" ? (
-                      <Input
-                        name="more"
-                        style={{
-                          width: 400,
-                          marginLeft: 10,
-                        }}
-                      />
-                    ) : null}
-                  </Radio> */}
                 </Space>
               </Radio.Group>
             </Form.Item>
@@ -545,54 +445,12 @@ export default function ReviewTopicPage({ params }) {
           </div>
         </div>
       </Spin>
-
-      <Modal
-        title="Thông tin chi tiết"
-        open={isModalOpen}
-        width={1000}
-        centered
-        footer={
-          <Button type="primary" onClick={handleOk}>
-            OK
-          </Button>
-        }
-      >
-        <div className="mt-4 space-y-4">
-          <Descriptions
-            title="Thông tin đề tài"
-            bordered
-            column={1}
-            items={topicItems}
-          />
-          <Descriptions
-            title="Thông tin Giảng viên Hướng dẫn"
-            bordered
-            column={1}
-            items={instructorItems}
-          />
-        </div>
-      </Modal>
+      <DetailModal
+        topic={topic}
+        isModalOpen={isModalOpen}
+        handleOk={handleOk}
+      />
       {contextHolder}
     </div>
   );
 }
-
-const SubmitButton = ({ form, children }) => {
-  const [submittable, setSubmittable] = useState(false);
-
-  // Watch all values
-  const values = Form.useWatch([], form);
-  useEffect(() => {
-    form
-      .validateFields({
-        validateOnly: true,
-      })
-      .then(() => setSubmittable(true))
-      .catch(() => setSubmittable(false));
-  }, [form, values]);
-  return (
-    <Button type="primary" htmlType="submit" disabled={!submittable}>
-      {children}
-    </Button>
-  );
-};

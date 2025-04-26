@@ -1,38 +1,21 @@
 "use client";
 
-import {
-  getTopics,
-  getTopicsByAppraisalBoardStaffId,
-  searchTopic,
-} from "@/service/topicService";
-import {
-  CheckOutlined,
-  DeleteOutlined,
-  HighlightOutlined,
-  PaperClipOutlined,
-  SyncOutlined,
-} from "@ant-design/icons";
-import {
-  Modal,
-  Spin,
-  Table,
-  message,
-  Input,
-  Tag,
-  Space,
-  Button,
-  Select,
-} from "antd";
-const { Search } = Input;
+import { getTopicsByAppraisalBoardStaffId } from "@/service/topicService";
+import { Modal, Spin, Table, message, Tag, Space, Button, Select } from "antd";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { storage } from "@/lib/firebase";
-import { getDownloadURL, ref } from "firebase/storage";
 import Link from "next/link";
 import { deleteAppraiseById } from "@/service/appraiseGradeService";
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
+import {
+  CheckIcon,
+  EditIcon,
+  LoaderIcon,
+  PaperclipIcon,
+  TrashIcon,
+} from "lucide-react";
 const { Option } = Select;
 
 export default function AppraiseTopicPage() {
@@ -72,17 +55,6 @@ export default function AppraiseTopicPage() {
     let res = await getAllPeriods();
     res = await res.json();
     setListPeriod(res);
-  };
-
-  const handleSearchChange = (event) => {
-    if (event.target.value === "") {
-      loadTopics();
-    }
-  };
-
-  const handleSearchTopic = async (searchValue) => {
-    let res = await searchTopic(searchValue);
-    setTopics(res);
   };
 
   const deleteAppraiseGrade = async (appraiseId) => {
@@ -132,14 +104,12 @@ export default function AppraiseTopicPage() {
       title: "Tên tiếng Việt",
       dataIndex: "vietnameseName",
       key: "vietnameseName",
-      width: "25%",
       ellipsis: true,
     },
     {
       title: "Tên tiếng Anh",
       dataIndex: "englishName",
       key: "englishName",
-      width: "25%",
       ellipsis: true,
     },
     {
@@ -149,8 +119,12 @@ export default function AppraiseTopicPage() {
       render: (_, record) => {
         if (!record.submitFile) return <span>Chưa nộp</span>;
         return (
-          <Link target="_blank" href={record.submitFile}>
-            <PaperClipOutlined /> Đường dẫn tài liệu
+          <Link
+            target="_blank"
+            href={record.submitFile}
+            className="flex items-center gap-x-1"
+          >
+            <PaperclipIcon className="size-4" /> Đường dẫn tài liệu
           </Link>
         );
       },
@@ -164,7 +138,13 @@ export default function AppraiseTopicPage() {
         return (
           <Tag
             color={isAppraised ? "success" : "default"}
-            icon={isAppraised ? <CheckOutlined /> : <SyncOutlined spin />}
+            icon={
+              isAppraised ? (
+                <CheckIcon className="inline-block mr-1 size-4" />
+              ) : (
+                <LoaderIcon className="inline-block mr-1 animate-spin size-4" />
+              )
+            }
           >
             {isAppraised ? "Đã thẩm định" : "Chưa thẩm định"}
           </Tag>
@@ -174,14 +154,13 @@ export default function AppraiseTopicPage() {
     {
       title: "Hành động",
       key: "action",
-      width: "10%",
       render: (_, record) => {
         return (
           <Space size="middle">
             <Button
               disabled={!record.submitFile}
               onClick={() => router.push(`/appraise/topics/${record._id}`)}
-              icon={<HighlightOutlined />}
+              icon={<EditIcon className="size-4" />}
             />
             <Button
               disabled={record.appraises.length === 0}
@@ -192,7 +171,7 @@ export default function AppraiseTopicPage() {
                 }
               }}
               danger
-              icon={<DeleteOutlined />}
+              icon={<TrashIcon className="size-4" />}
             />
           </Space>
         );
@@ -220,13 +199,6 @@ export default function AppraiseTopicPage() {
           )}
         </div>
 
-        {/* <Search
-          className="w-[450px] mb-4"
-          placeholder="Tìm kiếm đề tài..."
-          enterButton
-          onSearch={handleSearchTopic}
-          onChange={handleSearchChange}
-        /> */}
         <Spin spinning={!topics}>
           <Table
             rowKey={(record) => record._id}

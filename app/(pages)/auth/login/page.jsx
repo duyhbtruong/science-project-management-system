@@ -41,7 +41,7 @@ export default async function LoginPage() {
     <div className="flex items-center justify-center h-screen bg-gray-100">
       <Card className="shadow-md">
         <div className="flex justify-center text-2xl font-bold gap-x-2">
-          <Image src="/logo.svg" height={50} width={50} />
+          <Image src="/logo.svg" alt="logo" height={50} width={50} />
           <AppLogo fontSize={`text-3xl`} />
         </div>
         <LoginForm />
