@@ -1,19 +1,18 @@
 "use client";
 
-import { AlignLeftOutlined } from "@ant-design/icons";
-import { Form, Input, message, Space, Button, DatePicker } from "antd";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FileTextIcon } from "lucide-react";
+import { Form, Input, message, Space, DatePicker } from "antd";
+
 import { createPeriod } from "@/service/registrationService";
+import { SubmitButton } from "@/components/submit-button";
 
 export default function CreatePeriodPage() {
   const router = useRouter();
   const [form] = Form.useForm();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (formValues) => {
-    // console.log(">>> form: ", formValues);
     let period = {
       title: formValues.title,
       startDate: formValues.startDate.format("YYYY-MM-DD"),
@@ -23,7 +22,6 @@ export default function CreatePeriodPage() {
       appraiseDeadline: formValues.appraiseDeadline.format("YYYY-MM-DD"),
     };
 
-    // console.log(">>> period: ", period);
     let res = await createPeriod(period);
 
     if (res.status === 201) {
@@ -51,8 +49,8 @@ export default function CreatePeriodPage() {
 
   return (
     <>
+      {contextHolder}
       <div className="bg-gray-100 min-h-[100vh]">
-        {contextHolder}
         <div className="py-6 mx-32">
           <div className="flex justify-center pb-6 text-xl font-semibold">
             Tạo Đợt Đăng ký Đề tài mới
@@ -68,7 +66,7 @@ export default function CreatePeriodPage() {
             >
               <Form.Item label="Tên" name="title" rules={[{ required: true }]}>
                 <Input
-                  prefix={<AlignLeftOutlined className="text-border" />}
+                  prefix={<FileTextIcon className="mr-1 text-border size-4" />}
                   placeholder="Nhập tên đợt đăng ký..."
                 />
               </Form.Item>
@@ -140,23 +138,3 @@ export default function CreatePeriodPage() {
     </>
   );
 }
-
-const SubmitButton = ({ form, children }) => {
-  const [submittable, setSubmittable] = useState(false);
-
-  // Watch all values
-  const values = Form.useWatch([], form);
-  useEffect(() => {
-    form
-      .validateFields({
-        validateOnly: true,
-      })
-      .then(() => setSubmittable(true))
-      .catch(() => setSubmittable(false));
-  }, [form, values]);
-  return (
-    <Button type="primary" htmlType="submit" disabled={!submittable}>
-      {children}
-    </Button>
-  );
-};

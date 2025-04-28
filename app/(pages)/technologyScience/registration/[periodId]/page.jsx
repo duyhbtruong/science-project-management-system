@@ -1,18 +1,19 @@
 "use client";
 
 import { AlignLeftOutlined } from "@ant-design/icons";
-import { Form, Input, message, Space, Button, Spin, DatePicker } from "antd";
+import { Form, Input, message, Space, Spin, DatePicker } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getPeriodById, updatePeriodById } from "@/service/registrationService";
 import dayjs from "dayjs";
+import { SubmitButton } from "@/components/submit-button";
+import { FileTextIcon } from "lucide-react";
 
 export default function EditPeriodScreen({ params }) {
   const periodId = params.periodId;
   const router = useRouter();
   const [form] = Form.useForm();
   const [period, setPeriod] = useState();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   const loadPeriod = async () => {
@@ -71,8 +72,6 @@ export default function EditPeriodScreen({ params }) {
     }
   };
 
-  console.log(">>> period: ", period);
-
   return (
     <>
       <div className="bg-gray-100 min-h-[100vh]">
@@ -97,7 +96,9 @@ export default function EditPeriodScreen({ params }) {
                   rules={[{ required: true }]}
                 >
                   <Input
-                    prefix={<AlignLeftOutlined className="text-border" />}
+                    prefix={
+                      <FileTextIcon className="mr-1 text-border size-4" />
+                    }
                     placeholder="Nhập tên đợt đăng ký..."
                   />
                 </Form.Item>
@@ -159,7 +160,7 @@ export default function EditPeriodScreen({ params }) {
 
                 <Form.Item>
                   <Space>
-                    <SubmitButton form={form}>Tạo</SubmitButton>
+                    <SubmitButton form={form}>Cập nhật</SubmitButton>
                   </Space>
                 </Form.Item>
               </Form>
@@ -170,23 +171,3 @@ export default function EditPeriodScreen({ params }) {
     </>
   );
 }
-
-const SubmitButton = ({ form, children }) => {
-  const [submittable, setSubmittable] = useState(false);
-
-  // Watch all values
-  const values = Form.useWatch([], form);
-  useEffect(() => {
-    form
-      .validateFields({
-        validateOnly: true,
-      })
-      .then(() => setSubmittable(true))
-      .catch(() => setSubmittable(false));
-  }, [form, values]);
-  return (
-    <Button type="primary" htmlType="submit" disabled={!submittable}>
-      {children}
-    </Button>
-  );
-};

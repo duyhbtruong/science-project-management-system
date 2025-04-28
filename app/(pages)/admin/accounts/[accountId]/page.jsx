@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function UpdateAccount({ params }) {
-  const id = params.documentId;
+  const id = params.accountId;
   const [messageApi, contextHolder] = message.useMessage();
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();

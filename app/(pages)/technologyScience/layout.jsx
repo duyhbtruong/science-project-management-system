@@ -1,7 +1,7 @@
 "use client";
 
 import NavigationBar from "@/app/(pages)/technologyScience/nav-bar";
-import { Layout } from "antd";
+import { Layout, message } from "antd";
 const { Content, Sider } = Layout;
 
 export default function TechnologyScienceLayout({ children }) {
