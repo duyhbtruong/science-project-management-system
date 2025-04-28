@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Descriptions } from "antd";
 import { ExportOutlined, PaperClipOutlined } from "@ant-design/icons";
+import { LinkIcon, PaperclipIcon } from "lucide-react";
 
 const ExpandedRow = ({ record }) => {
   const instructorItems = [
@@ -16,8 +17,9 @@ const ExpandedRow = ({ record }) => {
         <Link
           target="_blank"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
+          className="flex items-center justify-center"
         >
-          <ExportOutlined className="mr-1" />
+          <LinkIcon className="mr-1 size-4" />
           {record.instructor.accountId.email}
         </Link>
       ),
@@ -70,8 +72,12 @@ const ExpandedRow = ({ record }) => {
       children: (
         <p>
           {record.registerFile && (
-            <Link target="_blank" href={record.registerFile}>
-              <PaperClipOutlined className="mr-1" />
+            <Link
+              target="_blank"
+              href={record.registerFile}
+              className="flex items-center justify-center"
+            >
+              <PaperclipIcon className="mr-1 size-4" />
               Tài liệu đính kèm
             </Link>
           )}
@@ -85,8 +91,12 @@ const ExpandedRow = ({ record }) => {
       children: (
         <p>
           {record.submitFile && (
-            <Link target="_blank" href={record.submitFile}>
-              <PaperClipOutlined className="mr-1" />
+            <Link
+              target="_blank"
+              href={record.submitFile}
+              className="flex items-center justify-center"
+            >
+              <PaperclipIcon className="mr-1 size-4" />
               Tài liệu đính kèm
             </Link>
           )}
@@ -100,8 +110,12 @@ const ExpandedRow = ({ record }) => {
       children: (
         <p>
           {record.contractFile && (
-            <Link target="_blank" href={record.contractFile}>
-              <PaperClipOutlined className="mr-1" />
+            <Link
+              target="_blank"
+              href={record.contractFile}
+              className="flex items-center justify-center"
+            >
+              <PaperclipIcon className="mr-1 size-4" />
               Tài liệu đính kèm
             </Link>
           )}
@@ -115,8 +129,12 @@ const ExpandedRow = ({ record }) => {
       children: (
         <p>
           {record.paymentFile && (
-            <Link target="_blank" href={record.paymentFile}>
-              <PaperClipOutlined className="mr-1" />
+            <Link
+              target="_blank"
+              href={record.paymentFile}
+              className="flex items-center justify-center"
+            >
+              <PaperclipIcon className="mr-1 size-4" />
               Tài liệu đính kèm
             </Link>
           )}

@@ -36,12 +36,17 @@ export const getTableColumns = (showModal, deleteTopic) => [
         case true:
           color = "success";
           text = "Đã kiểm duyệt";
-          icon = <CheckIcon className="size-4" />;
+          icon = <CheckIcon className="inline-block mr-1 size-4" />;
           break;
         case false:
           color = "default";
           text = "Chưa kiểm duyệt";
-          icon = <LoaderIcon spin className="animate-spin size-4" />;
+          icon = (
+            <LoaderIcon
+              spin
+              className="inline-block mr-1 animate-spin size-4"
+            />
+          );
         default:
           break;
       }
@@ -74,12 +79,17 @@ export const getTableColumns = (showModal, deleteTopic) => [
         case true:
           color = "success";
           text = "Đã thẩm định";
-          icon = <CheckIcon className="size-4" />;
+          icon = <CheckIcon className="inline-block mr-1 size-4" />;
           break;
         case false:
           color = "default";
           text = "Chưa thẩm định";
-          icon = <LoaderIcon spin className="animate-spin size-4" />;
+          icon = (
+            <LoaderIcon
+              spin
+              className="inline-block mr-1 animate-spin size-4"
+            />
+          );
         default:
           break;
       }
