@@ -12,35 +12,41 @@ import {
   UnorderedListOutlined,
 } from "@ant-design/icons";
 import { AppLogo } from "@/components/logo";
+import Image from "next/image";
+import {
+  CalendarIcon,
+  ClipboardListIcon,
+  LineChartIcon,
+  LogOutIcon,
+} from "lucide-react";
 
 const items = [
   {
-    label: <AppLogo fontSize={`text-md`} className="w-[300px]" />,
+    label: <AppLogo fontSize={`text-md`} />,
     key: "logo",
     disabled: true,
     className: "hover:cursor-default",
+    icon: <Image src="/logo.svg" alt="logo" width={24} height={24} />,
   },
   {
     label: <Link href="/technologyScience/topics">Quản lý đề tài</Link>,
     key: "topics",
-    icon: <UnorderedListOutlined />,
+    icon: <ClipboardListIcon className="size-4" />,
   },
   {
-    label: (
-      <Link href="/technologyScience/registration">Quản lý đợt đăng ký</Link>
-    ),
+    label: <Link href="/technologyScience/registration">Quản lý đăng ký</Link>,
     key: "registration",
-    icon: <FileTextOutlined />,
+    icon: <CalendarIcon className="size-4" />,
   },
   {
     label: <Link href="/technologyScience/dashboard">Thống kê đề tài</Link>,
     key: "dashboard",
-    icon: <LineChartOutlined />,
+    icon: <LineChartIcon className="size-4" />,
   },
   {
     label: "Đăng xuất",
     key: "logout",
-    icon: <LogoutOutlined />,
+    icon: <LogOutIcon className="size-4" />,
     onClick: async () => await logout(),
   },
 ];
@@ -58,6 +64,7 @@ const NavigationBar = () => {
     <>
       <Menu
         onClick={(e) => setCurrent(e.key)}
+        mode="inline"
         selectedKeys={[current]}
         items={items}
       />

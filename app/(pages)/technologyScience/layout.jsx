@@ -1,10 +1,10 @@
 "use client";
 
-import NavigationBar from "@/app/(pages)/appraise/nav-bar";
+import NavigationBar from "@/app/(pages)/technologyScience/nav-bar";
 import { Layout } from "antd";
 const { Content, Sider } = Layout;
 
-export default function AppraiseLayout({ children }) {
+export default function TechnologyScienceLayout({ children }) {
   return (
     <Layout hasSider={true}>
       <Sider collapsible theme="light" className="h-screen">

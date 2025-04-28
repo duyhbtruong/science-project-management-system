@@ -10,7 +10,7 @@ export default function AdminLayout({ children }) {
       <Sider collapsible theme="light" className="h-screen">
         <NavigationBar />
       </Sider>
-      <Layout className="h-screen px-6 overflow-y-auto">
+      <Layout className="h-screen overflow-y-auto">
         <Content>{children}</Content>
       </Layout>
     </Layout>

@@ -1,0 +1,162 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { getAllPeriods } from "@/service/registrationService";
+import { getAllInstructors } from "@/service/instructorService";
+import { getAllAppraisalBoards } from "@/service/appraiseService";
+import { getTopicsByPeriod, searchTopic } from "@/service/topicService";
+
+import TopicTable from "./topic-table";
+import { Button, Input, Select, Spin } from "antd";
+const { Search } = Input;
+const { Option } = Select;
+
+import { exportTopicList } from "@/utils/export";
+import { DownloadIcon } from "lucide-react";
+
+export default function TopicsManagePage() {
+  const [listTopic, setListTopic] = useState();
+  const [listPeriod, setListPeriod] = useState();
+  const [selectedPeriod, setSelectedPeriod] = useState();
+  const [listAppraiseStaff, setListAppraiseStaff] = useState();
+  const [listReviewInstructor, setListReviewInstructor] = useState();
+
+  const loadTopics = async () => {
+    let res = await getTopicsByPeriod(selectedPeriod);
+    res = await res.json();
+    setListTopic(res);
+  };
+
+  const loadPeriod = async () => {
+    let res = await getAllPeriods();
+    res = await res.json();
+    setListPeriod(res);
+  };
+
+  const loadReviewInstructors = async () => {
+    let res = await getAllInstructors();
+    res = await res.json();
+    setListReviewInstructor(res);
+  };
+
+  const loadAppraiseStaffs = async () => {
+    let res = await getAllAppraisalBoards();
+    res = await res.json();
+    setListAppraiseStaff(res);
+  };
+
+  const handleSearchTopic = async (searchValue) => {
+    var res = await searchTopic(selectedPeriod, searchValue);
+    res = await res.json();
+    setListTopic(res);
+  };
+
+  const handleSearchChange = async (event) => {
+    if (event.target.value === "") {
+      loadTopics();
+    }
+  };
+
+  const handleExport = async () => {
+    let students = [];
+    for (const topic of listTopic) {
+      students.push(topic.owner);
+    }
+    exportTopicList(listTopic, students);
+  };
+
+  const handlePeriodChange = (value) => {
+    setSelectedPeriod(value);
+  };
+
+  useEffect(() => {
+    loadPeriod();
+    loadAppraiseStaffs();
+    loadReviewInstructors();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPeriod) return;
+
+    loadTopics();
+  }, [selectedPeriod]);
+
+  return (
+    <div className="bg-gray-100 min-h-[100vh]">
+      <div className="flex flex-col py-6 mx-32">
+        <div className="flex justify-between">
+          <div className="mb-4 space-x-4">
+            {listPeriod && (
+              <Select
+                className="w-64"
+                placeholder="Chọn đợt đăng ký..."
+                onChange={handlePeriodChange}
+                value={selectedPeriod}
+              >
+                {listPeriod.map((period, index) => (
+                  <Option
+                    key={`registration-period-${index}`}
+                    value={period._id}
+                  >
+                    {period.title}
+                  </Option>
+                ))}
+              </Select>
+            )}
+
+            {selectedPeriod && (
+              <Search
+                className="w-[450px] "
+                placeholder="Tìm kiếm đề tài..."
+                enterButton
+                onSearch={handleSearchTopic}
+                onChange={handleSearchChange}
+              />
+            )}
+          </div>
+
+          <Button
+            loading={!listTopic && selectedPeriod}
+            disabled={!selectedPeriod}
+            onClick={handleExport}
+            icon={<DownloadIcon className="size-4" />}
+            type="primary"
+            className="flex items-center justify-center"
+          >
+            Xuất danh sách
+          </Button>
+        </div>
+
+        {!selectedPeriod ? (
+          <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow">
+            <Select
+              className="w-64 mb-4"
+              placeholder="Chọn đợt đăng ký..."
+              onChange={handlePeriodChange}
+              value={selectedPeriod}
+            >
+              {listPeriod?.map((period, index) => (
+                <Option key={`registration-period-${index}`} value={period._id}>
+                  {period.title}
+                </Option>
+              ))}
+            </Select>
+            <p className="text-gray-500">
+              Vui lòng chọn đợt đăng ký để xem danh sách đề tài
+            </p>
+          </div>
+        ) : (
+          <Spin spinning={!listTopic}>
+            <TopicTable
+              listTopic={listTopic}
+              listReviewInstructor={listReviewInstructor}
+              listAppraiseStaff={listAppraiseStaff}
+              loadTopics={loadTopics}
+            />
+          </Spin>
+        )}
+      </div>
+    </div>
+  );
+}
