@@ -183,7 +183,7 @@ export default function AppraiseTopicPage() {
     <div className="min-h-[calc(100vh-45.8px)] bg-gray-100">
       <div className="flex flex-col py-6 mx-32">
         <div className="mb-4 space-x-4">
-          {listPeriod && (
+          {selectedPeriod && (
             <Select
               className="w-64"
               placeholder="Chọn đợt đăng ký..."
@@ -199,15 +199,35 @@ export default function AppraiseTopicPage() {
           )}
         </div>
 
-        <Spin spinning={!topics}>
-          <Table
-            rowKey={(record) => record._id}
-            tableLayout="fixed"
-            columns={columns}
-            dataSource={topics}
-            pagination={{ pageSize: 8 }}
-          />
-        </Spin>
+        {!selectedPeriod ? (
+          <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow">
+            <Select
+              className="w-64 mb-4"
+              placeholder="Chọn đợt đăng ký..."
+              onChange={handlePeriodChange}
+              value={selectedPeriod}
+            >
+              {listPeriod?.map((period, index) => (
+                <Option key={`registration-period-${index}`} value={period._id}>
+                  {period.title}
+                </Option>
+              ))}
+            </Select>
+            <p className="text-gray-500">
+              Vui lòng chọn đợt đăng ký để xem danh sách thẩm định đề tài
+            </p>
+          </div>
+        ) : (
+          <Spin spinning={!topics}>
+            <Table
+              rowKey={(record) => record._id}
+              tableLayout="fixed"
+              columns={columns}
+              dataSource={topics}
+              pagination={{ pageSize: 8 }}
+            />
+          </Spin>
+        )}
       </div>
       {modalContextHolder}
       {messageContextHolder}

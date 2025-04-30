@@ -18,7 +18,7 @@ import { InfoIcon } from "lucide-react";
 import { SubmitButton } from "@/components/submit-button";
 
 export default function ReviewTopicPage({ params }) {
-  const { id: topicId } = params;
+  const { topicId } = params;
   const session = useSession();
   const userId = session?.data?.user?.id;
   const [topic, setTopic] = useState();
