@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 export default async function Home() {
   const session = await auth();
 
+  console.log("USER: ", session.user);
+
   // Điều hướng user dựa theo role
   if (session.user.role === "admin") {
     redirect("/admin/accounts");
