@@ -1,0 +1,307 @@
+import { Button, Form, Input, Select, Upload } from "antd";
+import {
+  LightbulbIcon,
+  MinusCircleIcon,
+  PlusIcon,
+  UploadIcon,
+  Users2Icon,
+} from "lucide-react";
+
+export const TopicInfoSection = ({ listFile, setListFile }) => {
+  return (
+    <>
+      <Form.Item
+        label="Tên đề tài (tiếng Việt) - ghi bằng IN HOA"
+        name="vietnameseName"
+        hasFeedback
+        rules={[
+          {
+            required: true,
+            message: "Tên đề tài không được để trống.",
+          },
+          {
+            validator(_, value) {
+              if (value !== value?.toUpperCase()) {
+                return Promise.reject(
+                  new Error("Tên đề tài phải là chữ in hoa.")
+                );
+              } else return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Input
+          placeholder="Nhập tên tiếng Việt của đề tài..."
+          prefix={<LightbulbIcon className="mr-1 text-border size-4" />}
+        />
+      </Form.Item>
+
+      <Form.Item
+        label="Tên đề tài (tiếng Anh) - ghi bằng IN HOA"
+        name="englishName"
+        hasFeedback
+        rules={[
+          {
+            required: true,
+            message: "Tên đề tài không được để trống.",
+          },
+          {
+            validator(_, value) {
+              if (value !== value?.toUpperCase()) {
+                return Promise.reject(
+                  new Error("Tên đề tài phải là chữ in hoa.")
+                );
+              } else return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Input
+          placeholder="Nhập tên tiếng Anh của đề tài..."
+          prefix={<LightbulbIcon className="mr-1 text-border size-4" />}
+        />
+      </Form.Item>
+
+      <Form.Item
+        label="Loại hình nghiên cứu"
+        name="type"
+        rules={[
+          {
+            required: true,
+            message: "Không được để trống loại hình nghiên cứu.",
+          },
+        ]}
+      >
+        <Select
+          placeholder="Chọn loại hình nghiên cứu..."
+          options={[
+            {
+              value: "Nghiên cứu cơ bản",
+              label: "Nghiên cứu cơ bản",
+            },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item
+        label="Tóm tắt nội dung đề tài"
+        name="summary"
+        hasFeedback
+        rules={[
+          {
+            required: true,
+            message: "Không được để trống tóm tắt đề tài.",
+          },
+          {
+            max: 300,
+            message: "Không được dài quá 300 chữ!",
+          },
+        ]}
+      >
+        <Input.TextArea
+          showCount
+          maxLength={300}
+          rows={5}
+          style={{ resize: "none" }}
+          placeholder="Nhập tóm tắt nội dung đề tài..."
+        />
+      </Form.Item>
+
+      <Form.List
+        name="references"
+        hasFeedback
+        rules={[
+          {
+            validator: async (_, references) => {
+              if (!references) {
+                return Promise.reject(
+                  new Error("Phải có ít nhất 1 tài liệu tham khảo chính.")
+                );
+              } else if (references.length > 5) {
+                return Promise.reject(
+                  new Error("Tối đa nhập 5 tài liệu tham khảo chính.")
+                );
+              }
+            },
+          },
+        ]}
+      >
+        {(references, { add, remove }, { errors }) => (
+          <>
+            {references.map((reference, index) => {
+              const { key, ...restProps } = reference;
+              return (
+                <Form.Item
+                  label={index == 0 ? "Tài liệu tham khảo" : null}
+                  required={true}
+                  key={key}
+                >
+                  <Form.Item
+                    {...restProps}
+                    validateTrigger={["onChange", "onBlur"]}
+                    rules={[
+                      {
+                        required: true,
+                        whitespace: true,
+                        message:
+                          "Nhập tài liệu tham khảo hoặc xóa trường này đi.",
+                      },
+                    ]}
+                    noStyle
+                  >
+                    <Input
+                      placeholder={`[${index + 1}] Nhập tài liệu tham khảo...`}
+                      style={{
+                        width: references.length < 2 ? "100%" : "95%",
+                      }}
+                    />
+                  </Form.Item>
+                  {references.length > 1 && (
+                    <MinusCircleIcon
+                      className="inline-block ml-2 size-4 hover:cursor-pointer"
+                      onClick={() => remove(reference.name)}
+                    />
+                  )}
+                </Form.Item>
+              );
+            })}
+
+            <Form.Item>
+              <Button
+                className="flex items-center justify-center w-full"
+                type="dashed"
+                onClick={() => add()}
+                icon={<PlusIcon className="size-4" />}
+              >
+                Thêm tài liệu
+              </Button>
+              <Form.ErrorList errors={errors} />
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+
+      <Form.Item
+        label="Dự kiến kết quả"
+        name="expectedResult"
+        hasFeedback
+        rules={[
+          {
+            required: true,
+            message: "Không được để trống nội dung dự kiến kết quả.",
+          },
+          {
+            max: 300,
+            message: "Không được dài quá 300 chữ!",
+          },
+        ]}
+      >
+        <Input.TextArea
+          placeholder="Nhập kết quả dự kiến của đề tài..."
+          showCount
+          maxLength={300}
+          rows={5}
+          style={{ resize: "none" }}
+        />
+      </Form.Item>
+
+      <Form.List
+        name="participants"
+        rules={[
+          {
+            validator: async (_, participants) => {
+              if (!participants) {
+                return Promise.reject(
+                  new Error("Phải có ít nhất 1 thành viên tham gia")
+                );
+              } else if (participants.length > 3) {
+                return Promise.reject(
+                  new Error(
+                    "Tối đa được 3 thành viên tham gia nghiên cứu đề tài."
+                  )
+                );
+              }
+            },
+          },
+        ]}
+      >
+        {(fields, { add, remove }, { errors }) => (
+          <>
+            {fields.map((field, index) => {
+              const { key, ...restProps } = field;
+              return (
+                <Form.Item
+                  label={
+                    index == 0
+                      ? "Danh sách thành viên đề tài (Kể cả CNĐT) - mỗi dòng một thành viên"
+                      : null
+                  }
+                  required={true}
+                  key={key}
+                >
+                  <Form.Item
+                    {...restProps}
+                    validateTrigger={["onChange", "onBlur"]}
+                    rules={[
+                      {
+                        required: true,
+                        whitespace: true,
+                        message:
+                          "Nhập tên thành viên hoặc xóa dòng này nếu không cần thiết.",
+                      },
+                    ]}
+                    noStyle
+                  >
+                    <Input
+                      placeholder={`Nhập tên thành viên thứ ${index + 1}... `}
+                      style={{
+                        width: fields.length < 2 ? "100%" : "95%",
+                      }}
+                      prefix={
+                        <Users2Icon className="mr-1 text-border size-4" />
+                      }
+                    />
+                  </Form.Item>
+                  {fields.length > 1 && (
+                    <MinusCircleIcon
+                      className="inline-block ml-2 size-4 hover:cursor-pointer"
+                      onClick={() => remove(field.name)}
+                    />
+                  )}
+                </Form.Item>
+              );
+            })}
+            <Form.Item>
+              <Button
+                className="flex items-center justify-center w-full"
+                type="dashed"
+                onClick={() => add()}
+                icon={<PlusIcon className="size-4" />}
+              >
+                Thêm thành viên
+              </Button>
+              <Form.ErrorList errors={errors} />
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+
+      <Form.Item label="Hồ sơ đăng ký" required={true}>
+        <Upload
+          className="w-full"
+          accept=".pdf"
+          maxCount={1}
+          onChange={({ fileList }) => setListFile(fileList)}
+          fileList={listFile}
+        >
+          <Button
+            className="flex items-center justify-center w-full"
+            icon={<UploadIcon className="size-4" />}
+          >
+            Nộp hồ sơ
+          </Button>
+        </Upload>
+      </Form.Item>
+    </>
+  );
+};

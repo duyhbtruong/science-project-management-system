@@ -55,7 +55,7 @@ const AccountsPage = () => {
   }, []);
 
   return (
-    <div className="h-screen py-6 bg-gray-100">
+    <div className="h-screen px-6 py-6 bg-gray-100">
       <div className="flex flex-col gap-y-4">
         <div className="flex justify-between">
           <Search
