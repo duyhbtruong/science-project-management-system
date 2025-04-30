@@ -1,16 +1,16 @@
 "use client";
 
-import NavigationBar from "@/components/ui/instructor/nav-bar";
+import NavigationBar from "@/app/(pages)/instructor/nav-bar";
 import { Layout } from "antd";
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 export default function InstructorLayout({ children }) {
   return (
     <Layout hasSider>
-      <Sider theme="light" className="relative">
+      <Sider collapsible theme="light" className="h-screen">
         <NavigationBar />
       </Sider>
-      <Layout className="px-6">
+      <Layout className="h-screen overflow-y-auto">
         <Content>{children}</Content>
       </Layout>
     </Layout>
