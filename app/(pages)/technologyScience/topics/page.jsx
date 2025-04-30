@@ -85,9 +85,9 @@ export default function TopicsManagePage() {
   return (
     <div className="bg-gray-100 min-h-[100vh]">
       <div className="flex flex-col py-6 mx-32">
-        <div className="flex justify-between">
-          <div className="mb-4 space-x-4">
-            {listPeriod && (
+        <div className="flex justify-between mb-4">
+          <div className="space-x-4">
+            {selectedPeriod && (
               <Select
                 className="w-64"
                 placeholder="Chọn đợt đăng ký..."
