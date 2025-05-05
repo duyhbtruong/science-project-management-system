@@ -1,12 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Topic } from "@/models/Topic";
-import { Account } from "@/models/users/Account";
 import { Instructor } from "@/models/users/Instructor";
 import { AppraisalBoard } from "@/models/users/AppraisalBoard";
-import { ReviewGrade } from "@/models/ReviewGrade";
-import { AppraiseGrade } from "@/models/AppraiseGrade";
-import { Student } from "@/models/users/Student";
-import { RegistrationPeriod } from "@/models/RegistrationPeriod";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
@@ -229,7 +224,6 @@ export async function DELETE(request, { params }) {
     }
 
     await Topic.findByIdAndDelete({ _id: id });
-    await Student.updateOne({ topicId: id }, { $unset: { topicId: null } });
 
     return NextResponse.json(
       { message: "Hủy đăng ký đề tài thành công." },

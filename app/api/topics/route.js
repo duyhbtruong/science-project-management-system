@@ -9,6 +9,7 @@ import { Student } from "@/models/users/Student";
 import { RegistrationPeriod } from "@/models/RegistrationPeriod";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
+import { Section } from "@/models/Section";
 
 export async function GET(request) {
   try {
@@ -178,7 +179,7 @@ export async function POST(request) {
       );
     }
 
-    if (await Topic.findOne({ owner: owner })) {
+    if (await Topic.findOne({ owner: owner, period: period })) {
       return NextResponse.json(
         { message: "Sinh viên đã đăng ký đề tài." },
         { status: 409 }
@@ -204,6 +205,9 @@ export async function POST(request) {
       );
     }
 
+    // Lấy danh sách tiêu chí
+    const sections = await Section.find();
+
     // Lưu thông tin đăng ký
     const newTopicId = await Topic.create({
       vietnameseName,
@@ -214,6 +218,7 @@ export async function POST(request) {
       expectedResult,
       participants,
       registrationPeriod,
+      sections,
       owner,
       instructor,
     }).then((result) => result._id);

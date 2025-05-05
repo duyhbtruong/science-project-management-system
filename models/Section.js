@@ -1,6 +1,6 @@
 import { Schema, models, model } from "mongoose";
 
-const SectionSchema = new Schema(
+export const SectionSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     order: { type: Number, required: true, default: 0 },
