@@ -24,6 +24,7 @@ import {
   reorderSections as apiReorderSections,
 } from "@/service/sectionService";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
+import { PlusIcon, SaveIcon } from "lucide-react";
 
 export default function SectionManager() {
   const [sections, setSections] = useState([]);
@@ -151,7 +152,7 @@ export default function SectionManager() {
       {contextHolder}
       <div className="flex items-center mb-4">
         <Input
-          placeholder="New section title"
+          placeholder="Tên tiêu chí mới..."
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           className="mr-2"
@@ -160,16 +161,19 @@ export default function SectionManager() {
           type="primary"
           onClick={addSection}
           loading={adding}
-          className="mr-2"
+          className="flex items-center mr-2"
+          icon={<PlusIcon className="size-4" />}
         >
-          Add Section
+          Thêm tiêu chí
         </Button>
         <Button
           onClick={saveSections}
           loading={saving}
           disabled={sections.length === 0}
+          icon={<SaveIcon className="size-4" />}
+          className="flex items-center"
         >
-          Save
+          Lưu thay đổi
         </Button>
       </div>
       <DndContext

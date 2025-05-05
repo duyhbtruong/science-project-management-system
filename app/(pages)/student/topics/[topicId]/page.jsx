@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { storage } from "@/lib/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { uploadSubmitFile } from "@/service/upload";
+import { deleteRegisterFile, uploadSubmitFile } from "@/service/upload";
 import Link from "next/link";
 import { TopicDetails } from "./topic-details";
 import { StudentDetails } from "./student-details";
@@ -71,7 +71,7 @@ export default function TopicInformationPage({ params }) {
     setFileList(fileList);
   };
 
-  const handleImageUpload = () => {
+  const handleUploadFile = () => {
     if (fileList.length === 0) {
       setIsUploadOpen(false);
       return;
@@ -100,6 +100,19 @@ export default function TopicInformationPage({ params }) {
       });
   };
 
+  const handleDeleteFile = async (filePath) => {
+    try {
+      const res = await deleteRegisterFile(filePath);
+      if (res.ok) {
+        console.log("Xóa file thành công.");
+      } else {
+        console.error("Lỗi xóa file.");
+      }
+    } catch (error) {
+      console.error("Lỗi xóa file ", error);
+    }
+  };
+
   const loadTopic = async () => {
     let res = await getTopicById(topicId);
     res = await res.json();
@@ -125,7 +138,9 @@ export default function TopicInformationPage({ params }) {
             onClick={async () => {
               const confirmed = await modal.confirm(config);
               if (confirmed) {
-                await deleteTopicById(topicId);
+                await deleteTopicById(topicId).finally(() =>
+                  handleDeleteFile(topic.registerFile)
+                );
                 router.replace(`/student/topics`);
               }
             }}
@@ -169,7 +184,7 @@ export default function TopicInformationPage({ params }) {
         open={isUploadOpen}
         width={800}
         centered
-        onOk={handleImageUpload}
+        onOk={handleUploadFile}
         okText="Xác nhận"
         cancelText="Hủy"
         onCancel={() => {

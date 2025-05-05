@@ -34,8 +34,8 @@ const items = [
     icon: <CalendarIcon className="size-4" />,
   },
   {
-    label: <Link href="/technologyScience/templates">Mẫu báo cáo</Link>,
-    key: "templates",
+    label: <Link href="/technologyScience/section">Mẫu báo cáo</Link>,
+    key: "section",
     icon: <FileText className="size-4" />,
   },
   {
@@ -58,7 +58,7 @@ const NavigationBar = () => {
     if (pathname.includes("review")) return "review";
     if (pathname.includes("registration")) return "registration";
     if (pathname.includes("dashboard")) return "dashboard";
-    if (pathname.includes("section")) return "templates";
+    if (pathname.includes("section")) return "section";
   });
 
   return (

@@ -5,7 +5,7 @@ import { useCustomSession } from "@/hooks/use-custom-session";
 
 import { Divider, Form, Space, Spin, message } from "antd";
 
-import { createTopic } from "@/service/topicService";
+import { createTopic, getTopicsByPeriod } from "@/service/topicService";
 import { uploadRegisterFile } from "@/service/upload";
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
@@ -27,6 +27,8 @@ export default function TopicPage() {
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [redirect, setRedirect] = useState("");
   const [period, setPeriod] = useState();
   const [student, setStudent] = useState();
   const [listFile, setListFile] = useState([]);
@@ -57,6 +59,16 @@ export default function TopicPage() {
     setListInstructor(res);
   };
 
+  const loadTopicsByPeriod = async () => {
+    let res = await getTopicsByPeriod(period._id);
+    const listTopic = await res.json();
+    const topic = listTopic.find((topic) => topic.owner._id === student._id);
+    if (topic) {
+      setIsRegistered(true);
+      setRedirect(`/student/topics/${topic._id}`);
+    }
+  };
+
   useEffect(() => {
     loadListPeriod();
   }, []);
@@ -73,6 +85,12 @@ export default function TopicPage() {
     loadStudent();
     loadListInstructor();
   }, [account, period]);
+
+  useEffect(() => {
+    if (!student) return;
+
+    loadTopicsByPeriod();
+  }, [student]);
 
   useEffect(() => {
     if (!student || !listInstructor) return;
@@ -216,10 +234,7 @@ export default function TopicPage() {
       )}
 
       {!isLoading && (
-        <RegistrationModal
-          student={student}
-          visible={student?.topicId !== null}
-        />
+        <RegistrationModal redirect={redirect} visible={isRegistered} />
       )}
     </div>
   );

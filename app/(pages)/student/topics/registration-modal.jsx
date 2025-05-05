@@ -1,7 +1,7 @@
 import { Button, Modal } from "antd";
 import { ArrowRightIcon } from "lucide-react";
 
-export const RegistrationModal = ({ student, visible }) => {
+export const RegistrationModal = ({ redirect, visible }) => {
   return (
     <Modal
       title="Đăng ký đề tài"
@@ -13,7 +13,7 @@ export const RegistrationModal = ({ student, visible }) => {
           icon={<ArrowRightIcon className="size-4" />}
           key="link"
           type="primary"
-          href={student ? `/student/topics/${student.topicId}` : ``}
+          href={redirect}
         >
           Đến trang Quản lý đề tài cá nhân
         </Button>,
