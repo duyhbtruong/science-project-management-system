@@ -65,3 +65,14 @@ export const uploadPaymentFile = async (topicId, paymentFile) => {
     return error;
   }
 };
+
+export const deleteRegisterFile = async (filePath) => {
+  const res = await fetch(`http://localhost:3000/api/upload/delete`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ filePath }),
+  });
+  return res;
+};

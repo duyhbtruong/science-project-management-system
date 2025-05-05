@@ -8,12 +8,6 @@ export async function PUT(request, { params }) {
     const topicId = params.topicId;
     const { registerFile, contractFile, submitFile, paymentFile } =
       await request.json();
-    console.log("register file: ", {
-      registerFile,
-      contractFile,
-      submitFile,
-      paymentFile,
-    });
     if (!topicId || !mongoose.isValidObjectId(topicId)) {
       return NextResponse.json(
         { message: "Thiếu id hoặc id không hợp lệ." },
