@@ -4,6 +4,7 @@ export const SectionSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     order: { type: Number, required: true, default: 0 },
+    content: { type: String, default: "" },
   },
   {
     timestamps: true,

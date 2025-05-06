@@ -82,6 +82,7 @@ export async function PUT(request, { params }) {
       reference,
       expectedResult,
       participants,
+      sections,
     } = await request.json();
     const searchParams = request.nextUrl.searchParams;
     const reviewInstructor = searchParams.get("review");
@@ -118,6 +119,7 @@ export async function PUT(request, { params }) {
       reference,
       expectedResult,
       participants,
+      sections,
     };
 
     if (reviewInstructor) {

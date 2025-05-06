@@ -156,7 +156,7 @@ export const searchTopic = async (selectedPeriod, searchValue) => {
 
 export const updateTopicById = async (id, values) => {
   try {
-    const res = await fetch(`http://http://localhost:3000/api/topics/${id}`, {
+    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
       method: "PUT",
       body: JSON.stringify(values),
     });
