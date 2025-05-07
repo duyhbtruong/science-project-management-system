@@ -1,14 +1,26 @@
 import { model, models, Schema } from "mongoose";
 
-// Model cho Đợt đăng ký Đề tài
+/**
+ * Registration period model schema.
+ * Represents a period in which students can register scientific projects.
+ *
+ * Fields:
+ * - title: Title of a registration period.
+ * - startDate: The date begins the registration period.
+ * - endDate: The date ends the registration period.
+ * - reviewDeadline: Final date for technology science department employee to review topics.
+ * - submitDeadline: Final date for students to submit their reports
+ * if their topic passed the review phase.
+ * - appraiseDeadline: Final date for appraisal board staff to appraise
+ * students' topics.
+ */
 const registrationPeriodSchema = new Schema({
-  title: { type: String, required: true }, // Tên đợt đăng ký
-  startDate: { type: Date, required: true }, // Ngày bắt đầu
-  endDate: { type: Date, required: true }, // Ngày kết thúc
-  reviewDeadline: { type: Date, required: true }, // Hạn kiểm duyệt
-  submitDeadline: { type: Date, required: true }, // Hạn nộp file nghiệm thu
-  appraiseDeadline: { type: Date, required: true }, // Hạn thẩm định
-  isArchived: { type: Boolean, default: false }, // Trạng thái của đợt đăng ký: Đang mở | Đã được lưu trữ
+  title: { type: String, required: true },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+  reviewDeadline: { type: Date, required: true },
+  submitDeadline: { type: Date, required: true },
+  appraiseDeadline: { type: Date, required: true },
 });
 
 export const RegistrationPeriod =

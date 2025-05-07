@@ -1,15 +1,24 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-// Model cho Giảng viên
+/**
+ * Instructor model schema.
+ * Represents an user with instructor role in the application.
+ *
+ * Fields:
+ * - instructorId: Unique Id of an instructor.
+ * - faculty: The faculty which the instructor belongs to.
+ * - academicRank: The academic rank of instructor (Master, Doctor...).
+ * - accountId: Unique Id from accounts collection.
+ */
 const instructorSchema = new Schema({
-  instructorId: { type: String, required: true, unique: true }, // Mã số của giảng viên
-  faculty: { type: String, required: true }, // Khoa của giảng viên
-  academicRank: { type: String, required: true }, // Học hàm, học vị của giảng viên
+  instructorId: { type: String, required: true, unique: true },
+  faculty: { type: String, required: true },
+  academicRank: { type: String, required: true },
   accountId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Account",
     required: true,
-  }, // ID Tài khoản
+  },
 });
 
 export const Instructor =

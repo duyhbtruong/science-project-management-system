@@ -1,15 +1,24 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-// Model cho Sinh viên
+/**
+ * Student model schema.
+ * Represents an user with student role in the application.
+ *
+ * Fields:
+ * - studentId: Unique Id of a student.
+ * - faculty: The faculty which the student belongs to.
+ * - educationProgram: The education program the student currently participates in.
+ * - accountId: Unqiue Id from accounts collection.
+ */
 export const studentSchema = new Schema({
-  studentId: { type: String, required: true, unique: true }, // Mã số của Sinh viên
-  faculty: { type: String, required: true }, // Khoa của Sinh viên
-  educationProgram: { type: String, required: true }, // Chương trình đào tạo của Sinh viên
+  studentId: { type: String, required: true, unique: true },
+  faculty: { type: String, required: true },
+  educationProgram: { type: String, required: true },
   accountId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Account",
     required: true,
-  }, // ID Tài khoản
+  },
 });
 
 export const Student = models?.Student || model("Student", studentSchema);

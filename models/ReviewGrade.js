@@ -1,34 +1,52 @@
 import mongoose, { model, models, Schema } from "mongoose";
+import { criteriaSchema } from "./Criteria";
 
-// Model cho Class Review Grade
+/**
+ * Review grade model schema.
+ * Represents an review record of a topic by a review instructor.
+ *
+ * Fields:
+ * - topicId: Unique Id of a topic.
+ * - instructorId: Unique Id of an appraisal board who grades this.
+ * - status: Current state of this review record.
+ * - criteria: List of criterias.
+ * - finalGrade: Final grade to see if the topic passed or not.
+ * - isEureka: If the topic is good enough to participate in Eureka.
+ * - comment: Leave comments for student.
+ * - submittedDate: The date that the review instructor submit.
+ */
 const reviewGradeSchema = new Schema(
   {
     topicId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Topic",
       required: true,
-    }, // Mã đề tài
+    },
     instructorId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Instructor",
       required: true,
-    }, // Mã giảng viên kiểm duyệt
+    },
+    status: {
+      type: String,
+      enum: ["pending", "completed", "cancelled"],
+      default: "pending",
+    },
     criteria: {
-      type: [Number],
+      type: [criteriaSchema],
       required: true,
-    }, // Điểm tiêu chí
-    grade: {
+      default: [],
+    },
+    finalGrade: {
       type: Number,
-      required: true,
-    }, // Điểm tổng
+      default: null,
+    },
     isEureka: {
       type: String,
       required: true,
-    }, // Đạt Eureka hay không
-    note: {
-      type: String,
-      required: true,
-    }, // Ghi chú
+    },
+    comment: String,
+    submittedDate: Date,
   },
   {
     timestamps: true,

@@ -1,13 +1,20 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-// Model cho Cán bộ Hội đồng Thẩm định
+/**
+ * Appraisal staff model schema.
+ * Represents an user with appraise role in the application.
+ *
+ * Fields:
+ * - appraisalBoardId: Unique Id of a appraisal staff.
+ * - accountId: Unique Id from accounts collection.
+ */
 export const appraisalBoardSchema = new Schema({
-  appraisalBoardId: { type: String, required: true, unique: true }, // Mã số của Cán bộ
+  appraisalBoardId: { type: String, required: true, unique: true },
   accountId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Account",
     required: true,
-  }, // ID Tài khoản
+  },
 });
 
 export const AppraisalBoard =

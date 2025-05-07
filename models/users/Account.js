@@ -1,16 +1,27 @@
 import { model, models, Schema } from "mongoose";
 
-// Model cho Tài khoản
+/**
+ * Account model schema.
+ * Represents an account of an user in the application.
+ *
+ * Fields:
+ * - name: Name of user's account.
+ * - email: User's email address.
+ * - phone: User's phone number.
+ * - password: Hashed password.
+ * - role: User's role.
+ * - timestamps: Timestamps of account creation.
+ */
 const accountSchema = new Schema(
   {
-    name: { type: String, required: true }, // Tên của người dùng
-    email: { type: String, required: true, unique: true }, // Email của người dùng
-    phone: { type: String }, // Số điện thoại của người dùng
-    password: { type: String, required: true }, // Mật khẩu của người dùng
-    role: { type: String, required: true }, // Quyền của người dùn
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String },
+    password: { type: String, required: true },
+    role: { type: String, required: true },
   },
   {
-    timestamps: true, // Thời điểm tạo tài khoản
+    timestamps: true,
   }
 );
 

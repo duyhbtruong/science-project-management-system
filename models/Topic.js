@@ -1,52 +1,230 @@
 import mongoose, { model, models, Schema } from "mongoose";
-import { SectionSchema } from "./Section";
+import { sectionSchema } from "./Section";
 
-// Model cho Đề tài
+/**
+ * Topic schema model.
+ * Represents information of a registered topic.
+ *
+ * Fields:
+ * - vietnameseName: Topic name in Vietnamese.
+ * - englishName: Topic name in English.
+ * - type: Type of topic.
+ * - summary: Short paragraph summarizes topic.
+ * - reference: Source and references of topic.
+ * - expectedResult: Goals achieved after finish researching.
+ * - participants: Other students participate in this project.
+ * - registrationPeriod: Which timeline was the topic registered in.
+ * - reviewAssignments: List of assigned reviewers to topic.
+ * - appraiseAssignments: List of assigned appraisal boards to topic.
+ * - sections: Content of report.
+ * - owner: Owner of this project topic.
+ * - instructor: Instructor who guides and monitors the project.
+ * - files: Files related to project.
+ */
 const topicSchema = new Schema(
   {
-    vietnameseName: { type: String, required: true }, // Tên tiếng Việt
-    englishName: { type: String, required: true }, // Tên tiếng Anh
-    type: { type: String }, // Loại đề tài - Nghiên cứu cơ bản
-    summary: { type: String, required: true }, // Tóm tắt đề tài
-    reference: { type: [String], required: true }, // Tham khảo đề tài
-    expectedResult: { type: String, required: true }, // Kết quả dự đoán
-    participants: { type: [String], required: true }, // Danh sách thành viên
+    vietnameseName: { type: String, required: true },
+    englishName: { type: String, required: true },
+    type: { type: String },
+    summary: { type: String, required: true },
+    reference: { type: [String], required: true },
+    expectedResult: { type: String, required: true },
+    participants: { type: [String], required: true },
     registrationPeriod: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "RegistrationPeriod",
       required: true,
-    }, // Thuộc đợt đăng ký nào
-    reviewInstructor: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "Instructor",
-      default: null,
-    }, // Giảng viên chịu trách nhiệm kiểm duyệt
-    reviews: { type: [mongoose.SchemaTypes.ObjectId], ref: "ReviewGrade" }, // Danh sách kết quả kiểm duyệt
-    appraiseStaff: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "AppraisalBoard",
-      default: null,
-    }, // Cán bộ chịu trách nhiệm thẩm định
-    appraises: { type: [mongoose.SchemaTypes.ObjectId], ref: "AppraiseGrade" }, // Danh sách kết quả thẩm định
-    contractFile: { type: String, default: null }, // File hợp đồng
-    submitFile: { type: String, default: null }, // File nghiệm thu
-    registerFile: { type: String, default: null }, // File hồ sơ lúc đăng ký
-    paymentFile: { type: String, default: null }, // File quyết toán tài chính
-    sections: { type: [SectionSchema], default: [] },
+    },
+    reviewAssignments: [
+      {
+        instructor: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: "Instructor",
+          required: true,
+        },
+        reviewGrade: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: "ReviewGrade",
+          default: null,
+        },
+        assignedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        status: {
+          type: String,
+          enum: ["pending", "completed", "removed"],
+          default: "pending",
+        },
+      },
+    ],
+    appraiseAssignments: [
+      {
+        appraisalBoard: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: "AppraisalBoard",
+          required: true,
+        },
+        appraiseGrade: {
+          type: mongoose.SchemaTypes.ObjectId,
+          ref: "AppraiseGrade",
+          default: null,
+        },
+        assignedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        status: {
+          type: String,
+          enum: ["pending", "completed", "removed"],
+          default: "pending",
+        },
+      },
+    ],
+    sections: { type: [sectionSchema], default: [] },
     owner: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Student",
       required: true,
-    }, // Chủ sở hữu đề tài
+    },
     instructor: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Instructor",
       required: true,
-    }, // Giảng viên hướng dẫn
+    },
   },
   {
-    timestamps: true, // Thời gian đăng ký đề tài
+    timestamps: true,
   }
 );
+
+topicSchema.virtual("files", {
+  ref: "TopicFile",
+  localField: "_id",
+  foreignField: "topicId",
+});
+
+topicSchema.pre("save", async function (next) {
+  if (this.isModified("reviewAssignments")) {
+    try {
+      const ReviewGrade = mongoose.model("ReviewGrade");
+
+      for (const assignment of this.reviewAssignments) {
+        if (!assignment.reviewGrade && assignment.status === "pending") {
+          const newReviewGrade = await ReviewGrade.create({
+            topicId: this._id,
+            instructorId: assignment.instructor,
+            status: "pending",
+          });
+          assignment.reviewGrade = newReviewGrade._id;
+        }
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  if (this.isModified("appraiseAssignments")) {
+    try {
+      const AppraiseGrade = mongoose.model("AppraiseGrade");
+
+      for (const assignment of this.appraiseAssignments) {
+        if (!assignment.appraiseGrade && assignment.status === "pending") {
+          const newAppraiseGrade = await AppraiseGrade.create({
+            topicId: this._id,
+            appraisalBoardId: assignment.appraisalBoard,
+            status: "pending",
+          });
+          assignment.appraiseGrade = newAppraiseGrade._id;
+        }
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  next();
+});
+
+topicSchema.methods.updateReviewers = async function (newReviewerIds) {
+  const currentAssignments = this.reviewAssignments || [];
+  const ReviewGrade = mongoose.model("ReviewGrade");
+
+  // Mark removed assignments
+  for (const assignment of currentAssignments) {
+    if (!newReviewerIds.includes(assignment.instructor.toString())) {
+      assignment.status = "removed";
+      if (assignment.reviewGrade) {
+        await ReviewGrade.findByIdAndUpdate(assignment.reviewGrade, {
+          status: "cancelled",
+        });
+      }
+    }
+  }
+
+  // Add new assignments
+  for (const reviewerId of newReviewerIds) {
+    const existingAssignment = currentAssignments.find(
+      (a) => a.instructor.toString() === reviewerId && a.status !== "removed"
+    );
+
+    if (!existingAssignment) {
+      const newGrade = await ReviewGrade.create({
+        topicId: this._id,
+        instructorId: reviewerId,
+        status: "pending",
+      });
+
+      this.reviewAssignments.push({
+        instructor: reviewerId,
+        reviewGrade: newGrade._id,
+        status: "pending",
+      });
+    }
+  }
+
+  await this.save();
+};
+
+topicSchema.methods.updateAppraisers = async function (newAppraiserIds) {
+  const currentAssignments = this.appraiseAssignments || [];
+  const AppraiseGrade = mongoose.model("AppraiseGrade");
+
+  // Mark removed assignments
+  for (const assignment of currentAssignments) {
+    if (!newAppraiserIds.includes(assignment.appraisalBoard.toString())) {
+      assignment.status = "removed";
+      if (assignment.appraiseGrade) {
+        await AppraiseGrade.findByIdAndUpdate(assignment.appraiseGrade, {
+          status: "cancelled",
+        });
+      }
+    }
+  }
+
+  // Add new assignments
+  for (const appraiserId of newAppraiserIds) {
+    const existingAssignment = currentAssignments.find(
+      (a) =>
+        a.appraisalBoard.toString() === appraiserId && a.status !== "removed"
+    );
+
+    if (!existingAssignment) {
+      const newGrade = await AppraiseGrade.create({
+        topicId: this._id,
+        appraisalBoardId: appraiserId,
+        status: "pending",
+      });
+
+      this.appraiseAssignments.push({
+        appraisalBoard: appraiserId,
+        appraiseGrade: newGrade._id,
+        status: "pending",
+      });
+    }
+  }
+
+  await this.save();
+};
 
 export const Topic = models?.Topic || model("Topic", topicSchema);
