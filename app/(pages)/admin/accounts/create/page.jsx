@@ -192,7 +192,6 @@ export default function CreateAccount() {
             hasFeedback
           >
             <Input.Password
-              className="text-border"
               prefix={<LockIcon className="mr-1 text-border size-4" />}
             />
           </Form.Item>

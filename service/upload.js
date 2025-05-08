@@ -1,3 +1,4 @@
+// TODO: registerFile is currently a link, change to a file object
 export const uploadRegisterFile = async (topicId, registerFile) => {
   try {
     const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {

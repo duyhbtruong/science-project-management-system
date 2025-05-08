@@ -1,23 +1,19 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Topic } from "@/models/Topic";
-import { Account } from "@/models/users/Account";
+import { Student } from "@/models/users/Student";
 import { Instructor } from "@/models/users/Instructor";
-import { AppraisalBoard } from "@/models/users/AppraisalBoard";
+import { RegistrationPeriod } from "@/models/RegistrationPeriod";
+import { Section } from "@/models/Section";
 import { ReviewGrade } from "@/models/ReviewGrade";
 import { AppraiseGrade } from "@/models/AppraiseGrade";
-import { Student } from "@/models/users/Student";
-import { RegistrationPeriod } from "@/models/RegistrationPeriod";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { Section } from "@/models/Section";
 
 export async function GET(request) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const searchKeywords = searchParams.get("search");
     const instructorId = searchParams.get("instructor");
-    const reviewInstructorId = searchParams.get("reviewInstructor");
-    const appraisalBoardId = searchParams.get("staffId");
     const period = searchParams.get("period");
     const filter = {};
 
@@ -36,26 +32,6 @@ export async function GET(request) {
         );
       }
       filter.instructor = instructorId;
-    }
-
-    if (reviewInstructorId) {
-      if (!mongoose.isValidObjectId(reviewInstructorId)) {
-        return NextResponse.json(
-          { message: "Id không hợp lệ." },
-          { status: 400 }
-        );
-      }
-      filter.reviewInstructor = reviewInstructorId;
-    }
-
-    if (appraisalBoardId) {
-      if (!mongoose.isValidObjectId(appraisalBoardId)) {
-        return NextResponse.json(
-          { message: "Id không hợp lệ." },
-          { status: 400 }
-        );
-      }
-      filter.appraiseStaff = appraisalBoardId;
     }
 
     if (period) {
@@ -89,19 +65,36 @@ export async function GET(request) {
         path: "registrationPeriod",
       })
       .populate({
-        path: "reviewInstructor",
-        populate: {
-          path: "accountId",
-          select: "name email phone role",
-        },
+        path: "reviewAssignments",
+        populate: [
+          {
+            path: "instructor",
+            populate: {
+              path: "accountId",
+              select: "name email phone role",
+            },
+          },
+          {
+            path: "reviewGrade",
+          },
+        ],
       })
       .populate({
-        path: "appraiseStaff",
-        populate: {
-          path: "accountId",
-          select: "name email phone role",
-        },
-      });
+        path: "appraiseAssignments",
+        populate: [
+          {
+            path: "appraisalBoard",
+            populate: {
+              path: "accountId",
+              select: "name email phone role",
+            },
+          },
+          {
+            path: "appraiseGrade",
+          },
+        ],
+      })
+      .populate("files");
 
     return NextResponse.json(topics, { status: 200 });
   } catch (error) {
@@ -206,10 +199,10 @@ export async function POST(request) {
     }
 
     // Lấy danh sách tiêu chí
-    const sections = await Section.find();
+    const sections = await Section.find().sort({ order: 1 });
 
     // Lưu thông tin đăng ký
-    const newTopicId = await Topic.create({
+    const newTopic = await Topic.create({
       vietnameseName,
       englishName,
       type,
@@ -221,15 +214,10 @@ export async function POST(request) {
       sections,
       owner,
       instructor,
-    }).then((result) => result._id);
-
-    await Student.findByIdAndUpdate(
-      { _id: owner },
-      { $set: { topicId: newTopicId } }
-    );
+    });
 
     return NextResponse.json(
-      { newTopicId, message: "Đăng ký đề tài thành công!" },
+      { topicId: newTopic._id, message: "Đăng ký đề tài thành công!" },
       { status: 201 }
     );
   } catch (error) {

@@ -39,19 +39,36 @@ export async function GET(request, { params }) {
         path: "registrationPeriod",
       })
       .populate({
-        path: "reviewInstructor",
-        populate: {
-          path: "accountId",
-          select: "name email phone role",
-        },
+        path: "reviewAssignments",
+        populate: [
+          {
+            path: "instructor",
+            populate: {
+              path: "accountId",
+              select: "name email phone role",
+            },
+          },
+          {
+            path: "reviewGrade",
+          },
+        ],
       })
       .populate({
-        path: "appraiseStaff",
-        populate: {
-          path: "accountId",
-          select: "name email phone role",
-        },
-      });
+        path: "appraiseAssignments",
+        populate: [
+          {
+            path: "appraisalBoard",
+            populate: {
+              path: "accountId",
+              select: "name email phone role",
+            },
+          },
+          {
+            path: "appraiseGrade",
+          },
+        ],
+      })
+      .populate("files");
 
     if (!topic) {
       return NextResponse.json(
@@ -83,10 +100,9 @@ export async function PUT(request, { params }) {
       expectedResult,
       participants,
       sections,
+      reviewInstructorIds,
+      appraisalBoardIds,
     } = await request.json();
-    const searchParams = request.nextUrl.searchParams;
-    const reviewInstructor = searchParams.get("review");
-    const appraiseStaff = searchParams.get("appraise");
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -122,54 +138,32 @@ export async function PUT(request, { params }) {
       sections,
     };
 
-    if (reviewInstructor) {
-      if (reviewInstructor === "Không có") {
-        updatedTopic.reviewInstructor = null;
-      } else if (!mongoose.isValidObjectId(reviewInstructor)) {
-        return NextResponse.json(
-          { message: "Id giảng viên kiểm duyệt không hợp lệ." },
-          {
-            status: 400,
-          }
-        );
-      } else {
-        const instructor = await Instructor.findOne({ _id: reviewInstructor });
-        if (!instructor) {
+    if (reviewInstructorIds) {
+      for (const reviewInstructorId of reviewInstructorIds) {
+        if (!mongoose.isValidObjectId(reviewInstructorId)) {
           return NextResponse.json(
-            { message: "Không tìm thấy giảng viên kiểm duyệt." },
+            { message: "Thiếu id hoặc id không hợp lệ." },
             {
-              status: 404,
+              status: 400,
             }
           );
         }
-        updatedTopic.reviewInstructor = reviewInstructor;
       }
+      await topic.updateReviewers(reviewInstructorIds);
     }
 
-    if (appraiseStaff) {
-      if (appraiseStaff === "Không có") {
-        updatedTopic.appraiseStaff = null;
-      } else if (!mongoose.isValidObjectId(appraiseStaff)) {
-        return NextResponse.json(
-          { message: "Id cán bộ thẩm định không hợp lệ." },
-          {
-            status: 400,
-          }
-        );
-      } else {
-        const appraisalBoard = await AppraisalBoard.findOne({
-          _id: appraiseStaff,
-        });
-        if (!appraisalBoard) {
+    if (appraisalBoardIds) {
+      for (const appraisalBoardId of appraisalBoardIds) {
+        if (!mongoose.isValidObjectId(appraisalBoardId)) {
           return NextResponse.json(
-            { message: "Không tìm thấy cán bộ thẩm định." },
+            { message: "Thiếu id hoặc id không hợp lệ." },
             {
-              status: 404,
+              status: 400,
             }
           );
         }
-        updatedTopic.appraiseStaff = appraiseStaff;
       }
+      await topic.updateAppraisers(appraisalBoardIds);
     }
 
     await Topic.findByIdAndUpdate({ _id: id }, updatedTopic);

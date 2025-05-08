@@ -81,16 +81,25 @@ export default function TopicInformationPage({ params }) {
     startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
     endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
     const periodDir = `${period.title}-${startDate}-${endDate}`;
+
+    const file = listFile[0];
+    const fileName = file.name;
     const fileRef = ref(
       storage,
       `${periodDir}/${student?.studentId}/${fileList[0].name}`
     );
-    uploadBytes(fileRef, fileList[0]?.originFileObj)
+    uploadBytes(fileRef, file?.originFileObj)
       .then((snapshot) => {
         const fileRef = snapshot.ref._location.path_;
         return getDownloadURL(ref(storage, fileRef));
       })
-      .then((downloadLink) => uploadSubmitFile(topic._id, downloadLink))
+      .then((downloadLink) => {
+        const submitFile = {
+          name: fileName,
+          url: downloadLink,
+        };
+        uploadSubmitFile(topic._id, submitFile);
+      })
       .then((res) => {
         const { message } = res;
         messageApi.success(message);
@@ -144,7 +153,8 @@ export default function TopicInformationPage({ params }) {
                 router.replace(`/student/topics`);
               }
             }}
-            disabled={!topic?.reviews.length > 0 ? false : true}
+            // TODO: Disabled when isReviewed
+            disabled={!topic?.reviewAssignments.length > 0 ? false : true}
             icon={<CloseOutlined />}
             danger
           >

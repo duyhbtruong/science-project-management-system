@@ -136,8 +136,8 @@ export default function TopicPage() {
 
     if (res.status === 201) {
       res = await res.json();
-      const { newTopicId, message } = res;
-      handleRegisterFileUpload(newTopicId);
+      const { topicId, message } = res;
+      handleRegisterFileUpload(topicId);
       messageApi
         .open({
           type: "success",
@@ -167,18 +167,26 @@ export default function TopicPage() {
     startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
     endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
     const periodDir = `${period.title}-${startDate}-${endDate}`;
+
+    const file = listFile[0];
+    const fileName = file.name;
     const fileRef = ref(
       storage,
       `${periodDir}/${student?.studentId}/${listFile[0].name}`
     );
-    uploadBytes(fileRef, listFile[0]?.originFileObj)
+    uploadBytes(fileRef, file?.originFileObj)
       .then((snapshot) => {
         const fileRef = snapshot.ref._location.path_;
         return getDownloadURL(ref(storage, fileRef));
       })
       .then((downloadLink) => {
-        uploadRegisterFile(topicId, downloadLink);
-      });
+        const registerFile = {
+          name: fileName,
+          url: downloadLink,
+        };
+        uploadRegisterFile(topicId, registerFile);
+      })
+      .catch((error) => console.log("Upload file failed: ", error));
   };
 
   if (listPeriod && !period) return <NoRegistrationPeriod />;

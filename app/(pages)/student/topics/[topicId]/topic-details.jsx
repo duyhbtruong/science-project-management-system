@@ -46,15 +46,16 @@ export const TopicDetails = ({ topic, onUpload }) => {
       children: (
         <Tag
           icon={
-            topic?.reviews.length > 0 ? (
+            // TODO: Create a component to show reviews
+            topic?.reviewAssignments.length > 0 ? (
               <CheckIcon className="inline-block mr-1 size-4" />
             ) : (
               <LoaderIcon className="inline-block mr-1 size-4 animate-spin" />
             )
           }
-          color={topic?.reviews.length > 0 ? "success" : "default"}
+          color={topic?.reviewAssignments.length > 0 ? "success" : "default"}
         >
-          {topic?.reviews.length > 0
+          {topic?.reviewAssignments.length > 0
             ? TOPIC_STATUS.REVIEWED
             : TOPIC_STATUS.PENDING_REVIEW}
         </Tag>
@@ -67,15 +68,16 @@ export const TopicDetails = ({ topic, onUpload }) => {
       children: (
         <Tag
           icon={
-            topic?.appraises.length ? (
+            // TODO: Create component to see appraises
+            topic?.appraiseAssignments.length ? (
               <CheckIcon className="inline-block mr-1 size-4" />
             ) : (
               <LoaderIcon className="inline-block mr-1 size-4 animate-spin" />
             )
           }
-          color={topic?.appraises.length ? "success" : "default"}
+          color={topic?.appraiseAssignments.length ? "success" : "default"}
         >
-          {topic?.appraises.length
+          {topic?.appraiseAssignments.length
             ? TOPIC_STATUS.APPRAISED
             : TOPIC_STATUS.PENDING_APPRAISE}
         </Tag>
@@ -99,7 +101,7 @@ export const TopicDetails = ({ topic, onUpload }) => {
             </Link>
           )}
           <Button
-            disabled={!topic?.reviews.length}
+            disabled={!topic?.reviewAssignments.length}
             type="primary"
             icon={<UploadIcon className="size-4" />}
             onClick={onUpload}
