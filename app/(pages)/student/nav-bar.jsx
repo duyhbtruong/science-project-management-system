@@ -8,7 +8,7 @@ import { useState } from "react";
 import { LogoutOutlined, FileAddOutlined } from "@ant-design/icons";
 import { AppLogo } from "@/components/logo";
 import Image from "next/image";
-import { ClipboardPenIcon, LogOutIcon } from "lucide-react";
+import { ClipboardPenIcon, Lightbulb, LogOutIcon } from "lucide-react";
 
 const items = [
   {
@@ -19,9 +19,14 @@ const items = [
     icon: <Image src="/logo.svg" alt="logo" width={24} height={24} />,
   },
   {
-    label: <Link href="/student/topics">Đăng ký đề tài</Link>,
-    key: "topics",
+    label: <Link href="/student/register">Đăng ký đề tài</Link>,
+    key: "register",
     icon: <ClipboardPenIcon className="size-4" />,
+  },
+  {
+    label: <Link href="/student/topics">Quản lý đề tài</Link>,
+    key: "topics",
+    icon: <Lightbulb className="size-4" />,
   },
   {
     label: "Đăng xuất",
@@ -34,6 +39,7 @@ const items = [
 const NavigationBar = () => {
   const pathname = usePathname();
   const [current, setCurrent] = useState(() => {
+    if (pathname.includes("register")) return "register";
     if (pathname.includes("topics")) return "topics";
   });
 

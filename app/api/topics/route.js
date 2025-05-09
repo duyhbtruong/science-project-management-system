@@ -1,20 +1,24 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Topic } from "@/models/Topic";
+import { Account } from "@/models/users/Account";
 import { Student } from "@/models/users/Student";
 import { Instructor } from "@/models/users/Instructor";
+import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import { RegistrationPeriod } from "@/models/RegistrationPeriod";
 import { Section } from "@/models/Section";
 import { ReviewGrade } from "@/models/ReviewGrade";
 import { AppraiseGrade } from "@/models/AppraiseGrade";
+import { TopicFile } from "@/models/TopicFile";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
 export async function GET(request) {
   try {
     const searchParams = request.nextUrl.searchParams;
+    const owner = searchParams.get("owner");
+    const period = searchParams.get("period");
     const searchKeywords = searchParams.get("search");
     const instructorId = searchParams.get("instructor");
-    const period = searchParams.get("period");
     const filter = {};
 
     if (searchKeywords) {
@@ -32,6 +36,16 @@ export async function GET(request) {
         );
       }
       filter.instructor = instructorId;
+    }
+
+    if (owner) {
+      if (!mongoose.isValidObjectId(owner)) {
+        return NextResponse.json(
+          { message: "Id không hợp lệ." },
+          { status: 400 }
+        );
+      }
+      filter.owner = owner;
     }
 
     if (period) {

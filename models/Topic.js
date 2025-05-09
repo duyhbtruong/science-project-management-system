@@ -98,6 +98,8 @@ const topicSchema = new Schema(
   }
 );
 
+topicSchema.set("toJSON", { virtuals: true });
+
 topicSchema.virtual("files", {
   ref: "TopicFile",
   localField: "_id",

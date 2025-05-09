@@ -52,6 +52,23 @@ export const getTopicsByPeriod = async (periodId) => {
   }
 };
 
+export const getTopicsByOwner = async (owner) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/topics?owner=${owner}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!res) {
+      throw new Error("Failed to get topics by owner.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getTopicById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
