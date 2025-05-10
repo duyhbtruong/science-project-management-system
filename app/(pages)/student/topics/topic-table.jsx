@@ -5,9 +5,7 @@ import ExpandedRow from "./expanded-row";
 import { getTableColumns } from "./table-columns";
 
 const TopicTable = ({ listTopic }) => {
-  const [modal, modalContextHolder] = Modal.useModal();
   const [activeExpRow, setActiveExpRow] = useState([]);
-  const [messageApi, messageContextHolder] = message.useMessage();
 
   const columns = getTableColumns();
 

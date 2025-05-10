@@ -43,14 +43,13 @@ const NavigationBar = () => {
   });
 
   return (
-    <>
-      <Menu
-        onClick={(e) => setCurrent(e.key)}
-        mode="inline"
-        selectedKeys={[current]}
-        items={items}
-      />
-    </>
+    <Menu
+      className="h-full"
+      onClick={(e) => setCurrent(e.key)}
+      mode="inline"
+      selectedKeys={[current]}
+      items={items}
+    />
   );
 };
 

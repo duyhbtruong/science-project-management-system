@@ -1,37 +1,18 @@
 "use client";
 
 import { deleteTopicById, getTopicById } from "@/service/topicService";
-import {
-  CheckCircleOutlined,
-  CloseOutlined,
-  ExportOutlined,
-  InboxOutlined,
-  LinkOutlined,
-  PaperClipOutlined,
-  SyncOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Descriptions,
-  Modal,
-  Space,
-  Spin,
-  Tag,
-  Tooltip,
-  Upload,
-  message,
-} from "antd";
+import { CloseOutlined, InboxOutlined } from "@ant-design/icons";
+import { Button, Modal, Spin, Upload, message } from "antd";
 const { Dragger } = Upload;
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { storage } from "@/lib/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { deleteRegisterFile, uploadSubmitFile } from "@/service/upload";
-import Link from "next/link";
 import { TopicDetails } from "./topic-details";
 import { StudentDetails } from "./student-details";
 import { InstructorDetails } from "./instructor-details";
+import { FullscreenLoader } from "@/components/fullscreen-loader";
 
 export const TOPIC_STATUS = {
   REVIEWED: "Đã kiểm duyệt",
@@ -47,6 +28,7 @@ const MODAL_CONFIG = {
 
 export default function TopicInformationPage({ params }) {
   const { topicId } = params;
+
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();
   const [instructor, setInstructor] = useState();
@@ -124,25 +106,29 @@ export default function TopicInformationPage({ params }) {
 
   const loadTopic = async () => {
     let res = await getTopicById(topicId);
-    res = await res.json();
-    setTopic(res);
-    setStudent(res.owner);
-    setAccount(res.owner.accountId);
-    setInstructor(res.instructor);
-    setPeriod(res.registrationPeriod);
+    if (res.ok) {
+      res = await res.json();
+      setTopic(res);
+      setStudent(res.owner);
+      setAccount(res.owner.accountId);
+      setInstructor(res.instructor);
+      setPeriod(res.registrationPeriod);
+    }
   };
 
   useEffect(() => {
     loadTopic();
   }, []);
 
+  console.log("TOPIC: ", topic);
+
   return (
-    <div className="bg-gray-100 min-h-[100vh]">
-      <div className="py-6 mx-32">
-        <div className="flex justify-between p-4 mb-6 bg-white rounded-md">
-          <span className="flex justify-center text-lg font-semibold">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container px-4 py-8 mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
             Quản lý Đề tài cá nhân
-          </span>
+          </h1>
           <Button
             onClick={async () => {
               const confirmed = await modal.confirm(config);
@@ -153,18 +139,18 @@ export default function TopicInformationPage({ params }) {
                 router.replace(`/student/topics`);
               }
             }}
-            // TODO: Disabled when isReviewed
-            disabled={!topic?.reviewAssignments.length > 0 ? false : true}
+            disabled={!topic || topic.reviewAssignments.length > 0}
             icon={<CloseOutlined />}
             danger
+            className="flex items-center gap-2"
           >
             Hủy đăng ký
           </Button>
         </div>
-        <div className="flex flex-col gap-4">
-          {/* Thông tin Đề tài */}
+
+        <div className="grid grid-cols-1 gap-6">
           <Spin spinning={!topic}>
-            <div className="flex flex-col gap-4 p-4 bg-white rounded-md">
+            <div className="p-6 bg-white rounded-lg shadow-sm">
               <TopicDetails
                 topic={topic}
                 onUpload={() => setIsUploadOpen(true)}
@@ -172,25 +158,28 @@ export default function TopicInformationPage({ params }) {
             </div>
           </Spin>
 
-          <div className="flex gap-4">
-            {/* Thông tin chủ nhiệm đề tài */}
-            <div className="flex flex-col flex-grow p-4 bg-white rounded-md">
-              <Spin className="w-[500px]" spinning={!account || !student}>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="p-6 bg-white rounded-lg shadow-sm">
+              <Spin spinning={!account || !student}>
                 <StudentDetails student={student} account={account} />
               </Spin>
             </div>
 
-            {/* Thông tin GVHD */}
-            <div className="flex flex-col flex-grow p-4 bg-white rounded-md">
-              <Spin className="flex flex-row" spinning={!instructor}>
+            <div className="p-6 bg-white rounded-lg shadow-sm">
+              <Spin spinning={!instructor}>
                 <InstructorDetails instructor={instructor} />
               </Spin>
             </div>
           </div>
         </div>
       </div>
+
       <Modal
-        title="Upload bản mềm"
+        title={
+          <div className="text-lg font-semibold text-gray-800">
+            Upload bản mềm
+          </div>
+        }
         open={isUploadOpen}
         width={800}
         centered
@@ -201,6 +190,7 @@ export default function TopicInformationPage({ params }) {
           setFileList([]);
           setIsUploadOpen(false);
         }}
+        className="upload-modal"
       >
         <Dragger
           name="file"
@@ -209,15 +199,16 @@ export default function TopicInformationPage({ params }) {
           maxCount={1}
           onChange={handleChange}
           fileList={fileList}
+          className="upload-dragger"
         >
           <p className="ant-upload-drag-icon">
-            <InboxOutlined />
+            <InboxOutlined className="text-4xl text-blue-500" />
           </p>
-          <p className="ant-upload-text">
-            Nhấn hoặc thả file vào khu vực này để đăng tài liệu.
+          <p className="text-lg font-medium text-gray-700 ant-upload-text">
+            Nhấn hoặc thả file vào khu vực này để đăng tài liệu
           </p>
-          <p className="ant-upload-hint">
-            Định dạng tên File là: MSSV_TEN_DE_TAI.
+          <p className="text-gray-500 ant-upload-hint">
+            Định dạng tên File là: MSSV_TEN_DE_TAI
           </p>
         </Dragger>
       </Modal>

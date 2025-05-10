@@ -32,11 +32,12 @@ export const getTableColumns = () => [
   {
     title: "Hành động",
     key: "action",
-    render: () => (
+    render: (_, { _id }) => (
       <Button
         type="primary"
         icon={<ArrowRightIcon className="size-4" />}
         iconPosition="end"
+        href={`/student/topics/${_id}`}
       >
         Xem chi tiết
       </Button>

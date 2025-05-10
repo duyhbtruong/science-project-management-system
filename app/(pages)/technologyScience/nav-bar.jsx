@@ -10,6 +10,7 @@ import Image from "next/image";
 import {
   CalendarIcon,
   ClipboardListIcon,
+  FileCheckIcon,
   FileText,
   LineChartIcon,
   LogOutIcon,
@@ -39,6 +40,11 @@ const items = [
     icon: <FileText className="size-4" />,
   },
   {
+    label: <Link href="/technologyScience/criteria">Mẫu đánh giá</Link>,
+    key: "criteria",
+    icon: <FileCheckIcon className="size-4" />,
+  },
+  {
     label: <Link href="/technologyScience/dashboard">Thống kê đề tài</Link>,
     key: "dashboard",
     icon: <LineChartIcon className="size-4" />,
@@ -55,21 +61,20 @@ const NavigationBar = () => {
   const pathname = usePathname();
   const [current, setCurrent] = useState(() => {
     if (pathname.includes("topics")) return "topics";
-    if (pathname.includes("review")) return "review";
     if (pathname.includes("registration")) return "registration";
     if (pathname.includes("dashboard")) return "dashboard";
     if (pathname.includes("section")) return "section";
+    if (pathname.includes("criteria")) return "criteria";
   });
 
   return (
-    <>
-      <Menu
-        onClick={(e) => setCurrent(e.key)}
-        mode="inline"
-        selectedKeys={[current]}
-        items={items}
-      />
-    </>
+    <Menu
+      className="h-full"
+      onClick={(e) => setCurrent(e.key)}
+      mode="inline"
+      selectedKeys={[current]}
+      items={items}
+    />
   );
 };
 
