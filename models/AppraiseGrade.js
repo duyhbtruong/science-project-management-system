@@ -42,8 +42,9 @@ const appraiseGradeSchema = new Schema(
       default: null,
     },
     isEureka: {
-      type: String,
+      type: Boolean,
       required: true,
+      default: false,
     },
     comment: String,
     submittedDate: Date,

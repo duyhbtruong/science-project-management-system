@@ -1,98 +1,14 @@
 import { useState } from "react";
 import { Modal, Table, message } from "antd";
-import {
-  assignAppraisalBoard,
-  assignReviewInstructor,
-  deleteTopicById,
-} from "@/service/topicService";
+import { deleteTopicById } from "@/service/topicService";
 
 import ExpandedRow from "./expanded-row";
-import AssignmentModal from "./assignment-modal";
 import { getTableColumns } from "./table-columns";
 
-const TopicTable = ({
-  listTopic,
-  listReviewInstructor,
-  listAppraiseStaff,
-  loadTopics,
-}) => {
+const TopicTable = ({ listTopic, loadTopics, showModal }) => {
   const [modal, modalContextHolder] = Modal.useModal();
   const [activeExpRow, setActiveExpRow] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [messageApi, messageContextHolder] = message.useMessage();
-
-  const [assignedTopicId, setAssignedTopicId] = useState();
-  const [selectedInstructor, setSelectedInstructor] = useState(`Không có`);
-  const [selectedStaff, setSelectedStaff] = useState(`Không có`);
-
-  const showModal = (topic) => {
-    if (topic.reviewInstructor) {
-      setSelectedInstructor(topic.reviewInstructor._id);
-    }
-
-    if (topic.appraiseStaff) {
-      setSelectedStaff(topic.appraiseStaff._id);
-    }
-    setAssignedTopicId(topic._id);
-    setIsModalVisible(true);
-  };
-
-  const handleOk = async () => {
-    if (selectedInstructor) {
-      let res = await assignReviewInstructor(
-        assignedTopicId,
-        selectedInstructor
-      );
-
-      if (res.status === 200) {
-        res = await res.json();
-        const { message } = res;
-        messageApi.open({
-          type: "success",
-          content: message,
-          duration: 2,
-        });
-      } else {
-        res = await res.json();
-        const { message } = res;
-        messageApi.open({
-          type: "error",
-          content: message,
-          duration: 2,
-        });
-      }
-    }
-
-    if (selectedStaff) {
-      let res = await assignAppraisalBoard(assignedTopicId, selectedStaff);
-      if (res.status === 200) {
-        res = await res.json();
-        const { message } = res;
-        messageApi.open({
-          type: "success",
-          content: message,
-          duration: 2,
-        });
-      } else {
-        res = await res.json();
-        const { message } = res;
-        messageApi.open({
-          type: "error",
-          content: message,
-          duration: 2,
-        });
-      }
-    }
-    setAssignedTopicId(null);
-    setSelectedInstructor(`Không có`);
-    setSelectedStaff(`Không có`);
-    loadTopics();
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
 
   const deleteTopic = async (id) => {
     const confirmed = await modal.confirm({
@@ -143,18 +59,6 @@ const TopicTable = ({
             setActiveExpRow(expanded ? [record._id] : []);
           },
         }}
-      />
-
-      <AssignmentModal
-        isVisible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        selectedInstructor={selectedInstructor}
-        selectedStaff={selectedStaff}
-        setSelectedInstructor={setSelectedInstructor}
-        setSelectedStaff={setSelectedStaff}
-        listReviewInstructor={listReviewInstructor}
-        listAppraiseStaff={listAppraiseStaff}
       />
       {modalContextHolder}
       {messageContextHolder}

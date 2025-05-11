@@ -4,6 +4,8 @@ import { Student } from "@/models/users/Student";
 import { Instructor } from "@/models/users/Instructor";
 import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import { RegistrationPeriod } from "@/models/RegistrationPeriod";
+import { ReviewGrade } from "@/models/ReviewGrade";
+import { AppraiseGrade } from "@/models/AppraiseGrade";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 

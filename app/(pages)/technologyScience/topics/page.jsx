@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 
 import { getAllPeriods } from "@/service/registrationService";
-import { getAllInstructors } from "@/service/instructorService";
+import { getAllInstructorsByFaculty } from "@/service/instructorService";
 import { getAllAppraisalBoards } from "@/service/appraiseService";
-import { getTopicsByPeriod, searchTopic } from "@/service/topicService";
+import {
+  getTopicsByPeriod,
+  searchTopic,
+  updateTopicById,
+} from "@/service/topicService";
 
 import TopicTable from "./topic-table";
 import { Button, Input, Select, Spin } from "antd";
@@ -14,13 +18,19 @@ const { Option } = Select;
 
 import { exportTopicList } from "@/utils/export";
 import { DownloadIcon } from "lucide-react";
+import AssignmentModal from "./assignment-modal";
 
 export default function TopicsManagePage() {
   const [listTopic, setListTopic] = useState();
   const [listPeriod, setListPeriod] = useState();
   const [selectedPeriod, setSelectedPeriod] = useState();
+
   const [listAppraiseStaff, setListAppraiseStaff] = useState();
   const [listReviewInstructor, setListReviewInstructor] = useState();
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedInstructors, setSelectedInstructors] = useState([]);
+  const [selectedStaffs, setSelectedStaffs] = useState([]);
 
   const loadTopics = async () => {
     let res = await getTopicsByPeriod(selectedPeriod);
@@ -34,8 +44,8 @@ export default function TopicsManagePage() {
     setListPeriod(res);
   };
 
-  const loadReviewInstructors = async () => {
-    let res = await getAllInstructors();
+  const loadReviewInstructors = async (topic) => {
+    let res = await getAllInstructorsByFaculty(topic.owner.faculty);
     res = await res.json();
     setListReviewInstructor(res);
   };
@@ -68,12 +78,61 @@ export default function TopicsManagePage() {
 
   const handlePeriodChange = (value) => {
     setSelectedPeriod(value);
+    loadAppraiseStaffs();
+  };
+
+  const showModal = (record) => {
+    setSelectedTopic(record);
+    loadReviewInstructors(record);
+    setSelectedInstructors(
+      record.reviewAssignments
+        ?.filter((a) => a.status !== "removed")
+        .map((a) => a.instructor.id || [])
+    );
+    setSelectedStaffs(
+      record.appraiseAssignments
+        ?.filter((a) => a.status !== "removed")
+        .map((a) => a.appraisalBoard.id) || []
+    );
+    setIsModalVisible(true);
+  };
+
+  const handleModalOk = async () => {
+    if (!selectedTopic) return;
+
+    try {
+      const response = await updateTopicById(selectedTopic._id, {
+        reviewInstructorIds: selectedInstructors,
+        appraisalBoardIds: selectedStaffs,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update assignments");
+      }
+
+      // Refresh the topic list
+      await loadTopics();
+      setIsModalVisible(false);
+      setSelectedTopic(null);
+      setSelectedInstructors([]);
+      setSelectedStaffs([]);
+    } catch (error) {
+      console.error("Error updating assignments:", error);
+      // You might want to show an error message to the user here
+    }
+
+    setListReviewInstructor();
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setSelectedTopic(null);
+    setSelectedInstructors([]);
+    setSelectedStaffs([]);
   };
 
   useEffect(() => {
     loadPeriod();
-    loadAppraiseStaffs();
-    loadReviewInstructors();
   }, []);
 
   useEffect(() => {
@@ -81,6 +140,9 @@ export default function TopicsManagePage() {
 
     loadTopics();
   }, [selectedPeriod]);
+
+  console.log(listReviewInstructor);
+  console.log(listAppraiseStaff);
 
   return (
     <div className="bg-gray-100 min-h-[100vh]">
@@ -153,9 +215,22 @@ export default function TopicsManagePage() {
               listReviewInstructor={listReviewInstructor}
               listAppraiseStaff={listAppraiseStaff}
               loadTopics={loadTopics}
+              showModal={showModal}
             />
           </Spin>
         )}
+
+        <AssignmentModal
+          isVisible={isModalVisible}
+          onOk={handleModalOk}
+          onCancel={handleModalCancel}
+          selectedInstructors={selectedInstructors}
+          selectedStaffs={selectedStaffs}
+          setSelectedInstructors={setSelectedInstructors}
+          setSelectedStaffs={setSelectedStaffs}
+          listReviewInstructor={listReviewInstructor}
+          listAppraiseStaff={listAppraiseStaff}
+        />
       </div>
     </div>
   );

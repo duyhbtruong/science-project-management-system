@@ -150,52 +150,46 @@ export default function SectionManager() {
   return (
     <div className="p-4">
       {contextHolder}
-      <div className="flex items-center mb-4">
-        <Input
-          placeholder="Tên tiêu chí mới..."
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          className="mr-2"
-        />
-        <Button
-          type="primary"
-          onClick={addSection}
-          loading={adding}
-          className="flex items-center mr-2"
-          icon={<PlusIcon className="size-4" />}
+      <div className="space-y-4">
+        <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow">
+          <h2 className="text-lg font-medium">Thêm Tiêu chí Mới</h2>
+          <Input
+            placeholder="Tiêu đề tiêu chí..."
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
+          <Button
+            type="primary"
+            onClick={addSection}
+            loading={adding}
+            className="flex items-center justify-center w-full"
+            icon={<PlusIcon className="size-4" />}
+          >
+            Thêm Tiêu chí
+          </Button>
+        </div>
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-          Thêm tiêu chí
-        </Button>
-        <Button
-          onClick={saveSections}
-          loading={saving}
-          disabled={sections.length === 0}
-          icon={<SaveIcon className="size-4" />}
-          className="flex items-center"
-        >
-          Lưu thay đổi
-        </Button>
+          <SortableContext
+            items={sections.map((sec) => sec.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {sections.map((sec) => (
+              <SortableItem
+                key={sec.id}
+                id={sec.id}
+                title={sec.title}
+                onChange={updateTitle}
+                onDelete={deleteSection}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       </div>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={sections.map((sec) => sec.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {sections.map((sec) => (
-            <SortableItem
-              key={sec.id}
-              id={sec.id}
-              title={sec.title}
-              onChange={updateTitle}
-              onDelete={deleteSection}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
     </div>
   );
 }

@@ -188,43 +188,6 @@ export const updateTopicById = async (id, values) => {
   }
 };
 
-export const assignReviewInstructor = async (topicId, instructorId) => {
-  try {
-    const res = await fetch(
-      `http://localhost:3000/api/topics/${topicId}?review=${instructorId}`,
-      {
-        method: "PUT",
-        body: JSON.stringify({}),
-      }
-    );
-
-    if (!res) {
-      throw new Error("Failed to assign review instructor.");
-    }
-
-    return res;
-  } catch (error) {
-    return error;
-  }
-};
-
-export const assignAppraisalBoard = async (topicId, appraisalBoardId) => {
-  try {
-    const res = await fetch(
-      `http://localhost:3000/api/topics/${topicId}?appraise=${appraisalBoardId}`,
-      { method: "PUT", body: JSON.stringify({}) }
-    );
-
-    if (!res) {
-      throw new Error("Failed to assign appraisal board.");
-    }
-
-    return res;
-  } catch (error) {
-    return error;
-  }
-};
-
 export const deleteTopicById = async (id) => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics/${id}`, {

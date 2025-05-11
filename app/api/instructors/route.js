@@ -9,6 +9,7 @@ export async function GET(request) {
     await mongooseConnect();
     const searchParams = request.nextUrl.searchParams;
     const searchKeywords = searchParams.get("search");
+    const faculty = searchParams.get("faculty");
     var filter = { $match: {} };
 
     if (searchKeywords) {
@@ -17,6 +18,12 @@ export async function GET(request) {
           { "account.name": { $regex: searchKeywords, $options: "i" } },
           { instructorId: { $regex: searchKeywords, $options: "i" } },
         ],
+      };
+    }
+
+    if (faculty) {
+      filter.$match = {
+        faculty: faculty,
       };
     }
 

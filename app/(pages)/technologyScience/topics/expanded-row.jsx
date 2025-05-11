@@ -1,7 +1,24 @@
 import Link from "next/link";
-import { Descriptions } from "antd";
-import { ExportOutlined, PaperClipOutlined } from "@ant-design/icons";
-import { LinkIcon, PaperclipIcon } from "lucide-react";
+import { Descriptions, Card, Tag, Space } from "antd";
+import {
+  LinkIcon,
+  CheckCircle2Icon,
+  ClockIcon,
+  XCircleIcon,
+} from "lucide-react";
+
+const StatusIcon = ({ status }) => {
+  switch (status) {
+    case "completed":
+      return <CheckCircle2Icon className="text-green-500 size-4" />;
+    case "pending":
+      return <ClockIcon className="text-yellow-500 size-4" />;
+    case "removed":
+      return <XCircleIcon className="text-red-500 size-4" />;
+    default:
+      return null;
+  }
+};
 
 const ExpandedRow = ({ record }) => {
   const instructorItems = [
@@ -43,6 +60,16 @@ const ExpandedRow = ({ record }) => {
       children: <p>{record.type}</p>,
     },
     {
+      label: "Tóm tắt",
+      key: "summary",
+      children: <p>{record.summary}</p>,
+    },
+    {
+      label: "Kết quả mong đợi",
+      key: "expectedResult",
+      children: <p>{record.expectedResult}</p>,
+    },
+    {
       label: "Thành viên",
       key: "participants",
       children: (
@@ -57,161 +84,107 @@ const ExpandedRow = ({ record }) => {
       ),
     },
     {
-      label: "Số lượng kiểm duyệt",
-      key: "reviews",
-      children: <p>{record.reviews.length}</p>,
-    },
-    {
-      label: "Số lượng thẩm định",
-      key: "appraise",
-      children: <p>{record.appraises.length}</p>,
-    },
-    {
-      label: "Hồ sơ đăng ký",
-      key: "registerFile",
+      label: "Tài liệu tham khảo",
+      key: "reference",
       children: (
         <p>
-          {record.registerFile && (
-            <Link
-              target="_blank"
-              href={record.registerFile}
-              className="flex items-center justify-center"
-            >
-              <PaperclipIcon className="mr-1 size-4" />
-              Tài liệu đính kèm
-            </Link>
-          )}
-          {!record.registerFile && "Chưa có"}
-        </p>
-      ),
-    },
-    {
-      label: "Tài liệu nộp bài",
-      key: "submitFile",
-      children: (
-        <p>
-          {record.submitFile && (
-            <Link
-              target="_blank"
-              href={record.submitFile}
-              className="flex items-center justify-center"
-            >
-              <PaperclipIcon className="mr-1 size-4" />
-              Tài liệu đính kèm
-            </Link>
-          )}
-          {!record.submitFile && "Chưa có"}
-        </p>
-      ),
-    },
-    {
-      label: "Hợp đồng đề tài",
-      key: "contractFile",
-      children: (
-        <p>
-          {record.contractFile && (
-            <Link
-              target="_blank"
-              href={record.contractFile}
-              className="flex items-center justify-center"
-            >
-              <PaperclipIcon className="mr-1 size-4" />
-              Tài liệu đính kèm
-            </Link>
-          )}
-          {!record.contractFile && "Chưa có"}
-        </p>
-      ),
-    },
-    {
-      label: "Hợp đồng tài chính",
-      key: "paymentFile",
-      children: (
-        <p>
-          {record.paymentFile && (
-            <Link
-              target="_blank"
-              href={record.paymentFile}
-              className="flex items-center justify-center"
-            >
-              <PaperclipIcon className="mr-1 size-4" />
-              Tài liệu đính kèm
-            </Link>
-          )}
-          {!record.paymentFile && "Chưa có"}
+          {record.reference.map((ref, index) => (
+            <span key={`reference-${index}`}>
+              {index + 1}. {ref}
+              <br />
+            </span>
+          ))}
         </p>
       ),
     },
   ];
 
-  const reviewInstructorItems = [
-    {
-      label: "Tên",
-      key: "name",
-      children: (
-        <p>
-          {record.reviewInstructor && record.reviewInstructor.accountId.name}
-          {!record.reviewInstructor && "Chưa có"}
-        </p>
-      ),
-    },
-    {
-      label: "Email",
-      key: "email",
-      children: (
-        <p>
-          {record.reviewInstructor && record.reviewInstructor.accountId.email}
-          {!record.reviewInstructor && "Chưa có"}
-        </p>
-      ),
-    },
-    {
-      label: "Học hàm, học vị",
-      key: "academicRank",
-      children: (
-        <p>
-          {record.reviewInstructor && record.reviewInstructor.academicRank}
-          {!record.reviewInstructor && "Chưa có"}
-        </p>
-      ),
-    },
-    {
-      label: "Khoa",
-      key: "faculty",
-      children: (
-        <p>
-          {record.reviewInstructor && record.reviewInstructor.faculty}
-          {!record.reviewInstructor && "Chưa có"}
-        </p>
-      ),
-    },
-  ];
+  const renderReviewAssignments = () => {
+    if (!record.reviewAssignments?.length) {
+      return <p>Chưa có giảng viên kiểm duyệt</p>;
+    }
 
-  const appraiseStaffItems = [
-    {
-      label: "Tên",
-      key: "name",
-      children: (
-        <p>
-          {record.appraiseStaff && record.appraiseStaff.accountId.name}
-          {!record.appraiseStaff && "Chưa có"}
-        </p>
-      ),
-    },
-    {
-      label: "Email",
-      key: "email",
-      children: (
-        <p>
-          {record.appraiseStaff && record.appraiseStaff.accountId.email}
-          {!record.appraiseStaff && "Chưa có"}
-        </p>
-      ),
-    },
-  ];
+    return (
+      <div className="grid grid-cols-1 gap-4 overflow-auto md:grid-cols-2">
+        {record.reviewAssignments.map((assignment, index) => (
+          <Card key={`review-${index}`} size="small" className="shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium">Giảng viên kiểm duyệt {index + 1}</h4>
+              <Space>
+                <StatusIcon status={assignment.status} />
+                <Tag
+                  color={
+                    assignment.status === "completed"
+                      ? "success"
+                      : assignment.status === "pending"
+                      ? "warning"
+                      : "error"
+                  }
+                >
+                  {assignment.status === "completed"
+                    ? "Hoàn thành"
+                    : assignment.status === "pending"
+                    ? "Đang chờ"
+                    : "Đã hủy"}
+                </Tag>
+              </Space>
+            </div>
+            <p className="text-sm text-gray-600">
+              Phân công: {new Date(assignment.assignedAt).toLocaleDateString()}
+            </p>
+            {assignment.reviewGrade.status === "completed" && (
+              <p className="text-sm text-gray-600">Đã có đánh giá</p>
+            )}
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
+  const renderAppraiseAssignments = () => {
+    if (!record.appraiseAssignments?.length) {
+      return <p>Chưa có hội đồng thẩm định</p>;
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {record.appraiseAssignments.map((assignment, index) => (
+          <Card key={`appraise-${index}`} size="small" className="shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium">Hội đồng thẩm định {index + 1}</h4>
+              <Space>
+                <StatusIcon status={assignment.status} />
+                <Tag
+                  color={
+                    assignment.status === "completed"
+                      ? "success"
+                      : assignment.status === "pending"
+                      ? "warning"
+                      : "error"
+                  }
+                >
+                  {assignment.status === "completed"
+                    ? "Hoàn thành"
+                    : assignment.status === "pending"
+                    ? "Đang chờ"
+                    : "Đã hủy"}
+                </Tag>
+              </Space>
+            </div>
+            <p className="text-sm text-gray-600">
+              Phân công: {new Date(assignment.assignedAt).toLocaleDateString()}
+            </p>
+            {assignment.appraiseGrade.status === "completed" && (
+              <p className="text-sm text-gray-600">Đã có đánh giá</p>
+            )}
+          </Card>
+        ))}
+      </div>
+    );
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Descriptions
         title="Thông tin Giảng viên Hướng dẫn"
         items={instructorItems}
@@ -221,14 +194,14 @@ const ExpandedRow = ({ record }) => {
         items={topicDataItems}
         column={2}
       />
-      <Descriptions
-        title="Thông tin Giảng viên kiểm duyệt"
-        items={reviewInstructorItems}
-      />
-      <Descriptions
-        title="Thông tin cán bộ thẩm định"
-        items={appraiseStaffItems}
-      />
+      <div>
+        <h3 className="mb-4 text-lg font-medium">Thông tin Kiểm duyệt</h3>
+        {renderReviewAssignments()}
+      </div>
+      <div>
+        <h3 className="mb-4 text-lg font-medium">Thông tin Thẩm định</h3>
+        {renderAppraiseAssignments()}
+      </div>
     </div>
   );
 };

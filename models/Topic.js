@@ -98,6 +98,13 @@ const topicSchema = new Schema(
   }
 );
 
+// Add indexes for better query performance
+topicSchema.index({ owner: 1 });
+topicSchema.index({ instructor: 1 });
+topicSchema.index({ registrationPeriod: 1 });
+topicSchema.index({ "reviewAssignments.instructor": 1 });
+topicSchema.index({ "appraiseAssignments.appraisalBoard": 1 });
+
 topicSchema.set("toJSON", { virtuals: true });
 
 topicSchema.virtual("files", {
@@ -149,125 +156,153 @@ topicSchema.pre("save", async function (next) {
 });
 
 topicSchema.methods.updateReviewers = async function (newReviewerIds) {
-  const currentAssignments = this.reviewAssignments || [];
-  const ReviewGrade = mongoose.model("ReviewGrade");
+  try {
+    const currentAssignments = this.reviewAssignments || [];
+    const ReviewGrade = mongoose.model("ReviewGrade");
 
-  // Mark removed assignments
-  for (const assignment of currentAssignments) {
-    if (!newReviewerIds.includes(assignment.instructor.toString())) {
-      assignment.status = "removed";
-    }
-  }
-
-  // Add new assignments
-  for (const reviewerId of newReviewerIds) {
-    const existingAssignment = currentAssignments.find(
-      (a) => a.instructor.toString() === reviewerId
-    );
-
-    if (existingAssignment) {
-      if (existingAssignment.status === "removed") {
-        existingAssignment.status = "pending";
-        if (!existingAssignment.reviewGrade) {
-          const newGrade = await ReviewGrade.create({
-            topicId: this._id,
-            instructorId: reviewerId,
-            status: "pending",
-          });
-          existingAssignment.reviewGrade = newGrade._id;
-        }
+    // Mark removed assignments
+    for (const assignment of currentAssignments) {
+      if (!newReviewerIds.includes(assignment.instructor.toString())) {
+        assignment.status = "removed";
       }
-    } else {
-      const newGrade = await ReviewGrade.create({
-        topicId: this._id,
-        instructorId: reviewerId,
-        status: "pending",
-      });
-
-      this.reviewAssignments.push({
-        instructor: reviewerId,
-        reviewGrade: newGrade._id,
-        assignedAt: new Date(),
-        status: "pending",
-      });
     }
-  }
 
-  // Cancel grades for removed assignments
-  const removedAssignments = currentAssignments.filter(
-    (a) => a.status === "removed"
-  );
-  for (const assignment of removedAssignments) {
-    if (assignment.reviewGrade) {
-      await ReviewGrade.findByIdAndUpdate(assignment.reviewGrade, {
-        status: "cancelled",
-      });
+    // Add new assignments
+    for (const reviewerId of newReviewerIds) {
+      const existingAssignment = currentAssignments.find(
+        (a) => a.instructor.toString() === reviewerId
+      );
+
+      if (existingAssignment) {
+        if (existingAssignment.status === "removed") {
+          existingAssignment.status = "pending";
+
+          // Check if we need to create a new grade
+          let needsNewGrade = !existingAssignment.reviewGrade;
+          if (existingAssignment.reviewGrade) {
+            const existingGrade = await ReviewGrade.findById(
+              existingAssignment.reviewGrade
+            );
+            needsNewGrade =
+              !existingGrade || existingGrade.status === "cancelled";
+          }
+
+          if (needsNewGrade) {
+            const newGrade = await ReviewGrade.create({
+              topicId: this._id,
+              instructorId: reviewerId,
+              status: "pending",
+            });
+            existingAssignment.reviewGrade = newGrade._id;
+          }
+        }
+      } else {
+        const newGrade = await ReviewGrade.create({
+          topicId: this._id,
+          instructorId: reviewerId,
+          status: "pending",
+        });
+
+        this.reviewAssignments.push({
+          instructor: reviewerId,
+          reviewGrade: newGrade._id,
+          assignedAt: new Date(),
+          status: "pending",
+        });
+      }
     }
-  }
 
-  await this.save();
+    // Cancel grades for removed assignments
+    const removedAssignments = currentAssignments.filter(
+      (a) => a.status === "removed"
+    );
+    for (const assignment of removedAssignments) {
+      if (assignment.reviewGrade) {
+        await ReviewGrade.findByIdAndUpdate(assignment.reviewGrade, {
+          status: "cancelled",
+        });
+      }
+    }
+
+    await this.save();
+  } catch (error) {
+    throw new Error(`Failed to update reviewers: ${error.message}`);
+  }
 };
 
 topicSchema.methods.updateAppraisers = async function (newAppraiserIds) {
-  const currentAssignments = this.appraiseAssignments || [];
-  const AppraiseGrade = mongoose.model("AppraiseGrade");
+  try {
+    const currentAssignments = this.appraiseAssignments || [];
+    const AppraiseGrade = mongoose.model("AppraiseGrade");
 
-  // Mark removed assignments
-  for (const assignment of currentAssignments) {
-    if (!newAppraiserIds.includes(assignment.appraisalBoard.toString())) {
-      assignment.status = "removed";
-    }
-  }
-
-  // Add new assignments
-  for (const appraiserId of newAppraiserIds) {
-    const existingAssignment = currentAssignments.find(
-      (a) => a.appraisalBoard.toString() === appraiserId
-    );
-
-    if (existingAssignment) {
-      if (existingAssignment.status === "removed") {
-        existingAssignment.status = "pending";
-        // Create new grade if needed
-        if (!existingAssignment.appraiseGrade) {
-          const newGrade = await AppraiseGrade.create({
-            topicId: this._id,
-            appraisalBoardId: appraiserId,
-            status: "pending",
-          });
-          existingAssignment.appraiseGrade = newGrade._id;
-        }
+    // Mark removed assignments
+    for (const assignment of currentAssignments) {
+      if (!newAppraiserIds.includes(assignment.appraisalBoard.toString())) {
+        assignment.status = "removed";
       }
-    } else {
-      // Create new assignment
-      const newGrade = await AppraiseGrade.create({
-        topicId: this._id,
-        appraisalBoardId: appraiserId,
-        status: "pending",
-      });
-
-      this.appraiseAssignments.push({
-        appraisalBoard: appraiserId,
-        appraiseGrade: newGrade._id,
-        assignedAt: new Date(),
-        status: "pending",
-      });
     }
-  }
 
-  // Cancel grades for removed assignments
-  const removedAssignments = currentAssignments.filter(
-    (a) => a.status === "removed"
-  );
-  for (const assignment of removedAssignments) {
-    if (assignment.appraiseGrade) {
-      await AppraiseGrade.findByIdAndUpdate(assignment.appraiseGrade, {
-        status: "cancelled",
-      });
+    // Add new assignments
+    for (const appraiserId of newAppraiserIds) {
+      const existingAssignment = currentAssignments.find(
+        (a) => a.appraisalBoard.toString() === appraiserId
+      );
+
+      if (existingAssignment) {
+        if (existingAssignment.status === "removed") {
+          existingAssignment.status = "pending";
+
+          // Check if we need to create a new grade
+          let needsNewGrade = !existingAssignment.appraiseGrade;
+          if (existingAssignment.appraiseGrade) {
+            const existingGrade = await AppraiseGrade.findById(
+              existingAssignment.appraiseGrade
+            );
+            needsNewGrade =
+              !existingGrade || existingGrade.status === "cancelled";
+          }
+
+          if (needsNewGrade) {
+            const newGrade = await AppraiseGrade.create({
+              topicId: this._id,
+              appraisalBoardId: appraiserId,
+              status: "pending",
+            });
+            existingAssignment.appraiseGrade = newGrade._id;
+          }
+        }
+      } else {
+        const newGrade = await AppraiseGrade.create({
+          topicId: this._id,
+          appraisalBoardId: appraiserId,
+          status: "pending",
+        });
+
+        this.appraiseAssignments.push({
+          appraisalBoard: appraiserId,
+          appraiseGrade: newGrade._id,
+          assignedAt: new Date(),
+          status: "pending",
+        });
+      }
     }
-  }
 
-  await this.save();
+    // Cancel grades for removed assignments
+    const removedAssignments = currentAssignments.filter(
+      (a) => a.status === "removed"
+    );
+    for (const assignment of removedAssignments) {
+      if (assignment.appraiseGrade) {
+        await AppraiseGrade.findByIdAndUpdate(assignment.appraiseGrade, {
+          status: "cancelled",
+        });
+      }
+    }
+
+    await this.save();
+  } catch (error) {
+    throw new Error(`Failed to update appraisers: ${error.message}`);
+  }
 };
 
 export const Topic = models?.Topic || model("Topic", topicSchema);

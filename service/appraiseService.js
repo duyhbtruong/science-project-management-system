@@ -15,6 +15,26 @@ export const getAllAppraisalBoards = async () => {
   }
 };
 
+export const getAllAppraisalBoardsByFaculty = async (faculty) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/appraisal-boards?faculty=${faculty}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    if (!res) {
+      throw new Error("Failed to get all appraisal boards.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const searchAppraisalBoards = async (searchValues) => {
   try {
     const res = await fetch(

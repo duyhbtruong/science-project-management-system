@@ -181,7 +181,7 @@ export default function CriteriaManager() {
     }
   };
 
-  if (loading) return <FullscreenLoader label="Đang tải..." />;
+  if (loading) return <FullscreenLoader label="Loading..." />;
 
   return (
     <div className="p-4">

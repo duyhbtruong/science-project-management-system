@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button, Input, InputNumber, Space } from "antd";
-import { GripVertical, Trash2 } from "lucide-react";
+import { GripVerticalIcon, TrashIcon } from "lucide-react";
 import { useState } from "react";
 
 export const SortableItem = ({
@@ -57,7 +57,7 @@ export const SortableItem = ({
       className="flex items-start gap-4 p-4 mb-2 bg-white border rounded shadow-sm"
     >
       <div {...attributes} {...listeners} className="mt-2 cursor-grab">
-        <GripVertical className="text-gray-400" />
+        <GripVerticalIcon className="text-gray-400" />
       </div>
 
       <div className="flex-1">
@@ -124,7 +124,7 @@ export const SortableItem = ({
           type="text"
           danger
           onClick={() => onDelete(id)}
-          icon={<Trash2 className="size-4" />}
+          icon={<TrashIcon className="size-4" />}
         />
       </Space>
     </div>

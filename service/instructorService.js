@@ -15,6 +15,26 @@ export const getAllInstructors = async () => {
   }
 };
 
+export const getAllInstructorsByFaculty = async (faculty) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/instructors?faculty=${faculty}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch instructors.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const searchInstructors = async (searchValues) => {
   try {
     const res = await fetch(

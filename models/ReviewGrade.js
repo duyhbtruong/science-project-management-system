@@ -33,7 +33,12 @@ const reviewGradeSchema = new Schema(
       default: "pending",
     },
     criteria: {
-      type: [criteriaSchema],
+      type: [
+        {
+          title: String,
+          grade: Number,
+        },
+      ],
       required: true,
       default: [],
     },
@@ -42,8 +47,9 @@ const reviewGradeSchema = new Schema(
       default: null,
     },
     isEureka: {
-      type: String,
+      type: Boolean,
       required: true,
+      default: false,
     },
     comment: String,
     submittedDate: Date,

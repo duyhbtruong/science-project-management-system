@@ -2,119 +2,70 @@ import { Button, Space, Tag } from "antd";
 import { CheckIcon, LoaderIcon, TrashIcon, UserPlus2Icon } from "lucide-react";
 import { dateFormat } from "@/utils/format";
 
+const getStatusTag = (record) => {
+  const hasReviewAssignments = record.reviewAssignments?.length > 0;
+  const hasAppraiseAssignments = record.appraiseAssignments?.length > 0;
+
+  if (!hasReviewAssignments && !hasAppraiseAssignments) {
+    return <Tag color="default">Chưa phân công</Tag>;
+  }
+
+  const reviewStatus = record.reviewAssignments?.some(
+    (a) => a.status === "completed"
+  );
+  const appraiseStatus = record.appraiseAssignments?.some(
+    (a) => a.status === "completed"
+  );
+
+  if (reviewStatus && appraiseStatus) {
+    return <Tag color="success">Hoàn thành</Tag>;
+  } else if (reviewStatus || appraiseStatus) {
+    return <Tag color="processing">Đang thực hiện</Tag>;
+  } else {
+    return <Tag color="warning">Đang chờ</Tag>;
+  }
+};
+
 export const getTableColumns = (showModal, deleteTopic) => [
   {
     title: "Tên tiếng Việt",
     dataIndex: "vietnameseName",
     key: "vietnameseName",
-    width: "25%",
+    width: "20%",
     ellipsis: true,
   },
   {
     title: "Tên tiếng Anh",
     dataIndex: "englishName",
     key: "englishName",
-    width: "25%",
+    width: "20%",
     ellipsis: true,
+  },
+  {
+    title: "Loại hình",
+    dataIndex: "type",
+    key: "type",
+    width: "15%",
+  },
+  {
+    title: "Trạng thái",
+    key: "status",
+    width: "15%",
+    render: (_, record) => getStatusTag(record),
   },
   {
     title: "Ngày đăng ký",
     dataIndex: "createdAt",
     key: "createdAt",
+    width: "15%",
     render: (_, { createdAt }) => {
       return <p>{dateFormat(new Date(createdAt))}</p>;
     },
   },
   {
-    title: "Trạng thái kiểm duyệt",
-    dataIndex: "reviews",
-    key: "reviews",
-    render: (_, { reviews }) => {
-      let color, icon, text;
-      const isReviewed = reviews.length > 0;
-      switch (isReviewed) {
-        case true:
-          color = "success";
-          text = "Đã kiểm duyệt";
-          icon = <CheckIcon className="inline-block mr-1 size-4" />;
-          break;
-        case false:
-          color = "default";
-          text = "Chưa kiểm duyệt";
-          icon = (
-            <LoaderIcon
-              spin
-              className="inline-block mr-1 animate-spin size-4"
-            />
-          );
-        default:
-          break;
-      }
-      return (
-        <Tag color={color} icon={icon}>
-          {text}
-        </Tag>
-      );
-    },
-    filters: [
-      {
-        text: "Đã kiểm duyệt",
-        value: true,
-      },
-      {
-        text: "Chưa kiểm duyệt",
-        value: false,
-      },
-    ],
-    onFilter: (value, record) => record.isReviewed === value,
-  },
-  {
-    title: "Trạng thái thẩm định",
-    dataIndex: "appraises",
-    key: "appraises",
-    render: (_, { appraises }) => {
-      let color, icon, text;
-      const isAppraised = appraises.length > 0;
-      switch (isAppraised) {
-        case true:
-          color = "success";
-          text = "Đã thẩm định";
-          icon = <CheckIcon className="inline-block mr-1 size-4" />;
-          break;
-        case false:
-          color = "default";
-          text = "Chưa thẩm định";
-          icon = (
-            <LoaderIcon
-              spin
-              className="inline-block mr-1 animate-spin size-4"
-            />
-          );
-        default:
-          break;
-      }
-      return (
-        <Tag color={color} icon={icon}>
-          {text}
-        </Tag>
-      );
-    },
-    filters: [
-      {
-        text: "Đã thẩm định",
-        value: true,
-      },
-      {
-        text: "Chưa thẩm định",
-        value: false,
-      },
-    ],
-    onFilter: (value, record) => record.isAppraised === value,
-  },
-  {
     title: "Hành động",
     key: "action",
-    width: "10%",
+    width: "15%",
     render: (_, record) => {
       return (
         <Space size="middle">

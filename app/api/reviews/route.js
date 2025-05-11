@@ -104,15 +104,6 @@ export async function POST(request) {
       );
     }
 
-    if (topic.reviews.length > 0) {
-      return NextResponse.json(
-        { message: "Đề tài đã được đánh giá" },
-        {
-          status: 409,
-        }
-      );
-    }
-
     const createdReview = await ReviewGrade.create({
       topicId,
       instructorId,
