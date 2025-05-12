@@ -3,25 +3,11 @@
 import { getAccountById } from "@/service/accountService";
 import {
   createReview,
-  getReviewsByTopicId,
+  getReviewById,
   updateReviewById,
 } from "@/service/reviewService";
-import { getTopicById } from "@/service/topicService";
 
-import { InfoOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Descriptions,
-  Form,
-  Input,
-  Modal,
-  Radio,
-  Select,
-  Space,
-  Spin,
-  message,
-} from "antd";
-import { SubmitButton } from "@/components/submit-button";
+import { Button, Form, Spin, message } from "antd";
 
 import emailjs from "@emailjs/browser";
 import { useEffect, useState } from "react";
@@ -48,12 +34,6 @@ export default function ReviewTopicPage({ params }) {
 
   const router = useRouter();
 
-  const loadTopic = async () => {
-    let res = await getTopicById(reviewId);
-    res = await res.json();
-    setTopic(res);
-  };
-
   const loadAccount = async () => {
     let res = await getAccountById(userId);
     res = await res.json();
@@ -62,14 +42,11 @@ export default function ReviewTopicPage({ params }) {
   };
 
   const loadReview = async () => {
-    let res = await getReviewsByTopicId(reviewId, userId);
+    let res = await getReviewById(reviewId);
     res = await res.json();
     setReview(res);
+    setTopic(res.topicId);
   };
-
-  useEffect(() => {
-    loadTopic();
-  }, []);
 
   useEffect(() => {
     if (!reviewId || !userId) return;
@@ -80,38 +57,37 @@ export default function ReviewTopicPage({ params }) {
   useEffect(() => {
     if (!review) return;
 
-    form.setFieldsValue({
-      criteriaOne: review?.criteria[0],
-      criteriaTwo: review?.criteria[1],
-      criteriaThree: review?.criteria[2],
-      criteriaFour: review?.criteria[3],
-      criteriaFive: review?.criteria[4],
-      criteriaSix: review?.criteria[5],
-      criteriaSeven: review?.criteria[6],
-      criteriaEight: review?.criteria[7],
-      criteriaNine: review?.grade,
-      criteriaTen: review?.isEureka,
-      criteriaEleven: review?.note,
+    const formValues = {
+      finalGrade: review.finalGrade,
+      isEureka: review.isEureka ? "Có" : "Không",
+      comment: review.comment,
+    };
+
+    review.criteria.forEach((criterion) => {
+      formValues[`criteria_${criterion.criteriaId}`] = criterion.grade;
     });
+
+    form.setFieldsValue(formValues);
   }, [review]);
 
   const onFinish = async (formData) => {
+    const criteriaGrades = Object.entries(formData)
+      .filter(([key]) => key.startsWith("criteria_"))
+      .map(([key, grade]) => {
+        const criteriaId = key.replace("criteria_", "");
+        return {
+          criteriaId,
+          grade: grade,
+        };
+      });
+
     const values = {
-      criteria: [
-        formData.criteriaOne,
-        formData.criteriaTwo,
-        formData.criteriaThree,
-        formData.criteriaFour,
-        formData.criteriaFive,
-        formData.criteriaSix,
-        formData.criteriaSeven,
-        formData.criteriaEight,
-      ],
+      criteria: criteriaGrades,
       topicId: reviewId,
       instructorId: instructor._id,
-      grade: formData.criteriaNine,
-      isEureka: formData.criteriaTen,
-      note: formData.criteriaEleven,
+      finalGrade: formData.finalGrade,
+      isEureka: formData.isEureka === "Có",
+      comment: formData.comment,
     };
 
     try {
@@ -143,18 +119,20 @@ export default function ReviewTopicPage({ params }) {
       student_name: topic?.owner?.accountId.name,
       instructor_name: topic?.instructor?.accountId.name,
       topic_title: topic?.vietnameseName,
-      criteria_1: formValues.criteriaOne,
-      criteria_2: formValues.criteriaTwo,
-      criteria_3: formValues.criteriaThree,
-      criteria_4: formValues.criteriaFour,
-      criteria_5: formValues.criteriaFive,
-      criteria_6: formValues.criteriaSix,
-      criteria_7: formValues.criteriaSeven,
-      criteria_8: formValues.criteriaEight,
-      grade: formValues.criteriaNine,
-      is_eureka: formValues.criteriaTen,
-      notes: formValues.criteriaEleven,
+      grade: formValues.finalGrade,
+      is_eureka: formValues.isEureka,
+      notes: formValues.comment,
     };
+
+    Object.entries(formValues)
+      .filter(([key]) => key.startsWith("criteria_"))
+      .forEach(([key, value]) => {
+        const criteriaId = key.replace("criteria_", "");
+        const criterion = criteria.find((c) => c._id === criteriaId);
+        if (criterion) {
+          templateParams[`criteria_${criterion.order + 1}`] = value;
+        }
+      });
 
     emailjs
       .send(

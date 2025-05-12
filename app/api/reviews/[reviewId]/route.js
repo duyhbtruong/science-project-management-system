@@ -1,12 +1,14 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { ReviewGrade } from "@/models/ReviewGrade";
 import { Topic } from "@/models/Topic";
+import { Account } from "@/models/users/Account";
+import { Instructor } from "@/models/users/Instructor";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
-    const reviewId = params.review;
+    const reviewId = params.reviewId;
 
     if (!reviewId || !mongoose.isValidObjectId(reviewId)) {
       return NextResponse.json(
@@ -19,7 +21,18 @@ export async function GET(request, { params }) {
 
     await mongooseConnect();
 
-    const review = await ReviewGrade.findOne({ _id: reviewId });
+    const review = await ReviewGrade.findOne({ _id: reviewId }).populate({
+      path: "topicId",
+      select:
+        "vietnameseName englishName summary expectedResult participants reference instructor",
+      populate: {
+        path: "instructor",
+        populate: {
+          path: "accountId",
+          select: "name email phone role",
+        },
+      },
+    });
 
     if (!review) {
       return NextResponse.json(
@@ -41,8 +54,8 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const reviewId = params.review;
-    const { criteria, grade, isEureka, note } = await request.json();
+    const reviewId = params.reviewId;
+    const { criteria, finalGrade, isEureka, comment } = await request.json();
 
     if (!reviewId || !mongoose.isValidObjectId(reviewId)) {
       return NextResponse.json(
@@ -66,9 +79,9 @@ export async function PUT(request, { params }) {
 
     await ReviewGrade.findByIdAndUpdate(reviewId, {
       criteria,
-      grade,
+      finalGrade,
       isEureka,
-      note,
+      comment,
     });
 
     return NextResponse.json(
@@ -87,7 +100,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const reviewId = params.review;
+    const reviewId = params.reviewId;
 
     if (!reviewId || !mongoose.isValidObjectId(reviewId)) {
       return NextResponse.json(

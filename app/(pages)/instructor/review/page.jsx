@@ -2,7 +2,11 @@
 
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
-import { deleteReviewById } from "@/service/reviewService";
+import {
+  getReviewsByTopicId,
+  deleteReviewById,
+  getReviewsByInstructorId,
+} from "@/service/reviewService";
 import { getTopicsByReviewInstructorId } from "@/service/topicService";
 import { Spin, Table, Modal, message, Select } from "antd";
 import { useSession } from "next-auth/react";
@@ -12,15 +16,17 @@ import { getTableColumns } from "./table-columns";
 const { Option } = Select;
 
 export default function ReviewPage() {
-  const router = useRouter();
   const session = useSession();
   const userId = session?.data?.user?.id;
 
+  const router = useRouter();
+
   const [account, setAccount] = useState();
   const [instructor, setInstructor] = useState();
-  const [listTopic, setTopics] = useState();
+  const [listReview, setListReview] = useState();
   const [listPeriod, setListPeriod] = useState();
   const [selectedPeriod, setSelectedPeriod] = useState();
+  const [loading, setLoading] = useState(false);
 
   const [modal, modalContextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -28,56 +34,70 @@ export default function ReviewPage() {
   const config = {
     title: "Hủy kết quả kiểm duyệt?",
     content: <p>Bạn có muốn hủy kết quả kiểm duyệt của đề tài này không?</p>,
+    okText: "Xác nhận",
+    cancelText: "Hủy",
   };
 
   const loadAccount = async () => {
-    let res = await getAccountById(userId);
-    res = await res.json();
-    setInstructor(res.instructor);
-    setAccount(res.account);
-  };
-
-  const loadTopics = async () => {
-    let res = await getTopicsByReviewInstructorId(
-      selectedPeriod,
-      instructor._id
-    );
-    res = await res.json();
-    setTopics(res);
-  };
-
-  const loadPeriod = async () => {
-    let res = await getAllPeriods();
-    res = await res.json();
-    setListPeriod(res);
-  };
-
-  const handleDelete = async (record) => {
-    const confirmed = await modal.confirm(config);
-    if (confirmed) {
-      deleteReview(record.reviews[0]);
+    try {
+      setLoading(true);
+      let res = await getAccountById(userId);
+      res = await res.json();
+      setInstructor(res.instructor);
+      setAccount(res.account);
+    } catch (error) {
+      messageApi.error("Không thể tải thông tin tài khoản");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteReview = async (reviewId) => {
-    let res = await deleteReviewById(reviewId);
-    if (res.status === 200) {
+  const loadListReview = async () => {
+    try {
+      setLoading(true);
+      let res = await getReviewsByInstructorId(selectedPeriod, instructor._id);
       res = await res.json();
-      const { message } = res;
-      messageApi.open({
-        type: "success",
-        content: message,
-        duration: 2,
-      });
-      loadTopics();
-    } else {
+      setListReview(res);
+    } catch (error) {
+      messageApi.error("Không thể tải danh sách kiểm duyệt");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadPeriod = async () => {
+    try {
+      setLoading(true);
+      let res = await getAllPeriods();
       res = await res.json();
-      const { message } = res;
-      messageApi.open({
-        type: "error",
-        content: message,
-        duration: 2,
-      });
+      setListPeriod(res);
+    } catch (error) {
+      messageApi.error("Không thể tải danh sách đợt đăng ký");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (record) => {
+    try {
+      const confirmed = await modal.confirm(config);
+      if (confirmed) {
+        setLoading(true);
+        const reviewId = record.reviews[0];
+        let res = await deleteReviewById(reviewId);
+        if (res.ok) {
+          const data = await res.json();
+          messageApi.success(data.message || "Hủy kiểm duyệt thành công");
+          loadTopics();
+        } else {
+          const data = await res.json();
+          messageApi.error(data.message || "Không thể hủy kiểm duyệt");
+        }
+      }
+    } catch (error) {
+      messageApi.error("Có lỗi xảy ra khi hủy kiểm duyệt");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,15 +111,13 @@ export default function ReviewPage() {
 
   useEffect(() => {
     if (!userId) return;
-
     loadAccount();
   }, [userId]);
 
   useEffect(() => {
-    if (!selectedPeriod || !instructor) return;
-
-    loadTopics();
-  }, [selectedPeriod]);
+    if (!selectedPeriod || !instructor?._id) return;
+    loadListReview();
+  }, [selectedPeriod, instructor]);
 
   const columns = getTableColumns(router, handleDelete);
 
@@ -107,60 +125,73 @@ export default function ReviewPage() {
     <>
       {modalContextHolder}
       {messageContextHolder}
-      <div className="bg-gray-100 min-h-[100vh]">
-        <div className="flex flex-col py-6 mx-32">
-          <div className="mb-4 space-x-4">
-            {selectedPeriod && (
-              <Select
-                className="w-64"
-                placeholder="Chọn đợt đăng ký..."
-                onChange={handlePeriodChange}
-                value={selectedPeriod}
-              >
-                {listPeriod.map((period, index) => (
-                  <Option
-                    key={`registration-period-${index}`}
-                    value={period._id}
-                  >
-                    {period.title}
-                  </Option>
-                ))}
-              </Select>
-            )}
+      <div className="bg-gray-50 min-h-[100vh]">
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Kiểm duyệt đề tài
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Quản lý và kiểm duyệt các đề tài nghiên cứu khoa học
+            </p>
           </div>
 
-          {!selectedPeriod ? (
-            <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow">
-              <Select
-                className="w-64 mb-4"
-                placeholder="Chọn đợt đăng ký..."
-                onChange={handlePeriodChange}
-                value={selectedPeriod}
-              >
-                {listPeriod?.map((period, index) => (
-                  <Option
-                    key={`registration-period-${index}`}
-                    value={period._id}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 max-w-sm">
+                  <Select
+                    className="w-full"
+                    placeholder="Chọn đợt đăng ký..."
+                    onChange={handlePeriodChange}
+                    value={selectedPeriod}
+                    size="large"
+                    loading={loading}
                   >
-                    {period.title}
-                  </Option>
-                ))}
-              </Select>
-              <p className="text-gray-500">
-                Vui lòng chọn đợt đăng ký để xem danh sách kiểm duyệt đề tài
-              </p>
+                    {listPeriod?.map((period, index) => (
+                      <Option
+                        key={`registration-period-${index}`}
+                        value={period._id}
+                      >
+                        {period.title}
+                      </Option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
             </div>
-          ) : (
-            <Spin spinning={!listTopic}>
-              <Table
-                rowKey={(record) => record._id}
-                tableLayout="fixed"
-                columns={columns}
-                dataSource={listTopic}
-                pagination={{ pageSize: 8 }}
-              />
-            </Spin>
-          )}
+
+            <div className="p-6">
+              {!selectedPeriod ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-center">
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                      Chưa chọn đợt đăng ký
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Vui lòng chọn đợt đăng ký để xem danh sách kiểm duyệt đề
+                      tài
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <Spin spinning={loading}>
+                  <Table
+                    rowKey={(record) => record._id}
+                    tableLayout="fixed"
+                    columns={columns}
+                    dataSource={listReview}
+                    pagination={{
+                      pageSize: 8,
+                      showSizeChanger: true,
+                      showTotal: (total) => `Tổng số ${total} đề tài`,
+                    }}
+                    className="review-table"
+                  />
+                </Spin>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </>

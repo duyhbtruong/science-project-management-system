@@ -81,7 +81,7 @@ const topicSchema = new Schema(
         },
       },
     ],
-    sections: { type: [sectionSchema], default: [] },
+    sections: { type: [sectionSchema], default: [], select: false },
     owner: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Student",

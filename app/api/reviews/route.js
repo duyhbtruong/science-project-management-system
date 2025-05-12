@@ -8,34 +8,30 @@ import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
-    const topicId = request.nextUrl.searchParams.get("topicId");
-
-    if (!topicId || !mongoose.isValidObjectId(topicId)) {
-      return NextResponse.json(
-        { message: "Thiếu topic id hoặc topic id không hợp lệ." },
-        {
-          status: 400,
-        }
-      );
-    }
+    const searchParams = request.nextUrl.searchParams;
+    const periodId = searchParams.get("periodId");
+    const instructorId = searchParams.get("instructorId");
+    const filter = {};
 
     await mongooseConnect();
 
-    const topic = await Topic.findOne({ _id: topicId });
-
-    if (!topic) {
-      return NextResponse.json(
-        { message: "Không tìm thấy đề tài." },
-        { status: 404 }
-      );
+    let topicIds = [];
+    if (periodId) {
+      const topics = await Topic.find({ registrationPeriodId: periodId });
+      topicIds = topics.map((topic) => topic._id);
     }
 
-    // TODO: Replace findOne() with find()
-    const reviews = await ReviewGrade.findOne({ topicId: topicId })
+    if (instructorId) {
+      filter.instructorId = instructorId;
+    }
+    if (topicIds.length > 0) {
+      filter.topicId = { $in: topicIds };
+    }
+
+    const reviews = await ReviewGrade.find(filter)
       .populate({
         path: "topicId",
-        select:
-          "vietnameseName englishName type summary reference participants expectedResult",
+        select: "vietnameseName englishName registrationPeriodId owner",
       })
       .populate({
         path: "instructorId",

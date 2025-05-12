@@ -1,15 +1,18 @@
 export const getCriteria = async () => {
-  const res = await fetch(`http://localhost:3000/api/criteria`, {
-    method: "GET",
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch("http://localhost:3000/api/criteria", {
+      method: "GET",
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || res.statusText);
+    if (!res.ok) {
+      throw new Error("Failed to get criteria.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
   }
-
-  return res.json();
 };
 
 export const createCriteria = async (criteriaData) => {

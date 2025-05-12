@@ -15,17 +15,18 @@ export const getReviewById = async (id) => {
   }
 };
 
-export const getReviewsByTopicId = async (topicId) => {
+export const getReviewsByInstructorId = async (periodId, instructorId) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/reviews?topicId=${topicId}`,
+      `http://localhost:3000/api/reviews?periodId=${periodId}&instructorId=${instructorId}`,
       {
         method: "GET",
         cache: "no-store",
       }
     );
+
     if (!res) {
-      throw new Error("Failed to get reviews by topic id.");
+      throw new Error("Failed to get reviews by instructor id.");
     }
 
     return res;

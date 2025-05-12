@@ -1,65 +1,78 @@
 import { Button, Space, Tag } from "antd";
-import { CheckIcon, EditIcon, LoaderIcon, TrashIcon } from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
 import { dateFormat } from "@/utils/format";
 
 export const getTableColumns = (router, handleDelete) => [
   {
-    title: "Tên tiếng Việt",
-    dataIndex: "vietnameseName",
+    title: "Tên đề tài (Tiếng Việt)",
+    dataIndex: ["topicId", "vietnameseName"],
     key: "vietnameseName",
     width: "25%",
     ellipsis: true,
+    className: "font-medium",
   },
   {
-    title: "Tên tiếng Anh",
-    dataIndex: "englishName",
+    title: "Tên đề tài (Tiếng Anh)",
+    dataIndex: ["topicId", "englishName"],
     key: "englishName",
     width: "25%",
     ellipsis: true,
+    className: "text-gray-600",
   },
   {
     title: "Ngày đăng ký",
     dataIndex: "createdAt",
     key: "createdAt",
-    render: (_, record) => <p>{dateFormat(new Date(record.createdAt))}</p>,
+    width: "15%",
+    render: (_, record) => (
+      <span className="text-gray-500">
+        {dateFormat(new Date(record.createdAt))}
+      </span>
+    ),
   },
   {
     title: "Trạng thái",
-    dataIndex: "isReviewed",
-    key: "isReviewed",
-    render: (_, record) => {
-      const isReviewed = record.reviews.length > 0;
-      return (
-        <Tag
-          color={isReviewed ? "success" : "default"}
-          icon={
-            isReviewed ? (
-              <CheckIcon className="inline-block mr-1 size-4" />
-            ) : (
-              <LoaderIcon className="inline-block mr-1 size-4 animate-spin" />
-            )
-          }
-        >
-          {isReviewed ? "Đã kiểm duyệt" : "Chưa kiểm duyệt"}
-        </Tag>
-      );
-    },
+    dataIndex: "status",
+    key: "status",
+    width: "15%",
+    render: (_, record) => (
+      <Tag
+        color={
+          record.status === "completed"
+            ? "success"
+            : record.status === "pending"
+            ? "processing"
+            : "error"
+        }
+      >
+        {record.status === "completed"
+          ? "Đã kiểm duyệt"
+          : record.status === "pending"
+          ? "Chưa kiểm duyệt"
+          : "Đã hủy"}
+      </Tag>
+    ),
   },
   {
     title: "Hành động",
     key: "action",
-    width: "10%",
+    width: "20%",
     render: (_, record) => (
-      <Space size="middle">
+      <Space size="middle" align="end">
         <Button
+          disabled={record.status === "cancelled"}
           onClick={() => router.push(`/instructor/review/${record._id}`)}
           icon={<EditIcon className="size-4" />}
+          className="flex items-center justify-center"
+          title="Chỉnh sửa"
         />
         <Button
-          disabled={record.reviews.length === 0}
-          onClick={(record) => handleDelete(record)}
+          disabled={record.status === "cancelled"}
+          onClick={() => handleDelete(record)}
           danger
           icon={<TrashIcon className="size-4" />}
+          className="flex items-center justify-center"
+          title="Xóa"
         />
       </Space>
     ),

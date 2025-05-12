@@ -9,7 +9,7 @@ import { criteriaSchema } from "./Criteria";
  * - topicId: Unique Id of a topic.
  * - instructorId: Unique Id of an appraisal board who grades this.
  * - status: Current state of this review record.
- * - criteria: List of criterias.
+ * - criteria: List of criterias with their grades.
  * - finalGrade: Final grade to see if the topic passed or not.
  * - isEureka: If the topic is good enough to participate in Eureka.
  * - comment: Leave comments for student.
@@ -35,8 +35,15 @@ const reviewGradeSchema = new Schema(
     criteria: {
       type: [
         {
-          title: String,
-          grade: Number,
+          criteriaId: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: "Criteria",
+            required: true,
+          },
+          grade: {
+            type: Number,
+            required: true,
+          },
         },
       ],
       required: true,
