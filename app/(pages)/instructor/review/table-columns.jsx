@@ -58,21 +58,16 @@ export const getTableColumns = (router, handleDelete) => [
     key: "action",
     width: "20%",
     render: (_, record) => (
-      <Space size="middle" align="end">
+      <Space size="middle">
         <Button
           disabled={record.status === "cancelled"}
           onClick={() => router.push(`/instructor/review/${record._id}`)}
           icon={<EditIcon className="size-4" />}
-          className="flex items-center justify-center"
-          title="Chỉnh sửa"
         />
         <Button
-          disabled={record.status === "cancelled"}
           onClick={() => handleDelete(record)}
           danger
           icon={<TrashIcon className="size-4" />}
-          className="flex items-center justify-center"
-          title="Xóa"
         />
       </Space>
     ),

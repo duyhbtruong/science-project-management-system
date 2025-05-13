@@ -1,27 +1,9 @@
-import { Form, Input, Radio, Select, Space, Spin } from "antd";
+import { useState } from "react";
+import { Form, Input, Radio, Select, Space } from "antd";
 import { SubmitButton } from "@/components/submit-button";
-import { useEffect, useState } from "react";
-import { getCriteria } from "@/service/criteriaService";
 
-export default function ReviewForm({ form, onFinish, value, setValue }) {
-  const [criteria, setCriteria] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadCriteria = async () => {
-      try {
-        const res = await getCriteria();
-        const data = await res.json();
-        setCriteria(data);
-      } catch (error) {
-        console.error("Error loading criteria:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCriteria();
-  }, []);
+export default function ReviewForm({ form, onFinish, criteria }) {
+  const [value, setValue] = useState();
 
   const generateOptions = (minGrade, maxGrade, step) => {
     const options = [];
@@ -33,10 +15,6 @@ export default function ReviewForm({ form, onFinish, value, setValue }) {
     }
     return options;
   };
-
-  if (loading) {
-    return <Spin />;
-  }
 
   return (
     <Form
@@ -86,7 +64,7 @@ export default function ReviewForm({ form, onFinish, value, setValue }) {
         label="Đề tài xuất sắc đạt yêu cầu tham gia giải EUREKA"
         rules={[{ required: true, message: "Không được để trống mục này!" }]}
       >
-        <Radio.Group onChange={(e) => setValue(e.target.value)} value={value}>
+        <Radio.Group value={value} onChange={(e) => setValue(e.target.value)}>
           <Space direction="vertical">
             <Radio value="Có">Có</Radio>
             <Radio value="Không">Không</Radio>
@@ -103,9 +81,7 @@ export default function ReviewForm({ form, onFinish, value, setValue }) {
       </Form.Item>
 
       <Form.Item className="mt-auto">
-        <SubmitButton form={form}>
-          {loading ? "Đang tải..." : "Xác nhận"}
-        </SubmitButton>
+        <SubmitButton form={form}>Xác nhận</SubmitButton>
       </Form.Item>
     </Form>
   );

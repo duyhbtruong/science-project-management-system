@@ -5,7 +5,7 @@ import { Criteria } from "@/models/Criteria";
 export async function GET() {
   try {
     await mongooseConnect();
-    const criteria = await Criteria.find().sort("order");
+    const criteria = await Criteria.find();
     return NextResponse.json(criteria, { status: 200 });
   } catch (error) {
     return NextResponse.json(

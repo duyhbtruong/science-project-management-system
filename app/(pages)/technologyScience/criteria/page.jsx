@@ -18,7 +18,6 @@ import { SortableItem } from "./sortable-item";
 import { PlusIcon } from "lucide-react";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 
-// You'll need to create these service functions
 import {
   getCriteria,
   createCriteria,
@@ -45,20 +44,25 @@ export default function CriteriaManager() {
     loadCriteria();
   }, []);
 
+  console.log("CRITERIA", criteria);
+
   const loadCriteria = async () => {
     try {
       const data = await getCriteria();
-      setCriteria(
-        data.map((c) => ({
-          id: c._id,
-          title: c.title,
-          minGrade: c.minGrade,
-          maxGrade: c.maxGrade,
-          step: c.step,
-        }))
-      );
+      if (data.ok) {
+        const res = await data.json();
+        setCriteria(
+          res.map((c) => ({
+            id: c._id,
+            title: c.title,
+            minGrade: c.minGrade,
+            maxGrade: c.maxGrade,
+            step: c.step,
+          }))
+        );
+      }
     } catch (err) {
-      messageApi.error("Lỗi khi tải danh sách tiêu chí.");
+      // messageApi.error("Lỗi khi tải danh sách tiêu chí.");
     } finally {
       setLoading(false);
     }
@@ -157,27 +161,6 @@ export default function CriteriaManager() {
     } catch (err) {
       messageApi.error("Xóa tiêu chí thất bại.");
       loadCriteria();
-    }
-  };
-
-  const saveCriteria = async () => {
-    setSaving(true);
-    try {
-      const updated = await reorderCriteria(criteria);
-      setCriteria(
-        updated.map((c) => ({
-          id: c._id,
-          title: c.title,
-          minGrade: c.minGrade,
-          maxGrade: c.maxGrade,
-          step: c.step,
-        }))
-      );
-      messageApi.success("All criteria saved.");
-    } catch {
-      messageApi.error("Save failed.");
-    } finally {
-      setSaving(false);
     }
   };
 

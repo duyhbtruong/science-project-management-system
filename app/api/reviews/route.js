@@ -54,7 +54,7 @@ export async function GET(request, { params }) {
 
 export async function POST(request) {
   try {
-    const { topicId, instructorId, criteria, grade, isEureka, note } =
+    const { topicId, instructorId, criteria, finalGrade, isEureka, comment } =
       await request.json();
 
     if (
@@ -91,30 +91,15 @@ export async function POST(request) {
       );
     }
 
-    if (!instructor._id.equals(topic.reviewInstructor)) {
-      return NextResponse.json(
-        { message: "Giảng viên không phải người kiểm duyệt đề tài." },
-        {
-          status: 409,
-        }
-      );
-    }
-
-    const createdReview = await ReviewGrade.create({
+    await ReviewGrade.create({
       topicId,
       instructorId,
       criteria,
-      grade,
+      finalGrade,
       isEureka,
-      note,
+      comment,
+      submittedDate: new Date(),
     });
-
-    await Topic.findByIdAndUpdate(
-      { _id: topicId },
-      {
-        reviews: [...topic.reviews, createdReview._id],
-      }
-    );
 
     return NextResponse.json(
       { message: "Tạo đánh giá thành công!" },

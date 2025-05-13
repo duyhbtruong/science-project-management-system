@@ -5,13 +5,22 @@ export const SubmitButton = ({ form, children }) => {
   const [submittable, setSubmittable] = useState(false);
 
   const values = Form.useWatch([], form);
+
   useEffect(() => {
-    form
-      .validateFields({
-        validateOnly: true,
-      })
-      .then(() => setSubmittable(true))
-      .catch(() => setSubmittable(false));
+    const validateForm = async () => {
+      try {
+        await form.validateFields({ validateOnly: true });
+        setSubmittable(true);
+      } catch {
+        setSubmittable(false);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      validateForm();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [form, values]);
 
   return (

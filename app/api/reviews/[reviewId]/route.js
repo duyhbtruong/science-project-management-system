@@ -24,14 +24,23 @@ export async function GET(request, { params }) {
     const review = await ReviewGrade.findOne({ _id: reviewId }).populate({
       path: "topicId",
       select:
-        "vietnameseName englishName summary expectedResult participants reference instructor",
-      populate: {
-        path: "instructor",
-        populate: {
-          path: "accountId",
-          select: "name email phone role",
+        "vietnameseName englishName summary expectedResult participants reference instructor owner",
+      populate: [
+        {
+          path: "instructor",
+          populate: {
+            path: "accountId",
+            select: "name email phone role",
+          },
         },
-      },
+        {
+          path: "owner",
+          populate: {
+            path: "accountId",
+            select: "name email phone role",
+          },
+        },
+      ],
     });
 
     if (!review) {
@@ -82,6 +91,7 @@ export async function PUT(request, { params }) {
       finalGrade,
       isEureka,
       comment,
+      submittedDate: new Date(),
     });
 
     return NextResponse.json(
@@ -122,23 +132,30 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    const topic = await Topic.findOne({
-      "reviews.0": mongoose.Types.ObjectId.createFromHexString(reviewId),
-    });
+    await ReviewGrade.findByIdAndDelete(reviewId);
 
-    if (!topic) {
-      return NextResponse.json(
-        { message: "Không tìm thấy đề tài" },
-        { status: 404 }
+    if (review.status !== "cancelled") {
+      const newReviewGrade = await ReviewGrade.create({
+        topicId: review.topicId,
+        instructorId: review.instructorId,
+        status: "pending",
+      });
+
+      await Topic.findByIdAndUpdate(
+        review.topicId,
+        {
+          $set: {
+            "reviewAssignments.$[elem].reviewGrade": newReviewGrade._id,
+          },
+        },
+        {
+          arrayFilters: [{ "elem.reviewGrade": reviewId }],
+        }
       );
     }
 
-    await Topic.findByIdAndUpdate({ _id: topic._id }, { reviews: [] });
-
-    await ReviewGrade.findByIdAndDelete(reviewId);
-
     return NextResponse.json(
-      { message: "Xóa đánh giá thành công." },
+      { message: "Xóa đánh giá thành công và tạo đánh giá mới." },
       { status: 200 }
     );
   } catch (error) {

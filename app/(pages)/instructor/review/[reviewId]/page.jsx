@@ -16,6 +16,8 @@ import { useSession } from "next-auth/react";
 import { InfoIcon } from "lucide-react";
 import ReviewForm from "./review-form";
 import DetailModal from "./detail-modal";
+import { getCriteria } from "@/service/criteriaService";
+import { FullscreenLoader } from "@/components/fullscreen-loader";
 
 export default function ReviewTopicPage({ params }) {
   const { reviewId } = params;
@@ -26,9 +28,10 @@ export default function ReviewTopicPage({ params }) {
   const [instructor, setInstructor] = useState();
   const [topic, setTopic] = useState();
   const [review, setReview] = useState();
-  const [value, setValue] = useState("Có");
+  const [criteria, setCriteria] = useState();
 
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -48,10 +51,21 @@ export default function ReviewTopicPage({ params }) {
     setTopic(res.topicId);
   };
 
+  const loadCriteria = async () => {
+    let res = await getCriteria();
+    res = await res.json();
+    setCriteria(res);
+  };
+
   useEffect(() => {
     if (!reviewId || !userId) return;
-    loadReview();
-    loadAccount();
+
+    const loadData = async () => {
+      await Promise.all([loadReview(), loadAccount(), loadCriteria()]);
+      setLoading(false);
+    };
+
+    loadData();
   }, [reviewId, userId]);
 
   useEffect(() => {
@@ -63,7 +77,7 @@ export default function ReviewTopicPage({ params }) {
       comment: review.comment,
     };
 
-    review.criteria.forEach((criterion) => {
+    review.criteria?.forEach((criterion) => {
       formValues[`criteria_${criterion.criteriaId}`] = criterion.grade;
     });
 
@@ -114,25 +128,41 @@ export default function ReviewTopicPage({ params }) {
     }
   };
 
-  const sendEmail = (formValues) => {
-    const templateParams = {
-      student_name: topic?.owner?.accountId.name,
-      instructor_name: topic?.instructor?.accountId.name,
-      topic_title: topic?.vietnameseName,
-      grade: formValues.finalGrade,
-      is_eureka: formValues.isEureka,
-      notes: formValues.comment,
-    };
-
-    Object.entries(formValues)
-      .filter(([key]) => key.startsWith("criteria_"))
-      .forEach(([key, value]) => {
-        const criteriaId = key.replace("criteria_", "");
-        const criterion = criteria.find((c) => c._id === criteriaId);
-        if (criterion) {
-          templateParams[`criteria_${criterion.order + 1}`] = value;
-        }
+  const sendEmail = (formValues, topic) => {
+    if (
+      !topic?.owner?.accountId?.name ||
+      !topic?.instructor?.accountId?.name ||
+      !topic?.vietnameseName
+    ) {
+      console.error("Missing required topic data:", {
+        student: topic?.owner?.accountId?.name,
+        instructor: topic?.instructor?.accountId?.name,
+        title: topic?.vietnameseName,
       });
+      return;
+    }
+
+    const criteriaTable = criteria.map((criterion, index) => {
+      const grade = formValues[`criteria_${criterion._id}`];
+      if (grade === undefined) {
+        console.error(`Missing grade for criterion ${criterion.title}`);
+      }
+      return {
+        index: index + 1,
+        title: criterion.title || "N/A",
+        grade: grade || "N/A",
+      };
+    });
+
+    const templateParams = {
+      student_name: topic.owner.accountId.name,
+      instructor_name: topic.instructor.accountId.name,
+      topic_title: topic.vietnameseName,
+      final_grade: formValues.finalGrade || "N/A",
+      is_eureka: formValues.isEureka || "Không",
+      notes: formValues.comment || "Không có",
+      criteria_table: criteriaTable,
+    };
 
     emailjs
       .send(
@@ -151,6 +181,8 @@ export default function ReviewTopicPage({ params }) {
       );
   };
 
+  if (loading) return <FullscreenLoader label="Loading..." />;
+
   return (
     <div className="min-h-[calc(100vh-45.8px)] bg-gray-100 px-32">
       <div className="flex justify-between py-4">
@@ -168,12 +200,7 @@ export default function ReviewTopicPage({ params }) {
 
       <Spin spinning={!topic}>
         <div className="relative flex gap-4">
-          <ReviewForm
-            form={form}
-            onFinish={onFinish}
-            value={value}
-            setValue={setValue}
-          />
+          <ReviewForm form={form} onFinish={onFinish} criteria={criteria} />
 
           <div className="space-y-4 bg-white rounded-md sticky top-4 h-fit w-[290px] p-4">
             <span className="font-medium">Danh sách tiêu chí</span>

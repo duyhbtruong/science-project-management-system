@@ -83,12 +83,11 @@ export default function ReviewPage() {
       const confirmed = await modal.confirm(config);
       if (confirmed) {
         setLoading(true);
-        const reviewId = record.reviews[0];
-        let res = await deleteReviewById(reviewId);
+        let res = await deleteReviewById(record._id);
         if (res.ok) {
           const data = await res.json();
           messageApi.success(data.message || "Hủy kiểm duyệt thành công");
-          loadTopics();
+          loadListReview();
         } else {
           const data = await res.json();
           messageApi.error(data.message || "Không thể hủy kiểm duyệt");
