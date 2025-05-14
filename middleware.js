@@ -16,7 +16,7 @@ const ROLE_DEFAULT_PATH = {
   student: "/student/topics",
   instructor: "/instructor/topics",
   technologyScience: "/technologyScience/dashboard",
-  appraise: "/appraise/topics",
+  "appraisal-board": "/appraisal-board/appraise",
 };
 
 export default auth(async (req) => {

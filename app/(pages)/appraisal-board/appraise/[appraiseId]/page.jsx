@@ -2,52 +2,51 @@
 
 import { getAccountById } from "@/service/accountService";
 import {
-  createReview,
-  getReviewById,
-  updateReviewById,
-} from "@/service/reviewService";
-
+  createAppraise,
+  getAppraiseById,
+  updateAppraiseById,
+} from "@/service/appraiseGradeService";
+import { getTopicById } from "@/service/topicService";
 import { Button, Form, Spin, message } from "antd";
-
-import emailjs from "@emailjs/browser";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { InfoIcon } from "lucide-react";
-import ReviewForm from "./review-form";
-import DetailModal from "./detail-modal";
-import { getCriteria } from "@/service/criteriaService";
-import { FullscreenLoader } from "@/components/fullscreen-loader";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import emailjs from "@emailjs/browser";
 
-export default function ReviewTopicPage({ params }) {
-  const { reviewId } = params;
+import DetailModal from "./detail";
+import { InfoIcon } from "lucide-react";
+import { FullscreenLoader } from "@/components/fullscreen-loader";
+import AppraiseForm from "./appraise-form";
+import { getCriteria } from "@/service/criteriaService";
+
+export default function AppraiseTopicPage({ params }) {
+  const { appraiseId } = params;
   const session = useSession();
   const userId = session?.data?.user?.id;
 
   const [account, setAccount] = useState();
-  const [instructor, setInstructor] = useState();
+  const [appraisalBoard, setAppraisalBoard] = useState();
   const [topic, setTopic] = useState();
-  const [review, setReview] = useState();
+  const [appraise, setAppraise] = useState();
   const [criteria, setCriteria] = useState();
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-
   const router = useRouter();
 
   const loadAccount = async () => {
     let res = await getAccountById(userId);
     res = await res.json();
     setAccount(res.account);
-    setInstructor(res.instructor);
+    setAppraisalBoard(res.appraisalBoard);
   };
 
-  const loadReview = async () => {
-    let res = await getReviewById(reviewId);
+  const loadAppraise = async () => {
+    let res = await getAppraiseById(appraiseId);
     res = await res.json();
-    setReview(res);
+    setAppraise(res);
     setTopic(res.topicId);
   };
 
@@ -58,31 +57,31 @@ export default function ReviewTopicPage({ params }) {
   };
 
   useEffect(() => {
-    if (!reviewId || !userId) return;
+    if (!appraiseId || !userId) return;
 
     const loadData = async () => {
-      await Promise.all([loadReview(), loadAccount(), loadCriteria()]);
+      await Promise.all([loadAppraise(), loadAccount(), loadCriteria()]);
     };
 
     loadData();
-  }, [reviewId, userId]);
+  }, [appraiseId, userId]);
 
   useEffect(() => {
-    if (!review) return;
+    if (!appraise) return;
 
     const formValues = {
-      finalGrade: review.finalGrade,
-      isEureka: review.isEureka ? "Có" : "Không",
-      comment: review.comment,
+      finalGrade: appraise.finalGrade,
+      isEureka: appraise.isEureka ? "Có" : "Không",
+      comment: appraise.comment,
     };
 
-    review.criteria?.forEach((criterion) => {
+    appraise.criteria?.forEach((criterion) => {
       formValues[`criteria_${criterion.criteriaId}`] = criterion.grade;
     });
 
     form.setFieldsValue(formValues);
     setLoading(false);
-  }, [review]);
+  }, [appraise]);
 
   const onFinish = async (formData) => {
     const criteriaGrades = Object.entries(formData)
@@ -97,26 +96,26 @@ export default function ReviewTopicPage({ params }) {
 
     const values = {
       criteria: criteriaGrades,
-      topicId: reviewId,
-      instructorId: instructor._id,
+      topicId: appraiseId,
+      appraisalBoardId: appraisalBoard._id,
       finalGrade: formData.finalGrade,
       isEureka: formData.isEureka === "Có",
       comment: formData.comment,
     };
 
     try {
-      const res = !review
-        ? await createReview(values)
-        : await updateReviewById(review._id, values);
+      const res = !appraise
+        ? await createAppraise(values)
+        : await updateAppraiseById(appraise._id, values);
 
-      if (res.status === 200 || res.status === 201) {
+      if (res.status === 201 || res.status === 200) {
         const { message } = await res.json();
         await messageApi.open({
           type: "success",
           content: message,
           duration: 2,
         });
-        router.push(`/instructor/review`);
+        router.push(`/appraisal-board/appraise`);
         sendEmail(formData, topic);
       }
     } catch (error) {
@@ -167,7 +166,7 @@ export default function ReviewTopicPage({ params }) {
     emailjs
       .send(
         "service_58b77bc",
-        "template_raalckx",
+        "template_6qodktp",
         templateParams,
         "csc_oEDcgGk9d_Gtc"
       )
@@ -186,7 +185,7 @@ export default function ReviewTopicPage({ params }) {
   return (
     <div className="min-h-[calc(100vh-45.8px)] bg-gray-100 px-32">
       <div className="flex justify-between py-4">
-        <span className="text-lg font-semibold">Kiểm duyệt đề tài</span>
+        <span className="text-lg font-semibold">Thẩm định đề tài</span>
         <Button
           onClick={() => setIsModalOpen(true)}
           loading={!topic}
@@ -200,7 +199,7 @@ export default function ReviewTopicPage({ params }) {
 
       <Spin spinning={!topic}>
         <div className="relative flex gap-4">
-          <ReviewForm form={form} onFinish={onFinish} criteria={criteria} />
+          <AppraiseForm form={form} onFinish={onFinish} criteria={criteria} />
 
           <div className="space-y-4 bg-white rounded-md sticky top-4 h-fit w-[290px] p-4">
             <span className="font-medium">Danh sách tiêu chí</span>

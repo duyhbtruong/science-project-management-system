@@ -1,11 +1,11 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
 /**
- * Appraisal staff model schema.
- * Represents an user with appraise role in the application.
+ * Appraisal board model schema.
+ * Represents an user with appraisal board role in the application.
  *
  * Fields:
- * - appraisalBoardId: Unique Id of a appraisal staff.
+ * - appraisalBoardId: Unique Id of a appraisal board.
  * - accountId: Unique Id from accounts collection.
  */
 export const appraisalBoardSchema = new Schema({

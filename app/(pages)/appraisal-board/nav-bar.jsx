@@ -18,8 +18,8 @@ const items = [
     icon: <Image src="/logo.svg" alt="logo" width={24} height={24} />,
   },
   {
-    label: <Link href="/appraise/topics">Thẩm định đề tài</Link>,
-    key: "topics",
+    label: <Link href="/appraisal-board/appraise">Thẩm định đề tài</Link>,
+    key: "appraise",
     icon: <ClipboardListIcon className="size-4" />,
   },
   {
@@ -33,7 +33,7 @@ const items = [
 const NavigationBar = () => {
   const pathname = usePathname();
   const [current, setCurrent] = useState(() => {
-    if (pathname.includes("topics")) return "topics";
+    if (pathname.includes("appraise")) return "appraise";
   });
 
   return (

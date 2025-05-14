@@ -21,7 +21,11 @@ export default function AppraiseAssignmentsCard({ appraiseAssignments }) {
         {appraiseAssignments
           .filter((assignment) => assignment.status !== "removed")
           .map((assignment, index) => (
-            <Card key={`appraise-${index}`} size="small" className="shadow-sm">
+            <Card
+              key={`appraisal-board-${index}`}
+              size="small"
+              className="shadow-sm"
+            >
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-medium">Hội đồng thẩm định {index + 1}</h4>
                 <Space>

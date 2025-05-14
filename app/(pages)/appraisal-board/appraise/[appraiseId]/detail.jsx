@@ -61,6 +61,7 @@ export default function DetailModal({ isOpen, onOk, onCancel, topic }) {
       children: (
         <Link
           className="flex items-center space-x-1"
+          target="_blank"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
           <LinkIcon className="text-blue-500 size-4 hover:text-blue-600" />

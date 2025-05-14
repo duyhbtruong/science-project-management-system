@@ -57,10 +57,12 @@ export async function GET(request, { params }) {
       account = { account, instructor };
     }
 
-    if (account.role === "appraise") {
-      const appraise = await AppraisalBoard.findOne({ accountId: account._id });
+    if (account.role === "appraisal-board") {
+      const appraisalBoard = await AppraisalBoard.findOne({
+        accountId: account._id,
+      });
 
-      if (!appraise) {
+      if (!appraisalBoard) {
         return NextResponse.json(
           { message: "Không tìm thấy cán bộ thẩm định." },
           {
@@ -69,7 +71,7 @@ export async function GET(request, { params }) {
         );
       }
 
-      account = { account, appraise };
+      account = { account, appraisalBoard };
     }
 
     if (account.role === "technologyScience") {

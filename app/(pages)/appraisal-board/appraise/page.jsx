@@ -48,7 +48,7 @@ export default function AppraiseTopicPage() {
       setLoading(true);
       let res = await getAccountById(userId);
       res = await res.json();
-      setAppraisalBoard(res.appraise);
+      setAppraisalBoard(res.appraisalBoard);
       setAccount(res.account);
     } catch (error) {
       messageApi.error("Không thể tải thông tin tài khoản");

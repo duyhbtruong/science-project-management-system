@@ -65,7 +65,7 @@ export const getTableColumns = (router, handleDelete) => [
       <Space size="middle">
         <Button
           disabled={record.status === "cancelled"}
-          onClick={() => router.push(`/appraise/topics/${record._id}`)}
+          onClick={() => router.push(`/appraisal-board/appraise/${record._id}`)}
           icon={<EditIcon className="size-4" />}
         />
         <Button

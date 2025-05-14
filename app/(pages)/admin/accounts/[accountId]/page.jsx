@@ -29,7 +29,7 @@ export default function UpdateAccount({ params }) {
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();
   const [technologyScience, setTechnologyScience] = useState();
-  const [appraise, setAppraise] = useState();
+  const [appraisalBoard, setAppraisalBoard] = useState();
   const [instructor, setInstructor] = useState();
   const [role, setRole] = useState();
   const [form] = Form.useForm();
@@ -43,7 +43,7 @@ export default function UpdateAccount({ params }) {
     setRole(response.account.role);
     setStudent(response.student);
     setTechnologyScience(response.technologyScience);
-    setAppraise(response.appraise);
+    setAppraisalBoard(response.appraisalBoard);
     setInstructor(response.instructor);
   };
 
@@ -61,7 +61,7 @@ export default function UpdateAccount({ params }) {
       role: account?.role,
       studentId: student?.studentId,
       technologyScienceId: technologyScience?.technologyScienceId,
-      appraisalBoardId: appraise?.appraisalBoardId,
+      appraisalBoardId: appraisalBoard?.appraisalBoardId,
       instructorId: instructor?.instructorId,
       faculty: student?.faculty ?? instructor?.faculty,
       academicRank: instructor?.academicRank,
@@ -83,8 +83,8 @@ export default function UpdateAccount({ params }) {
       res = await updateTechnologyScienceById(technologyScience._id, values);
     }
 
-    if (account.role === "appraise") {
-      res = await updateAppraisalBoardById(appraise._id, values);
+    if (account.role === "appraisal-board") {
+      res = await updateAppraisalBoardById(appraisalBoard._id, values);
     }
 
     const { message } = await res.json();
@@ -229,7 +229,7 @@ export default function UpdateAccount({ params }) {
                     value: "technologyScience",
                     label: "Phòng Khoa học Công nghệ",
                   },
-                  { value: "appraise", label: "Phòng thẩm định" },
+                  { value: "appraisal-board", label: "Phòng thẩm định" },
                 ]}
                 disabled
               />
@@ -314,7 +314,7 @@ export default function UpdateAccount({ params }) {
               </>
             )}
 
-            {role === "appraise" && (
+            {role === "appraisal-board" && (
               <>
                 <Form.Item
                   label="Mã số Phòng thẩm định"

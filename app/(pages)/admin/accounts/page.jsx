@@ -117,7 +117,7 @@ const AccountsPage = () => {
                 return <Tag color="geekblue">Sinh viên</Tag>;
               if (record.role === "technologyScience")
                 return <Tag color="orange">Phòng Khoa học Công nghệ</Tag>;
-              if (record.role === "appraise")
+              if (record.role === "appraisal-board")
                 return <Tag color="cyan">Phòng Thẩm định</Tag>;
               if (record.role === "admin")
                 return <Tag color="red">Quản trị viên</Tag>;
@@ -134,7 +134,7 @@ const AccountsPage = () => {
                 text: "Phòng Khoa học Công nghệ",
                 value: "technologyScience",
               },
-              { text: "Phòng Thẩm định", value: "appraise" },
+              { text: "Phòng Thẩm định", value: "appraisal-board" },
               {
                 text: "Quản trị viên",
                 value: "admin",

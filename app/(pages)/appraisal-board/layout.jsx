@@ -1,6 +1,6 @@
 "use client";
 
-import NavigationBar from "@/app/(pages)/appraise/nav-bar";
+import NavigationBar from "@/app/(pages)/appraisal-board/nav-bar";
 import { Layout } from "antd";
 const { Content, Sider } = Layout;
 

@@ -83,7 +83,7 @@ export default function CreateAccount() {
           }
           break;
         }
-        case "appraise": {
+        case "appraisal-board": {
           const res = await createAppraisalBoard(values);
           if (res.status === 201) {
             const { message } = await res.json();
@@ -216,7 +216,7 @@ export default function CreateAccount() {
                   value: "technologyScience",
                   label: "Phòng Khoa học Công nghệ",
                 },
-                { value: "appraise", label: "Phòng thẩm định" },
+                { value: "appraisal-board", label: "Phòng thẩm định" },
               ]}
             />
           </Form.Item>
@@ -300,7 +300,7 @@ export default function CreateAccount() {
             </>
           )}
 
-          {role === "appraise" && (
+          {role === "appraisal-board" && (
             <>
               <Form.Item
                 label="Mã số Phòng Thẩm định"
