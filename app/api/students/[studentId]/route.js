@@ -1,50 +1,65 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/users/Account";
-import { AppraisalBoard } from "@/models/users/AppraisalBoard";
+import { Student } from "@/models/users/Student";
+import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
 
 export async function GET(request, { params }) {
   try {
-    const id = params.appraise;
+    await mongooseConnect();
+    const id = params.studentId;
 
-    if (!id || !mongoose.isValidObjectId(id)) {
+    if (!id) {
       return NextResponse.json(
-        { message: "Thiếu id hoặc id không hợp lệ." },
+        { message: "Thiếu id của tài khoản sinh viên." },
         {
           status: 400,
         }
       );
     }
 
-    await mongooseConnect();
+    if (!mongoose.isValidObjectId(id)) {
+      return NextResponse.json(
+        { message: "Id của tài khoản sinh viên không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
+    }
 
-    const appraisalBoard = await AppraisalBoard.findOne({ _id: id }).populate(
-      "accountId"
-    );
+    const student = await Student.findOne({ _id: id }).populate("accountId");
 
-    if (!appraisalBoard) {
-      return NextResponse.json("Không tìm thấy tài khoản cán bộ.", {
+    if (!student) {
+      return NextResponse.json("Không tìm thấy tài khoản sinh viên.", {
         status: 404,
       });
     }
 
-    return NextResponse.json(appraisalBoard, { status: 200 });
+    return NextResponse.json(student, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi lấy tài khoản cán bộ hội đồng thẩm định " + error },
-      { status: 500 }
+      { message: "Lỗi lấy tài khoản sinh viên " + error },
+      {
+        status: 500,
+      }
     );
   }
 }
 
 export async function PUT(request, { params }) {
   try {
-    const id = params.appraise;
-    const { appraisalBoardId, name, email, phone, password } =
-      await request.json();
-    const appraisalBoardUpdate = {};
+    const id = params.studentId;
+    const {
+      studentId,
+      faculty,
+      educationProgram,
+      name,
+      email,
+      phone,
+      password,
+    } = await request.json();
+    const studentUpdate = { faculty, educationProgram };
     const accountUpdate = { name, phone };
 
     if (!id || !mongoose.isValidObjectId(id)) {
@@ -58,7 +73,7 @@ export async function PUT(request, { params }) {
 
     await mongooseConnect();
 
-    const appraisalBoard = await AppraisalBoard.aggregate([
+    const student = await Student.aggregate([
       {
         $lookup: {
           from: Account.collection.name,
@@ -77,9 +92,9 @@ export async function PUT(request, { params }) {
       },
     ]).then((result) => result[0]);
 
-    if (!appraisalBoard) {
+    if (!student) {
       return NextResponse.json(
-        { message: "Không tìm thấy tài khoản cán bộ hội đồng." },
+        { message: "Không tìm thấy tài khoản sinh viên." },
         {
           status: 404,
         }
@@ -88,22 +103,21 @@ export async function PUT(request, { params }) {
 
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
-
       accountUpdate.password = hashedPassword;
     }
 
-    if (appraisalBoardId !== appraisalBoard.appraisalBoardId) {
-      if (await AppraisalBoard.findOne({ appraisalBoardId })) {
+    if (studentId !== student.studentId) {
+      if (await Student.findOne({ studentId })) {
         return NextResponse.json(
-          { message: "Mã số cán bộ hội đồng đã tồn tại." },
+          { message: "Mã số sinh viên đã tồn tại." },
           { status: 409 }
         );
       }
 
-      appraisalBoardUpdate.appraisalBoardId = appraisalBoardId;
+      studentUpdate.studentId = studentId;
     }
 
-    if (email !== appraisalBoard.account.email) {
+    if (email !== student.account.email) {
       if (await Account.findOne({ email })) {
         return NextResponse.json(
           { message: "Email đã được sử dụng." },
@@ -114,27 +128,26 @@ export async function PUT(request, { params }) {
       accountUpdate.email = email;
     }
 
-    await AppraisalBoard.findByIdAndUpdate({ _id: id }, appraisalBoardUpdate);
-    await Account.findByIdAndUpdate(
-      { _id: appraisalBoard.accountId },
-      accountUpdate
-    );
+    await Student.findByIdAndUpdate({ _id: id }, studentUpdate);
+    await Account.findByIdAndUpdate({ _id: student.accountId }, accountUpdate);
 
     return NextResponse.json(
-      { message: "Tài khoản cán bộ hội đồng đã cập nhật thành công." },
+      { message: "Tài khoản sinh viên đã cập nhật thành công." },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi cập nhật tài khoản cán bộ hội đồng thẩm định " + error },
-      { status: 500 }
+      { message: "Lỗi cập nhật tài khoản sinh viên " + error },
+      {
+        status: 500,
+      }
     );
   }
 }
 
 export async function DELETE(request, { params }) {
   try {
-    const id = params.appraise;
+    const id = params.studentId;
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -147,38 +160,36 @@ export async function DELETE(request, { params }) {
 
     await mongooseConnect();
 
-    const appraisalBoard = await AppraisalBoard.findOne({ _id: id });
+    const student = await Student.findOne({ _id: id });
 
-    if (!appraisalBoard) {
+    if (!student) {
       return NextResponse.json(
-        { message: "Không tìm thấy cán bộ hội đồng." },
-        {
-          status: 404,
-        }
+        { message: "Không tìm thấy sinh viên." },
+        { status: 404 }
       );
     }
 
-    const account = await Account.findOne({ _id: appraisalBoard.accountId });
+    const account = await Account.findOne({ _id: student.accountId });
 
     if (!account) {
       return NextResponse.json(
-        { message: "Không tìm thấy tài khoản cán bộ hội đồng." },
+        { message: "Không tìm thấy tài khoản của sinh viên." },
         {
           status: 404,
         }
       );
     }
 
-    await AppraisalBoard.findByIdAndDelete({ _id: id });
+    await Student.findByIdAndDelete({ _id: id });
     await Account.findByIdAndDelete({ _id: account._id });
 
     return NextResponse.json(
-      { message: "Xóa tài khoản cán bộ hội đồng thành công." },
+      { message: "Xóa tài khoản sinh viên thành công." },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi xóa tài khoản cán bộ hội đồng " + error },
+      { message: "Lỗi xóa tài khoản sinh viên " + error },
       {
         status: 500,
       }

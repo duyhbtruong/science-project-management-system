@@ -1,45 +1,42 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/users/Account";
-import { Student } from "@/models/users/Student";
+import { TechnologyScience } from "@/models/users/TechnologyScience";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
 export async function GET(request, { params }) {
   try {
+    const id = params.technologyScienceId;
+
+    if (!id || !mongoose.isValidObjectId(id)) {
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        {
+          status: 400,
+        }
+      );
+    }
+
     await mongooseConnect();
-    const id = params.student;
 
-    if (!id) {
+    const technologyScience = await TechnologyScience.findOne({
+      _id: id,
+    }).populate("accountId");
+
+    if (!technologyScience) {
       return NextResponse.json(
-        { message: "Thiếu id của tài khoản sinh viên." },
+        { message: "Không tìm thấy tài khoản phòng KHCN." },
         {
-          status: 400,
+          status: 404,
         }
       );
     }
 
-    if (!mongoose.isValidObjectId(id)) {
-      return NextResponse.json(
-        { message: "Id của tài khoản sinh viên không hợp lệ." },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const student = await Student.findOne({ _id: id }).populate("accountId");
-
-    if (!student) {
-      return NextResponse.json("Không tìm thấy tài khoản sinh viên.", {
-        status: 404,
-      });
-    }
-
-    return NextResponse.json(student, { status: 200 });
+    return NextResponse.json(technologyScience, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi lấy tài khoản sinh viên " + error },
+      { message: "Lỗi lấy tài khoản phòng KHCN " + error },
       {
         status: 500,
       }
@@ -49,17 +46,10 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const id = params.student;
-    const {
-      studentId,
-      faculty,
-      educationProgram,
-      name,
-      email,
-      phone,
-      password,
-    } = await request.json();
-    const studentUpdate = { faculty, educationProgram };
+    const id = params.technologyScienceId;
+    const { technologyScienceId, name, email, phone, password } =
+      await request.json();
+    const technologyScienceUpdate = {};
     const accountUpdate = { name, phone };
 
     if (!id || !mongoose.isValidObjectId(id)) {
@@ -73,7 +63,7 @@ export async function PUT(request, { params }) {
 
     await mongooseConnect();
 
-    const student = await Student.aggregate([
+    const technologyScience = await TechnologyScience.aggregate([
       {
         $lookup: {
           from: Account.collection.name,
@@ -92,9 +82,9 @@ export async function PUT(request, { params }) {
       },
     ]).then((result) => result[0]);
 
-    if (!student) {
+    if (!technologyScience) {
       return NextResponse.json(
-        { message: "Không tìm thấy tài khoản sinh viên." },
+        { message: "Không tìm thấy tài khoản phòng KHCN." },
         {
           status: 404,
         }
@@ -103,21 +93,22 @@ export async function PUT(request, { params }) {
 
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
+
       accountUpdate.password = hashedPassword;
     }
 
-    if (studentId !== student.studentId) {
-      if (await Student.findOne({ studentId })) {
+    if (technologyScienceId !== technologyScience.technologyScienceId) {
+      if (await TechnologyScience.findOne({ technologyScienceId })) {
         return NextResponse.json(
-          { message: "Mã số sinh viên đã tồn tại." },
+          { message: "Mã số phòng KHCN đã tồn tại." },
           { status: 409 }
         );
       }
 
-      studentUpdate.studentId = studentId;
+      technologyScienceUpdate.technologyScienceId = technologyScienceId;
     }
 
-    if (email !== student.account.email) {
+    if (email !== technologyScience.account.email) {
       if (await Account.findOne({ email })) {
         return NextResponse.json(
           { message: "Email đã được sử dụng." },
@@ -128,16 +119,22 @@ export async function PUT(request, { params }) {
       accountUpdate.email = email;
     }
 
-    await Student.findByIdAndUpdate({ _id: id }, studentUpdate);
-    await Account.findByIdAndUpdate({ _id: student.accountId }, accountUpdate);
+    await TechnologyScience.findByIdAndUpdate(
+      { _id: id },
+      technologyScienceUpdate
+    );
+    await Account.findByIdAndUpdate(
+      { _id: technologyScience.accountId },
+      accountUpdate
+    );
 
     return NextResponse.json(
-      { message: "Tài khoản sinh viên đã cập nhật thành công." },
+      { message: "Tài khoản phòng KHCN đã cập nhật thành công." },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi cập nhật tài khoản sinh viên " + error },
+      { message: "Lỗi cập nhật tài khoản phòng KHCN " + error },
       {
         status: 500,
       }
@@ -147,7 +144,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const id = params.student;
+    const id = params.technologyScienceId;
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -160,36 +157,36 @@ export async function DELETE(request, { params }) {
 
     await mongooseConnect();
 
-    const student = await Student.findOne({ _id: id });
+    const technologyScience = await TechnologyScience.findOne({ _id: id });
 
-    if (!student) {
+    if (!technologyScience) {
       return NextResponse.json(
-        { message: "Không tìm thấy sinh viên." },
+        { message: "Không tìm thấy phòng KHCN." },
         { status: 404 }
       );
     }
 
-    const account = await Account.findOne({ _id: student.accountId });
+    const account = await Account.findOne({ _id: technologyScience.accountId });
 
     if (!account) {
       return NextResponse.json(
-        { message: "Không tìm thấy tài khoản của sinh viên." },
+        { message: "Không tìm thấy tài khoản phòng KHCN." },
         {
           status: 404,
         }
       );
     }
 
-    await Student.findByIdAndDelete({ _id: id });
+    await TechnologyScience.findByIdAndDelete({ _id: id });
     await Account.findByIdAndDelete({ _id: account._id });
 
     return NextResponse.json(
-      { message: "Xóa tài khoản sinh viên thành công." },
+      { message: "Xóa tài khoản phòng KHCN thành công." },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi xóa tài khoản sinh viên " + error },
+      { message: "Lỗi xóa tài khoản phòng KHCN " + error },
       {
         status: 500,
       }

@@ -35,23 +35,6 @@ export const getReviewsByInstructorId = async (periodId, instructorId) => {
   }
 };
 
-export const updateReviewById = async (reviewId, values) => {
-  try {
-    const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
-      method: "PUT",
-      body: JSON.stringify(values),
-    });
-
-    if (!res) {
-      throw new Error("Failed to update review.");
-    }
-
-    return res;
-  } catch (error) {
-    return error;
-  }
-};
-
 export const createReview = async (values) => {
   try {
     const res = await fetch(`http://localhost:3000/api/reviews`, {
@@ -61,6 +44,23 @@ export const createReview = async (values) => {
 
     if (!res) {
       throw new Error("Failed to create review.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const updateReviewById = async (reviewId, values) => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
+      method: "PUT",
+      body: JSON.stringify(values),
+    });
+
+    if (!res) {
+      throw new Error("Failed to update review.");
     }
 
     return res;

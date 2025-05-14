@@ -1,6 +1,5 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { ReviewGrade } from "@/models/ReviewGrade";
-import { Account } from "@/models/users/Account";
 import { Topic } from "@/models/Topic";
 import { Instructor } from "@/models/users/Instructor";
 import mongoose from "mongoose";

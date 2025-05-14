@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
-    const accountId = params.account;
+    const accountId = params.accountId;
 
     if (!accountId || !mongoose.isValidObjectId(accountId)) {
       return NextResponse.json(
@@ -102,7 +102,7 @@ export async function GET(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const accountId = params.account;
+    const accountId = params.accountId;
 
     if (!accountId || !mongoose.isValidObjectId(accountId)) {
       return NextResponse.json(

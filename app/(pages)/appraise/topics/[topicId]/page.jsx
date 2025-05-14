@@ -4,7 +4,7 @@ import { getAccountById } from "@/service/accountService";
 import {
   createAppraise,
   getAppraisesByTopicId,
-  updateAppraise,
+  updateAppraiseById,
 } from "@/service/appraiseGradeService";
 import { getTopicById } from "@/service/topicService";
 import { Button, Form, Input, Radio, Select, Space, Spin, message } from "antd";
@@ -132,7 +132,7 @@ export default function ReviewTopicPage({ params }) {
         });
       }
     } else {
-      let res = await updateAppraise(appraise._id, values);
+      let res = await updateAppraiseById(appraise._id, values);
       if (res.status === 200) {
         res = await res.json();
         const { message } = res;

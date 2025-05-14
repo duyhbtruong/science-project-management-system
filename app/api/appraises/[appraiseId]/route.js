@@ -1,13 +1,12 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { AppraiseGrade } from "@/models/AppraiseGrade";
 import { Topic } from "@/models/Topic";
-import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
-    const appraiseId = params.appraise;
+    const appraiseId = params.appraiseId;
 
     if (!appraiseId || !mongoose.isValidObjectId(appraiseId)) {
       return NextResponse.json(
@@ -20,7 +19,27 @@ export async function GET(request, { params }) {
 
     await mongooseConnect();
 
-    const appraise = await AppraiseGrade.findOne({ _id: appraiseId });
+    const appraise = await AppraiseGrade.findOne({ _id: appraiseId }).populate({
+      path: "topicId",
+      select:
+        "vietnameseName englishName summary expectedResult participants reference instructor owner",
+      populate: [
+        {
+          path: "instructor",
+          populate: {
+            path: "accountId",
+            select: "name email phone role",
+          },
+        },
+        {
+          path: "owner",
+          populate: {
+            path: "accountId",
+            select: "name email phone role",
+          },
+        },
+      ],
+    });
 
     if (!appraise) {
       return NextResponse.json(
@@ -44,8 +63,8 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const appraiseId = params.appraise;
-    const { criteria, grade, isEureka, note } = await request.json();
+    const appraiseId = params.appraiseId;
+    const { criteria, finalGrade, isEureka, comment } = await request.json();
 
     if (!appraiseId || !mongoose.isValidObjectId(appraiseId)) {
       return NextResponse.json(
@@ -69,12 +88,25 @@ export async function PUT(request, { params }) {
       );
     }
 
-    await AppraiseGrade.findByIdAndUpdate(appraiseId, {
-      criteria,
-      grade,
-      isEureka,
-      note,
-    });
+    appraise.criteria = criteria;
+    appraise.finalGrade = finalGrade;
+    appraise.isEureka = isEureka;
+    appraise.comment = comment;
+    appraise.submittedDate = new Date();
+    appraise.status = "completed";
+    await appraise.save();
+
+    await Topic.updateOne(
+      { "appraiseAssignments.appraiseGrade": appraiseId },
+      {
+        $set: {
+          "appraiseAssignments.$[elem].status": "completed",
+        },
+      },
+      {
+        arrayFilters: [{ "elem.appraiseGrade": appraiseId }],
+      }
+    );
 
     return NextResponse.json(
       { message: "Cập nhật kết quả thẩm định thành công." },
@@ -92,7 +124,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const appraiseId = params.appraise;
+    const appraiseId = params.appraiseId;
 
     if (!appraiseId || !mongoose.isValidObjectId(appraiseId)) {
       return NextResponse.json(
@@ -116,28 +148,36 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    const topic = await Topic.findOne({
-      "appraises.0": mongoose.Types.ObjectId.createFromHexString(appraiseId),
-    });
+    await AppraiseGrade.findByIdAndDelete(appraiseId);
 
-    if (!topic) {
-      return NextResponse.json(
-        { message: "Không tìm thấy đề tài" },
-        { status: 404 }
+    if (appraise.status !== "cancelled") {
+      const newAppraiseGrade = await AppraiseGrade.create({
+        topicId: appraise.topicId,
+        appraisalBoardId: appraise.appraisalBoardId,
+        status: "pending",
+      });
+
+      await Topic.findByIdAndUpdate(
+        appraise.topicId,
+        {
+          $set: {
+            "appraiseAssignments.$[elem].appraiseGrade": newAppraiseGrade._id,
+            "appraiseAssignments.$[elem].status": "pending",
+          },
+        },
+        {
+          arrayFilters: [{ "elem.appraiseGrade": appraiseId }],
+        }
       );
     }
 
-    await Topic.findByIdAndUpdate({ _id: topic._id }, { appraises: [] });
-
-    await AppraiseGrade.findByIdAndDelete(appraiseId);
-
     return NextResponse.json(
-      { message: "Xóa kết quả thẩm định thành công." },
+      { message: "Xóa kết quả thẩm định thành công và tạo thẩm định mới." },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi xóa kết quả thẩm định " },
+      { message: "Lỗi xóa kết quả thẩm định " + error },
       { status: 500 }
     );
   }

@@ -1,12 +1,14 @@
 "use client";
 
-import { getTopicsByAppraisalBoardStaffId } from "@/service/topicService";
 import { Modal, Spin, Table, message, Tag, Space, Button, Select } from "antd";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { deleteAppraiseById } from "@/service/appraiseGradeService";
+import {
+  deleteAppraiseById,
+  getAppraisesByAppraisalBoardId,
+} from "@/service/appraiseGradeService";
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
 import {
@@ -16,66 +18,93 @@ import {
   PaperclipIcon,
   TrashIcon,
 } from "lucide-react";
+import { getTableColumns } from "./table-columns";
 const { Option } = Select;
 
 export default function AppraiseTopicPage() {
   const session = useSession();
   const userId = session?.data?.user?.id;
-  const [topics, setTopics] = useState();
+  const router = useRouter();
+
   const [account, setAccount] = useState();
   const [appraisalBoard, setAppraisalBoard] = useState();
   const [listPeriod, setListPeriod] = useState();
+  const [listAppraise, setListAppraise] = useState();
   const [selectedPeriod, setSelectedPeriod] = useState();
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const [modal, modalContextHolder] = Modal.useModal();
   const [messageApi, messageContextHolder] = message.useMessage();
 
   const config = {
     title: "Hủy kết quả thẩm định?",
     content: <p>Bạn có muốn hủy kết quả thẩm định của đề tài này không?</p>,
+    okText: "Xác nhận",
+    cancelText: "Hủy",
   };
 
   const loadAccount = async () => {
-    let res = await getAccountById(userId);
-    res = await res.json();
-    setAppraisalBoard(res.appraise);
-    setAccount(res.account);
+    try {
+      setLoading(true);
+      let res = await getAccountById(userId);
+      res = await res.json();
+      setAppraisalBoard(res.appraise);
+      setAccount(res.account);
+    } catch (error) {
+      messageApi.error("Không thể tải thông tin tài khoản");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const loadTopics = async () => {
-    let res = await getTopicsByAppraisalBoardStaffId(
-      selectedPeriod,
-      appraisalBoard._id
-    );
-    res = await res.json();
-    setTopics(res);
+  const loadListAppraise = async () => {
+    try {
+      setLoading(true);
+      let res = await getAppraisesByAppraisalBoardId(
+        selectedPeriod,
+        appraisalBoard._id
+      );
+      res = await res.json();
+      setListAppraise(res);
+    } catch (error) {
+      messageApi.error("Không thể tải danh sách thẩm định");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadPeriod = async () => {
-    let res = await getAllPeriods();
-    res = await res.json();
-    setListPeriod(res);
+    try {
+      setLoading(true);
+      let res = await getAllPeriods();
+      res = await res.json();
+      setListPeriod(res);
+    } catch (error) {
+      messageApi.error("Không thể tải danh sách đợt đăng ký");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteAppraiseGrade = async (appraiseId) => {
-    let res = await deleteAppraiseById(appraiseId);
-    if (res.status === 200) {
-      res = await res.json();
-      const { message } = res;
-      messageApi.open({
-        type: "success",
-        content: message,
-        dutation: 2,
-      });
-      loadTopics();
-    } else {
-      res = await res.json();
-      const { message } = res;
-      messageApi.open({
-        type: "error",
-        content: message,
-        duration: 2,
-      });
+  const handleDelete = async (record) => {
+    try {
+      const confirmed = await modal.confirm(config);
+      if (confirmed) {
+        setLoading(true);
+        let res = await deleteAppraiseById(record._id);
+        if (res.ok) {
+          const data = await res.json();
+          messageApi.success(data.message || "Hủy thẩm định thành công");
+          loadListAppraise();
+        } else {
+          const data = await res.json();
+          messageApi.error(data.message || "Không thể hủy thẩm định");
+        }
+      }
+    } catch (error) {
+      messageApi.error("Có lỗi xảy ra khi hủy thẩm định");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,148 +118,88 @@ export default function AppraiseTopicPage() {
 
   useEffect(() => {
     if (!userId) return;
-
     loadAccount();
   }, [userId]);
 
   useEffect(() => {
-    if (!selectedPeriod || !appraisalBoard) return;
+    if (!selectedPeriod || !appraisalBoard?._id) return;
+    loadListAppraise();
+  }, [selectedPeriod, appraisalBoard]);
 
-    loadTopics();
-  }, [selectedPeriod]);
-
-  const columns = [
-    {
-      title: "Tên tiếng Việt",
-      dataIndex: "vietnameseName",
-      key: "vietnameseName",
-      ellipsis: true,
-    },
-    {
-      title: "Tên tiếng Anh",
-      dataIndex: "englishName",
-      key: "englishName",
-      ellipsis: true,
-    },
-    {
-      title: "Tài liệu",
-      dataIndex: "submitFile",
-      key: "submitFile",
-      render: (_, record) => {
-        if (!record.submitFile) return <span>Chưa nộp</span>;
-        return (
-          <Link
-            target="_blank"
-            href={record.submitFile}
-            className="flex items-center gap-x-1"
-          >
-            <PaperclipIcon className="size-4" /> Đường dẫn tài liệu
-          </Link>
-        );
-      },
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "isAppraised",
-      key: "isAppraised",
-      render: (_, record) => {
-        const isAppraised = record.appraises.length > 0;
-        return (
-          <Tag
-            color={isAppraised ? "success" : "default"}
-            icon={
-              isAppraised ? (
-                <CheckIcon className="inline-block mr-1 size-4" />
-              ) : (
-                <LoaderIcon className="inline-block mr-1 animate-spin size-4" />
-              )
-            }
-          >
-            {isAppraised ? "Đã thẩm định" : "Chưa thẩm định"}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      render: (_, record) => {
-        return (
-          <Space size="middle">
-            <Button
-              disabled={!record.submitFile}
-              onClick={() => router.push(`/appraise/topics/${record._id}`)}
-              icon={<EditIcon className="size-4" />}
-            />
-            <Button
-              disabled={record.appraises.length === 0}
-              onClick={async () => {
-                const confirmed = await modal.confirm(config);
-                if (confirmed) {
-                  deleteAppraiseGrade(record.appraises[0]);
-                }
-              }}
-              danger
-              icon={<TrashIcon className="size-4" />}
-            />
-          </Space>
-        );
-      },
-    },
-  ];
+  const columns = getTableColumns(router, handleDelete);
 
   return (
-    <div className="min-h-[calc(100vh-45.8px)] bg-gray-100">
-      <div className="flex flex-col py-6 mx-32">
-        <div className="mb-4 space-x-4">
-          {selectedPeriod && (
-            <Select
-              className="w-64"
-              placeholder="Chọn đợt đăng ký..."
-              onChange={handlePeriodChange}
-              value={selectedPeriod}
-            >
-              {listPeriod.map((period, index) => (
-                <Option key={`registration-period-${index}`} value={period._id}>
-                  {period.title}
-                </Option>
-              ))}
-            </Select>
-          )}
-        </div>
-
-        {!selectedPeriod ? (
-          <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow">
-            <Select
-              className="w-64 mb-4"
-              placeholder="Chọn đợt đăng ký..."
-              onChange={handlePeriodChange}
-              value={selectedPeriod}
-            >
-              {listPeriod?.map((period, index) => (
-                <Option key={`registration-period-${index}`} value={period._id}>
-                  {period.title}
-                </Option>
-              ))}
-            </Select>
-            <p className="text-gray-500">
-              Vui lòng chọn đợt đăng ký để xem danh sách thẩm định đề tài
-            </p>
-          </div>
-        ) : (
-          <Spin spinning={!topics}>
-            <Table
-              rowKey={(record) => record._id}
-              tableLayout="fixed"
-              columns={columns}
-              dataSource={topics}
-              pagination={{ pageSize: 8 }}
-            />
-          </Spin>
-        )}
-      </div>
+    <>
       {modalContextHolder}
       {messageContextHolder}
-    </div>
+      <div className="bg-gray-50 min-h-[100vh]">
+        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Thẩm định đề tài
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Quản lý và thẩm định các đề tài nghiên cứu khoa học
+            </p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 max-w-sm">
+                  <Select
+                    className="w-full"
+                    placeholder="Chọn đợt đăng ký..."
+                    onChange={handlePeriodChange}
+                    value={selectedPeriod}
+                    size="large"
+                    loading={loading}
+                  >
+                    {listPeriod?.map((period, index) => (
+                      <Option
+                        key={`registration-period-${index}`}
+                        value={period._id}
+                      >
+                        {period.title}
+                      </Option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {!selectedPeriod ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-center">
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                      Chưa chọn đợt đăng ký
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Vui lòng chọn đợt đăng ký để xem danh sách thẩm định đề
+                      tài
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <Spin spinning={loading}>
+                  <Table
+                    rowKey={(record) => record._id}
+                    tableLayout="fixed"
+                    columns={columns}
+                    dataSource={listAppraise}
+                    pagination={{
+                      pageSize: 8,
+                      showSizeChanger: true,
+                      showTotal: (total) => `Tổng số ${total} đề tài`,
+                    }}
+                  />
+                </Spin>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

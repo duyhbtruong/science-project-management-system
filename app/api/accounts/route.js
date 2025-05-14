@@ -1,10 +1,6 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/users/Account";
-import { Student } from "@/models/users/Student";
-import { AppraisalBoard } from "@/models/users/AppraisalBoard";
-import { TechnologyScience } from "@/models/users/TechnologyScience";
 import { NextResponse } from "next/server";
-import { Instructor } from "@/models/users/Instructor";
 import bcrypt from "bcrypt";
 
 export async function GET(request) {

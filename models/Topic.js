@@ -63,6 +63,10 @@ const topicSchema = new Schema(
         },
       },
     ],
+    appraisePassed: {
+      type: Boolean,
+      default: false,
+    },
     appraiseAssignments: [
       {
         appraisalBoard: {
@@ -164,14 +168,12 @@ topicSchema.methods.updateReviewers = async function (newReviewerIds) {
     const currentAssignments = this.reviewAssignments || [];
     const ReviewGrade = mongoose.model("ReviewGrade");
 
-    // Mark removed assignments
     for (const assignment of currentAssignments) {
       if (!newReviewerIds.includes(assignment.instructor.toString())) {
         assignment.status = "removed";
       }
     }
 
-    // Add new assignments
     for (const reviewerId of newReviewerIds) {
       const existingAssignment = currentAssignments.find(
         (a) => a.instructor.toString() === reviewerId
@@ -181,7 +183,6 @@ topicSchema.methods.updateReviewers = async function (newReviewerIds) {
         if (existingAssignment.status === "removed") {
           existingAssignment.status = "pending";
 
-          // Check if we need to create a new grade
           let needsNewGrade = !existingAssignment.reviewGrade;
           if (existingAssignment.reviewGrade) {
             const existingGrade = await ReviewGrade.findById(
@@ -216,7 +217,6 @@ topicSchema.methods.updateReviewers = async function (newReviewerIds) {
       }
     }
 
-    // Cancel grades for removed assignments
     const removedAssignments = currentAssignments.filter(
       (a) => a.status === "removed"
     );
@@ -239,14 +239,12 @@ topicSchema.methods.updateAppraisers = async function (newAppraiserIds) {
     const currentAssignments = this.appraiseAssignments || [];
     const AppraiseGrade = mongoose.model("AppraiseGrade");
 
-    // Mark removed assignments
     for (const assignment of currentAssignments) {
       if (!newAppraiserIds.includes(assignment.appraisalBoard.toString())) {
         assignment.status = "removed";
       }
     }
 
-    // Add new assignments
     for (const appraiserId of newAppraiserIds) {
       const existingAssignment = currentAssignments.find(
         (a) => a.appraisalBoard.toString() === appraiserId
@@ -256,7 +254,6 @@ topicSchema.methods.updateAppraisers = async function (newAppraiserIds) {
         if (existingAssignment.status === "removed") {
           existingAssignment.status = "pending";
 
-          // Check if we need to create a new grade
           let needsNewGrade = !existingAssignment.appraiseGrade;
           if (existingAssignment.appraiseGrade) {
             const existingGrade = await AppraiseGrade.findById(
@@ -291,7 +288,6 @@ topicSchema.methods.updateAppraisers = async function (newAppraiserIds) {
       }
     }
 
-    // Cancel grades for removed assignments
     const removedAssignments = currentAssignments.filter(
       (a) => a.status === "removed"
     );

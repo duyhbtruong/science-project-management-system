@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
-    const id = params.registration;
+    const id = params.periodId;
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -43,7 +43,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const id = params.registration;
+    const id = params.periodId;
     const {
       title,
       startDate,
@@ -159,7 +159,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const id = params.registration;
+    const id = params.periodId;
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(

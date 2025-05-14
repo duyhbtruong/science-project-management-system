@@ -1,14 +1,9 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Topic } from "@/models/Topic";
-import { Account } from "@/models/users/Account";
 import { Student } from "@/models/users/Student";
 import { Instructor } from "@/models/users/Instructor";
-import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import { RegistrationPeriod } from "@/models/RegistrationPeriod";
 import { Section } from "@/models/Section";
-import { ReviewGrade } from "@/models/ReviewGrade";
-import { AppraiseGrade } from "@/models/AppraiseGrade";
-import { TopicFile } from "@/models/TopicFile";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 

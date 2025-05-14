@@ -18,10 +18,13 @@ export const getAppraiseById = async (appraiseId) => {
   }
 };
 
-export const getAppraisesByTopicId = async (topicId) => {
+export const getAppraisesByAppraisalBoardId = async (
+  periodId,
+  appraisalBoardId
+) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/appraises?topicId=${topicId}`,
+      `http://localhost:3000/api/appraises?periodId=${periodId}&appraisalBoardId=${appraisalBoardId}`,
       {
         method: "GET",
         cache: "no-store",
@@ -29,7 +32,7 @@ export const getAppraisesByTopicId = async (topicId) => {
     );
 
     if (!res) {
-      throw new Error("Failed to get appraises by topic id.");
+      throw new Error("Failed to get appraises by appraisal board id.");
     }
 
     return res;
@@ -55,7 +58,7 @@ export const createAppraise = async (values) => {
   }
 };
 
-export const updateAppraise = async (appraiseId, values) => {
+export const updateAppraiseById = async (appraiseId, values) => {
   try {
     const res = await fetch(
       `http://localhost:3000/api/appraises/${appraiseId}`,

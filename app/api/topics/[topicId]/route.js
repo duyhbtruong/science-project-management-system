@@ -1,17 +1,11 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Topic } from "@/models/Topic";
-import { Student } from "@/models/users/Student";
-import { Instructor } from "@/models/users/Instructor";
-import { AppraisalBoard } from "@/models/users/AppraisalBoard";
-import { RegistrationPeriod } from "@/models/RegistrationPeriod";
-import { ReviewGrade } from "@/models/ReviewGrade";
-import { AppraiseGrade } from "@/models/AppraiseGrade";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
 export async function GET(request, { params }) {
   try {
-    const id = params.topic;
+    const id = params.topicId;
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -94,7 +88,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const id = params.topic;
+    const id = params.topicId;
     const {
       vietnameseName,
       englishName,
@@ -188,7 +182,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const id = params.topic;
+    const id = params.topicId;
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(

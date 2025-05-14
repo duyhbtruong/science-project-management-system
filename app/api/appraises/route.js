@@ -7,32 +7,30 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   try {
-    const topicId = request.nextUrl.searchParams.get("topicId");
-
-    if (!topicId || !mongoose.isValidObjectId(topicId)) {
-      return NextResponse.json(
-        { message: "Thiếu topic id hoặc topic id không hợp lệ." },
-        { status: 400 }
-      );
-    }
+    const searchParams = request.nextUrl.searchParams;
+    const periodId = searchParams.get("periodId");
+    const appraisalBoardId = searchParams.get("appraisalBoardId");
+    const filter = {};
 
     await mongooseConnect();
 
-    const topic = Topic.findOne({ _id: topicId });
-
-    if (!topic) {
-      return NextResponse.json(
-        { message: "Không tìm thấy đề tài." },
-        { status: 404 }
-      );
+    let topicIds = [];
+    if (periodId) {
+      const topics = await Topic.find({ registrationPeriodId: periodId });
+      topicIds = topics.map((topic) => topic._id);
     }
 
-    // TODO: Replace find() with findOne()
-    const appraises = await AppraiseGrade.findOne({ topicId: topicId })
+    if (appraisalBoardId) {
+      filter.appraisalBoardId = appraisalBoardId;
+    }
+    if (topicIds.length > 0) {
+      filter.topicId = { $in: topicIds };
+    }
+
+    const appraises = await AppraiseGrade.find(filter)
       .populate({
         path: "topicId",
-        select:
-          "vietnameseName englishName type summary reference participants expectedResult",
+        select: "vietnameseName englishName registrationPeriodId owner",
       })
       .populate({
         path: "appraisalBoardId",
@@ -55,8 +53,14 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { topicId, appraisalBoardId, criteria, grade, isEureka, note } =
-      await request.json();
+    const {
+      topicId,
+      appraisalBoardId,
+      criteria,
+      finalGrade,
+      isEureka,
+      comment,
+    } = await request.json();
 
     if (
       !topicId ||
@@ -81,50 +85,28 @@ export async function POST(request) {
       );
     }
 
-    const appraiseStaff = await AppraisalBoard.findOne({
+    const appraisalBoard = await AppraisalBoard.findOne({
       _id: appraisalBoardId,
     });
 
-    if (!appraiseStaff) {
+    if (!appraisalBoard) {
       return NextResponse.json(
-        { message: "Không tìm thấy cán bộ thẩm định." },
+        { message: "Không tìm thấy hội đồng thẩm định." },
         {
           status: 404,
         }
       );
     }
 
-    if (!appraiseStaff._id.equals(topic.appraiseStaff)) {
-      return NextResponse.json(
-        { message: "Cán bộ không phải người thẩm định đề tài." },
-        {
-          status: 409,
-        }
-      );
-    }
-
-    if (topic.appraises.length > 0) {
-      return NextResponse.json(
-        { message: "Đề tài đã được thẩm định." },
-        {
-          status: 409,
-        }
-      );
-    }
-
-    const createdAppraise = await AppraiseGrade.create({
+    await AppraiseGrade.create({
       topicId,
       appraisalBoardId,
       criteria,
-      grade,
+      finalGrade,
       isEureka,
-      note,
+      comment,
+      submittedDate: new Date(),
     });
-
-    await Topic.findByIdAndUpdate(
-      { _id: topicId },
-      { appraises: [...topic.appraises, createdAppraise._id] }
-    );
 
     return NextResponse.json(
       { message: "Tạo thẩm định thành công!" },
