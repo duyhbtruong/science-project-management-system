@@ -86,13 +86,25 @@ export async function PUT(request, { params }) {
       );
     }
 
-    await ReviewGrade.findByIdAndUpdate(reviewId, {
-      criteria,
-      finalGrade,
-      isEureka,
-      comment,
-      submittedDate: new Date(),
-    });
+    review.criteria = criteria;
+    review.finalGrade = finalGrade;
+    review.isEureka = isEureka;
+    review.comment = comment;
+    review.submittedDate = new Date();
+    review.status = "completed";
+    await review.save();
+
+    await Topic.updateOne(
+      { "reviewAssignments.reviewGrade": reviewId },
+      {
+        $set: {
+          "reviewAssignments.$[elem].status": "completed",
+        },
+      },
+      {
+        arrayFilters: [{ "elem.reviewGrade": reviewId }],
+      }
+    );
 
     return NextResponse.json(
       { message: "Cập nhật đánh giá thành công." },
@@ -146,6 +158,7 @@ export async function DELETE(request, { params }) {
         {
           $set: {
             "reviewAssignments.$[elem].reviewGrade": newReviewGrade._id,
+            "reviewAssignments.$[elem].status": "pending",
           },
         },
         {

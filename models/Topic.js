@@ -20,6 +20,7 @@ import { sectionSchema } from "./Section";
  * - owner: Owner of this project topic.
  * - instructor: Instructor who guides and monitors the project.
  * - files: Files related to project.
+ * - reviewPassed: Indicates whether the topic review has passed.
  */
 const topicSchema = new Schema(
   {
@@ -34,6 +35,10 @@ const topicSchema = new Schema(
       type: mongoose.SchemaTypes.ObjectId,
       ref: "RegistrationPeriod",
       required: true,
+    },
+    reviewPassed: {
+      type: Boolean,
+      default: false,
     },
     reviewAssignments: [
       {
@@ -98,7 +103,6 @@ const topicSchema = new Schema(
   }
 );
 
-// Add indexes for better query performance
 topicSchema.index({ owner: 1 });
 topicSchema.index({ instructor: 1 });
 topicSchema.index({ registrationPeriod: 1 });

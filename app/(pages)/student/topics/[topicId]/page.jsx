@@ -1,29 +1,20 @@
 "use client";
 
 import { deleteTopicById, getTopicById } from "@/service/topicService";
-import { CloseOutlined, InboxOutlined } from "@ant-design/icons";
-import { Button, Modal, Spin, Upload, message } from "antd";
-const { Dragger } = Upload;
+import { CloseOutlined } from "@ant-design/icons";
+import { Button, Modal, Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { storage } from "@/lib/firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { deleteRegisterFile, uploadSubmitFile } from "@/service/upload";
+import { deleteRegisterFile } from "@/service/upload";
 import { TopicDetails } from "./topic-details";
 import { StudentDetails } from "./student-details";
 import { InstructorDetails } from "./instructor-details";
-import { FullscreenLoader } from "@/components/fullscreen-loader";
 
 export const TOPIC_STATUS = {
   REVIEWED: "Đã kiểm duyệt",
   PENDING_REVIEW: "Chưa kiểm duyệt",
   APPRAISED: "Đã thẩm định",
   PENDING_APPRAISE: "Chưa thẩm định",
-};
-
-const MODAL_CONFIG = {
-  title: "Bạn có chắc chắn hủy đăng ký đề tài?",
-  content: "Hủy đề tài sẽ xóa toàn bộ thông tin đăng ký của đề tài.",
 };
 
 export default function TopicInformationPage({ params }) {
@@ -34,10 +25,7 @@ export default function TopicInformationPage({ params }) {
   const [instructor, setInstructor] = useState();
   const [period, setPeriod] = useState();
   const [topic, setTopic] = useState();
-  const [fileList, setFileList] = useState([]);
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [modal, modalContextHolder] = Modal.useModal();
-  const [messageApi, messageContextHolder] = message.useMessage();
   const router = useRouter();
 
   const config = {
@@ -47,48 +35,6 @@ export default function TopicInformationPage({ params }) {
         <p>Hủy đề tài sẽ xóa toàn bộ thông tin đăng ký của đề tài.</p>
       </>
     ),
-  };
-
-  const handleChange = ({ fileList }) => {
-    setFileList(fileList);
-  };
-
-  const handleUploadFile = () => {
-    if (fileList.length === 0) {
-      setIsUploadOpen(false);
-      return;
-    }
-    let startDate = new Date(period.startDate);
-    let endDate = new Date(period.endDate);
-    startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
-    endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
-    const periodDir = `${period.title}-${startDate}-${endDate}`;
-
-    const file = listFile[0];
-    const fileName = file.name;
-    const fileRef = ref(
-      storage,
-      `${periodDir}/${student?.studentId}/${fileList[0].name}`
-    );
-    uploadBytes(fileRef, file?.originFileObj)
-      .then((snapshot) => {
-        const fileRef = snapshot.ref._location.path_;
-        return getDownloadURL(ref(storage, fileRef));
-      })
-      .then((downloadLink) => {
-        const submitFile = {
-          name: fileName,
-          url: downloadLink,
-        };
-        uploadSubmitFile(topic._id, submitFile);
-      })
-      .then((res) => {
-        const { message } = res;
-        messageApi.success(message);
-        setIsUploadOpen(false);
-        loadTopic();
-        setFileList([]);
-      });
   };
 
   const handleDeleteFile = async (filePath) => {
@@ -151,10 +97,7 @@ export default function TopicInformationPage({ params }) {
         <div className="grid grid-cols-1 gap-6">
           <Spin spinning={!topic}>
             <div className="p-6 bg-white rounded-lg shadow-sm">
-              <TopicDetails
-                topic={topic}
-                onUpload={() => setIsUploadOpen(true)}
-              />
+              <TopicDetails topic={topic} router={router} />
             </div>
           </Spin>
 
@@ -174,46 +117,7 @@ export default function TopicInformationPage({ params }) {
         </div>
       </div>
 
-      <Modal
-        title={
-          <div className="text-lg font-semibold text-gray-800">
-            Upload bản mềm
-          </div>
-        }
-        open={isUploadOpen}
-        width={800}
-        centered
-        onOk={handleUploadFile}
-        okText="Xác nhận"
-        cancelText="Hủy"
-        onCancel={() => {
-          setFileList([]);
-          setIsUploadOpen(false);
-        }}
-        className="upload-modal"
-      >
-        <Dragger
-          name="file"
-          accept=".pdf"
-          multiple={false}
-          maxCount={1}
-          onChange={handleChange}
-          fileList={fileList}
-          className="upload-dragger"
-        >
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined className="text-4xl text-blue-500" />
-          </p>
-          <p className="text-lg font-medium text-gray-700 ant-upload-text">
-            Nhấn hoặc thả file vào khu vực này để đăng tài liệu
-          </p>
-          <p className="text-gray-500 ant-upload-hint">
-            Định dạng tên File là: MSSV_TEN_DE_TAI
-          </p>
-        </Dragger>
-      </Modal>
       {modalContextHolder}
-      {messageContextHolder}
     </div>
   );
 }

@@ -1,6 +1,13 @@
 import Link from "next/link";
-import { Descriptions } from "antd";
-import { LinkIcon } from "lucide-react";
+import { Descriptions, Card, Typography } from "antd";
+import {
+  LinkIcon,
+  UserIcon,
+  GraduationCapIcon,
+  BuildingIcon,
+} from "lucide-react";
+
+const { Title, Text } = Typography;
 
 export const InstructorDetails = ({ instructor }) => {
   const instructorItems = [
@@ -11,36 +18,58 @@ export const InstructorDetails = ({ instructor }) => {
         <Link
           target="_blank"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${instructor?.accountId.email}`}
-          className="flex items-center"
+          className="flex items-center space-x-2 text-blue-600 hover:text-blue-800"
         >
-          <LinkIcon className="mr-2 size-4" />
-          {instructor?.accountId.email}
+          <LinkIcon className="size-4" />
+          <Text className="text-blue-600 hover:text-blue-800">
+            {instructor?.accountId.email}
+          </Text>
         </Link>
       ),
     },
     {
       key: "2",
       label: "Họ và tên",
-      children: <p>{instructor?.accountId.name}</p>,
+      children: (
+        <div className="flex items-center space-x-2">
+          <UserIcon className="text-gray-500 size-4" />
+          <Text>{instructor?.accountId.name}</Text>
+        </div>
+      ),
     },
     {
       key: "3",
       label: "Học hàm, học vị",
-      children: <p>{instructor?.academicRank}</p>,
+      children: (
+        <div className="flex items-center space-x-2">
+          <GraduationCapIcon className="text-gray-500 size-4" />
+          <Text>{instructor?.academicRank}</Text>
+        </div>
+      ),
     },
     {
       key: "4",
       label: "Khoa",
-      children: <p>{instructor?.faculty}</p>,
+      children: (
+        <div className="flex items-center space-x-2">
+          <BuildingIcon className="text-gray-500 size-4" />
+          <Text>{instructor?.faculty}</Text>
+        </div>
+      ),
     },
   ];
 
   return (
-    <Descriptions
-      column={1}
-      bordered
-      title="Thông tin Giảng viên hướng dẫn"
-      items={instructorItems}
-    />
+    <Card className="shadow-sm">
+      <Title level={4} className="mb-4">
+        Thông tin Giảng viên hướng dẫn
+      </Title>
+      <Descriptions
+        column={1}
+        bordered
+        items={instructorItems}
+        className="instructor-descriptions"
+      />
+    </Card>
   );
 };

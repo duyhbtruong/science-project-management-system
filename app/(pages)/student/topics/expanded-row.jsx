@@ -1,6 +1,9 @@
 import Link from "next/link";
-import { Descriptions } from "antd";
+import { Descriptions, Typography } from "antd";
 import { LinkIcon } from "lucide-react";
+import ReviewAssignmentsCard from "@/components/review-assignments-card";
+import AppraiseAssignmentsCard from "@/components/appraise-assignments-card";
+const { Text } = Typography;
 
 const ExpandedRow = ({ record }) => {
   const instructorItems = [
@@ -16,10 +19,12 @@ const ExpandedRow = ({ record }) => {
         <Link
           target="_blank"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
-          className="flex items-center justify-center"
+          className="flex items-center space-x-2 text-blue-600 hover:text-blue-800"
         >
-          <LinkIcon className="mr-1 size-4" />
-          {record.instructor.accountId.email}
+          <LinkIcon className="size-4" />
+          <Text className="text-blue-600 hover:text-blue-800">
+            {record.instructor.accountId.email}
+          </Text>
         </Link>
       ),
     },
@@ -55,111 +60,7 @@ const ExpandedRow = ({ record }) => {
         </p>
       ),
     },
-    {
-      label: "Giảng viên kiểm duyệt",
-      key: "reviewAssignments",
-      children: (
-        <div>
-          {record.reviewAssignments.length > 0 ? (
-            <ul>
-              {record.reviewAssignments.map((a, index) => (
-                <li key={`review-assignment-${index}`}>
-                  {a.instructor.accountId.name}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            "Chưa có"
-          )}
-        </div>
-      ),
-    },
-    {
-      label: "Cán bộ thẩm định",
-      key: "appraiseAssignments",
-      children: (
-        <div>
-          {record.appraiseAssignments.length > 0 ? (
-            <ul>
-              {record.appraiseAssignments.map((a, index) => (
-                <li key={`appraise-assignment-${index}`}>
-                  {a.appraisalBoard.accountId.name}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            "Chưa có"
-          )}
-        </div>
-      ),
-    },
   ];
-
-  // const reviewInstructorItems = [
-  //   {
-  //     label: "Tên",
-  //     key: "name",
-  //     children: (
-  //       <p>
-  //         {record.reviewInstructor && record.reviewInstructor.accountId.name}
-  //         {!record.reviewInstructor && "Chưa có"}
-  //       </p>
-  //     ),
-  //   },
-  //   {
-  //     label: "Email",
-  //     key: "email",
-  //     children: (
-  //       <p>
-  //         {record.reviewInstructor && record.reviewInstructor.accountId.email}
-  //         {!record.reviewInstructor && "Chưa có"}
-  //       </p>
-  //     ),
-  //   },
-  //   {
-  //     label: "Học hàm, học vị",
-  //     key: "academicRank",
-  //     children: (
-  //       <p>
-  //         {record.reviewInstructor && record.reviewInstructor.academicRank}
-  //         {!record.reviewInstructor && "Chưa có"}
-  //       </p>
-  //     ),
-  //   },
-  //   {
-  //     label: "Khoa",
-  //     key: "faculty",
-  //     children: (
-  //       <p>
-  //         {record.reviewInstructor && record.reviewInstructor.faculty}
-  //         {!record.reviewInstructor && "Chưa có"}
-  //       </p>
-  //     ),
-  //   },
-  // ];
-
-  // const appraiseStaffItems = [
-  //   {
-  //     label: "Tên",
-  //     key: "name",
-  //     children: (
-  //       <p>
-  //         {record.appraiseStaff && record.appraiseStaff.accountId.name}
-  //         {!record.appraiseStaff && "Chưa có"}
-  //       </p>
-  //     ),
-  //   },
-  //   {
-  //     label: "Email",
-  //     key: "email",
-  //     children: (
-  //       <p>
-  //         {record.appraiseStaff && record.appraiseStaff.accountId.email}
-  //         {!record.appraiseStaff && "Chưa có"}
-  //       </p>
-  //     ),
-  //   },
-  // ];
 
   return (
     <div className="space-y-4">
@@ -172,14 +73,16 @@ const ExpandedRow = ({ record }) => {
         items={topicDataItems}
         column={2}
       />
-      {/* <Descriptions
-        title="Thông tin Giảng viên kiểm duyệt"
-        items={reviewInstructorItems}
-      />
-      <Descriptions
-        title="Thông tin cán bộ thẩm định"
-        items={appraiseStaffItems}
-      /> */}
+      <div>
+        <h3 className="mb-4 text-lg font-medium">Thông tin Kiểm duyệt</h3>
+        <ReviewAssignmentsCard reviewAssignments={record.reviewAssignments} />
+      </div>
+      <div>
+        <h3 className="mb-4 text-lg font-medium">Thông tin Thẩm định</h3>
+        <AppraiseAssignmentsCard
+          appraiseAssignments={record.appraiseAssignments}
+        />
+      </div>
     </div>
   );
 };

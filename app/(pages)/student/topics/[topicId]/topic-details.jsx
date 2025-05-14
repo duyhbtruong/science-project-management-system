@@ -1,85 +1,117 @@
-import { Button, Descriptions, Space, Tag } from "antd";
-import { CheckIcon, LoaderIcon, PaperclipIcon, UploadIcon } from "lucide-react";
-import { TOPIC_STATUS } from "./page";
+import { Button, Descriptions, Space, Tag, Card, Typography } from "antd";
+import {
+  CheckIcon,
+  LoaderIcon,
+  UploadIcon,
+  UsersIcon,
+  BookOpenIcon,
+  FileTextIcon,
+  ClipboardListIcon,
+  TargetIcon,
+  ArrowRightIcon,
+} from "lucide-react";
 import Link from "next/link";
+import ReviewAssignmentsCard from "@/components/review-assignments-card";
+import AppraiseAssignmentsCard from "@/components/appraise-assignments-card";
 
-export const TopicDetails = ({ topic, onUpload }) => {
+const { Title, Text, Paragraph } = Typography;
+
+export const TopicDetails = ({ topic, router }) => {
   const topicItems = [
     {
       key: "1",
       label: "Tên tiếng Việt",
-      children: <p>{topic?.vietnameseName}</p>,
+      children: <Text className="text-lg">{topic?.vietnameseName}</Text>,
       span: 2,
     },
     {
       key: "2",
       label: "Tên tiếng Anh",
-      children: <p>{topic?.englishName}</p>,
+      children: <Text className="text-lg">{topic?.englishName}</Text>,
       span: 2,
     },
     {
       key: "3",
       label: "Danh sách thành viên",
       children: (
-        <ul>
+        <div className="space-y-2">
           {topic &&
-            topic.participants?.map((participant, index) => {
-              return (
-                <li key={`participant-${index}`}>{`${
-                  index + 1
-                } - ${participant}`}</li>
-              );
-            })}
-        </ul>
+            topic.participants?.map((participant, index) => (
+              <div
+                key={`participant-${index}`}
+                className="flex items-center space-x-2"
+              >
+                <UsersIcon className="text-gray-500 size-4" />
+                <Text>{`${index + 1} - ${participant}`}</Text>
+              </div>
+            ))}
+        </div>
       ),
       span: 1,
     },
     {
       key: "4",
       label: "Loại hình nghiên cứu",
-      children: <p>{topic?.type}</p>,
+      children: (
+        <div className="flex items-center space-x-2">
+          <BookOpenIcon className="text-gray-500 size-4" />
+          <Text>{topic?.type}</Text>
+        </div>
+      ),
       span: 1,
     },
     {
       key: "5",
-      label: "Trạng thái kiểm duyệt",
+      label: "Kết quả kiểm duyệt",
       children: (
         <Tag
-          icon={
-            // TODO: Create a component to show reviews
-            topic?.reviewAssignments.length > 0 ? (
-              <CheckIcon className="inline-block mr-1 size-4" />
-            ) : (
-              <LoaderIcon className="inline-block mr-1 size-4 animate-spin" />
-            )
+          color={
+            topic?.reviewAssignments
+              .filter((assignment) => assignment.status !== "removed")
+              .every((assignment) => assignment.status !== "completed")
+              ? "warning"
+              : topic?.reviewPassed
+              ? "success"
+              : "error"
           }
-          color={topic?.reviewAssignments.length > 0 ? "success" : "default"}
         >
-          {topic?.reviewAssignments.length > 0
-            ? TOPIC_STATUS.REVIEWED
-            : TOPIC_STATUS.PENDING_REVIEW}
+          <span>
+            {topic?.reviewAssignments
+              .filter((assignment) => assignment.status !== "removed")
+              .every((assignment) => assignment.status !== "completed")
+              ? "Đang chờ"
+              : topic?.reviewPassed
+              ? "Đạt"
+              : "Không đạt"}
+          </span>
         </Tag>
       ),
       span: 1,
     },
     {
       key: "6",
-      label: "Trạng thái thẩm định",
+      label: "Kết quả thẩm định",
       children: (
         <Tag
-          icon={
-            // TODO: Create component to see appraises
-            topic?.appraiseAssignments.length ? (
-              <CheckIcon className="inline-block mr-1 size-4" />
-            ) : (
-              <LoaderIcon className="inline-block mr-1 size-4 animate-spin" />
-            )
+          color={
+            topic?.appraiseAssignments
+              .filter((assignment) => assignment.status !== "removed")
+              .every((assignment) => assignment.status !== "completed")
+              ? "warning"
+              : topic?.appraisePassed
+              ? "success"
+              : "error"
           }
-          color={topic?.appraiseAssignments.length ? "success" : "default"}
         >
-          {topic?.appraiseAssignments.length
-            ? TOPIC_STATUS.APPRAISED
-            : TOPIC_STATUS.PENDING_APPRAISE}
+          <span>
+            {topic?.appraiseAssignments
+              .filter((assignment) => assignment.status !== "removed")
+              .every((assignment) => assignment.status !== "completed")
+              ? "Đang chờ"
+              : topic?.appraisePassed
+              ? "Đạt"
+              : "Không đạt"}
+          </span>
         </Tag>
       ),
       span: 1,
@@ -87,30 +119,64 @@ export const TopicDetails = ({ topic, onUpload }) => {
   ];
 
   return (
-    <Descriptions
-      column={2}
-      bordered
-      title="Thông tin Đề tài"
-      items={topicItems}
-      extra={
-        <Space>
-          {topic?.submitFile && (
-            <Link target="_blank" href={topic?.submitFile}>
-              <PaperclipIcon className="mr-1 size-4" />
-              Tài liệu đã tải lên
-            </Link>
-          )}
+    <div className="space-y-6">
+      <Card className="shadow-sm">
+        <Title level={4} className="mb-4">
+          Thông tin Đề tài
+        </Title>
+        <Descriptions
+          column={2}
+          bordered
+          items={topicItems}
+          className="topic-descriptions"
+        />
+      </Card>
+
+      <Card className="shadow-sm">
+        <div className="flex items-center justify-between">
+          <Title level={4}>Tài liệu đính kèm</Title>
           <Button
-            disabled={!topic?.reviewAssignments.length}
+            disabled={!topic?.reviewPassed}
             type="primary"
-            icon={<UploadIcon className="size-4" />}
-            onClick={onUpload}
-            className="flex items-center justify-center"
+            icon={<ArrowRightIcon className="size-4" />}
+            onClick={() =>
+              router.push(`/student/topics/${topic?._id}/reports/123`)
+            }
+            iconPosition="end"
           >
-            Nộp bản mềm
+            Viết báo cáo
           </Button>
-        </Space>
-      }
-    />
+        </div>
+      </Card>
+
+      <Card className="shadow-sm">
+        <div className="flex items-center mb-4 space-x-2">
+          <ClipboardListIcon className="text-gray-500 size-5" />
+          <Title level={4} className="!mb-0">
+            Tóm tắt đề tài
+          </Title>
+        </div>
+        <Paragraph className="text-gray-700 whitespace-pre-line">
+          {topic?.summary || "Chưa có tóm tắt đề tài"}
+        </Paragraph>
+      </Card>
+
+      <Card className="shadow-sm">
+        <div className="flex items-center mb-4 space-x-2">
+          <TargetIcon className="text-gray-500 size-5" />
+          <Title level={4} className="!mb-0">
+            Kết quả dự kiến
+          </Title>
+        </div>
+        <Paragraph className="text-gray-700 whitespace-pre-line">
+          {topic?.expectedResult || "Chưa có kết quả dự kiến"}
+        </Paragraph>
+      </Card>
+
+      <ReviewAssignmentsCard reviewAssignments={topic?.reviewAssignments} />
+      <AppraiseAssignmentsCard
+        appraiseAssignments={topic?.appraiseAssignments}
+      />
+    </div>
   );
 };

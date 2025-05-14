@@ -66,5 +66,41 @@ const reviewGradeSchema = new Schema(
   }
 );
 
+reviewGradeSchema.post("save", async function () {
+  try {
+    const Topic = mongoose.model("Topic");
+    const topic = await Topic.findById(this.topicId).populate(
+      "reviewAssignments.reviewGrade"
+    );
+
+    if (!topic) return;
+
+    const activeAssignments = topic.reviewAssignments.filter(
+      (assignment) => assignment.status !== "removed"
+    );
+
+    const allGraded = activeAssignments.every(
+      (assignment) =>
+        assignment.reviewGrade && assignment.reviewGrade.status === "completed"
+    );
+
+    if (allGraded) {
+      const validGrades = activeAssignments
+        .map((assignment) => assignment.reviewGrade.finalGrade)
+        .filter((grade) => grade !== null);
+
+      if (validGrades.length > 0) {
+        const averageGrade =
+          validGrades.reduce((sum, grade) => sum + grade, 0) /
+          validGrades.length;
+        topic.reviewPassed = averageGrade >= 70;
+        await topic.save();
+      }
+    }
+  } catch (error) {
+    console.error("Error updating topic review status:", error);
+  }
+});
+
 export const ReviewGrade =
   models?.ReviewGrade || model("ReviewGrade", reviewGradeSchema);

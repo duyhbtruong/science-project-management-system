@@ -62,7 +62,6 @@ export default function ReviewTopicPage({ params }) {
 
     const loadData = async () => {
       await Promise.all([loadReview(), loadAccount(), loadCriteria()]);
-      setLoading(false);
     };
 
     loadData();
@@ -82,6 +81,7 @@ export default function ReviewTopicPage({ params }) {
     });
 
     form.setFieldsValue(formValues);
+    setLoading(false);
   }, [review]);
 
   const onFinish = async (formData) => {

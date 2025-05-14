@@ -4,6 +4,9 @@ import { SubmitButton } from "@/components/submit-button";
 
 export default function ReviewForm({ form, onFinish, criteria }) {
   const [value, setValue] = useState();
+  const [finalGrade, setFinalGrade] = useState(
+    form.getFieldValue("finalGrade")
+  );
 
   const generateOptions = (minGrade, maxGrade, step) => {
     const options = [];
@@ -23,6 +26,11 @@ export default function ReviewForm({ form, onFinish, criteria }) {
       autoComplete="off"
       layout="vertical"
       className="flex flex-col flex-grow"
+      onValuesChange={(changedValues) => {
+        if (changedValues.finalGrade) {
+          setFinalGrade(changedValues.finalGrade);
+        }
+      }}
     >
       {criteria.map((criterion, index) => (
         <Form.Item
@@ -76,6 +84,16 @@ export default function ReviewForm({ form, onFinish, criteria }) {
         className="p-4 bg-white rounded-md"
         name="comment"
         label="Góp ý, nhận xét dành cho CNĐT (Bắt buộc nếu điểm Kết quả CHUNG dưới 70)"
+        rules={
+          finalGrade < 70
+            ? [
+                {
+                  required: true,
+                  message: "Góp ý là bắt buộc nếu điểm Kết quả CHUNG dưới 70!",
+                },
+              ]
+            : []
+        }
       >
         <Input.TextArea autoSize placeholder="Nhập nhận xét..." />
       </Form.Item>

@@ -1,24 +1,8 @@
 import Link from "next/link";
 import { Descriptions, Card, Tag, Space } from "antd";
-import {
-  LinkIcon,
-  CheckCircle2Icon,
-  ClockIcon,
-  XCircleIcon,
-} from "lucide-react";
-
-const StatusIcon = ({ status }) => {
-  switch (status) {
-    case "completed":
-      return <CheckCircle2Icon className="text-green-500 size-4" />;
-    case "pending":
-      return <ClockIcon className="text-yellow-500 size-4" />;
-    case "removed":
-      return <XCircleIcon className="text-red-500 size-4" />;
-    default:
-      return null;
-  }
-};
+import { LinkIcon } from "lucide-react";
+import ReviewAssignmentsCard from "@/components/review-assignments-card";
+import AppraiseAssignmentsCard from "@/components/appraise-assignments-card";
 
 const ExpandedRow = ({ record }) => {
   const instructorItems = [
@@ -99,90 +83,6 @@ const ExpandedRow = ({ record }) => {
     },
   ];
 
-  const renderReviewAssignments = () => {
-    if (!record.reviewAssignments?.length) {
-      return <p>Chưa có giảng viên kiểm duyệt</p>;
-    }
-
-    return (
-      <div className="grid grid-cols-1 gap-4 overflow-auto md:grid-cols-2">
-        {record.reviewAssignments.map((assignment, index) => (
-          <Card key={`review-${index}`} size="small" className="shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium">Giảng viên kiểm duyệt {index + 1}</h4>
-              <Space>
-                <StatusIcon status={assignment.status} />
-                <Tag
-                  color={
-                    assignment.status === "completed"
-                      ? "success"
-                      : assignment.status === "pending"
-                      ? "warning"
-                      : "error"
-                  }
-                >
-                  {assignment.status === "completed"
-                    ? "Hoàn thành"
-                    : assignment.status === "pending"
-                    ? "Đang chờ"
-                    : "Đã hủy"}
-                </Tag>
-              </Space>
-            </div>
-            <p className="text-sm text-gray-600">
-              Phân công: {new Date(assignment.assignedAt).toLocaleDateString()}
-            </p>
-            {assignment.reviewGrade.status === "completed" && (
-              <p className="text-sm text-gray-600">Đã có đánh giá</p>
-            )}
-          </Card>
-        ))}
-      </div>
-    );
-  };
-
-  const renderAppraiseAssignments = () => {
-    if (!record.appraiseAssignments?.length) {
-      return <p>Chưa có hội đồng thẩm định</p>;
-    }
-
-    return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {record.appraiseAssignments.map((assignment, index) => (
-          <Card key={`appraise-${index}`} size="small" className="shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium">Hội đồng thẩm định {index + 1}</h4>
-              <Space>
-                <StatusIcon status={assignment.status} />
-                <Tag
-                  color={
-                    assignment.status === "completed"
-                      ? "success"
-                      : assignment.status === "pending"
-                      ? "warning"
-                      : "error"
-                  }
-                >
-                  {assignment.status === "completed"
-                    ? "Hoàn thành"
-                    : assignment.status === "pending"
-                    ? "Đang chờ"
-                    : "Đã hủy"}
-                </Tag>
-              </Space>
-            </div>
-            <p className="text-sm text-gray-600">
-              Phân công: {new Date(assignment.assignedAt).toLocaleDateString()}
-            </p>
-            {assignment.appraiseGrade.status === "completed" && (
-              <p className="text-sm text-gray-600">Đã có đánh giá</p>
-            )}
-          </Card>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <Descriptions
@@ -196,11 +96,13 @@ const ExpandedRow = ({ record }) => {
       />
       <div>
         <h3 className="mb-4 text-lg font-medium">Thông tin Kiểm duyệt</h3>
-        {renderReviewAssignments()}
+        <ReviewAssignmentsCard reviewAssignments={record.reviewAssignments} />
       </div>
       <div>
         <h3 className="mb-4 text-lg font-medium">Thông tin Thẩm định</h3>
-        {renderAppraiseAssignments()}
+        <AppraiseAssignmentsCard
+          appraiseAssignments={record.appraiseAssignments}
+        />
       </div>
     </div>
   );
