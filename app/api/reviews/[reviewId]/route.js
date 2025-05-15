@@ -142,17 +142,20 @@ export async function DELETE(request, { params }) {
       );
     }
 
+    const topicId = review.topicId;
+    const instructorId = review.instructorId;
+
     await ReviewGrade.findByIdAndDelete(reviewId);
 
     if (review.status !== "cancelled") {
-      const newReviewGrade = await ReviewGrade.create({
-        topicId: review.topicId,
-        instructorId: review.instructorId,
+      const newReviewGrade = new ReviewGrade({
+        topicId,
+        instructorId,
         status: "pending",
       });
 
       await Topic.findByIdAndUpdate(
-        review.topicId,
+        topicId,
         {
           $set: {
             "reviewAssignments.$[elem].reviewGrade": newReviewGrade._id,
@@ -163,6 +166,8 @@ export async function DELETE(request, { params }) {
           arrayFilters: [{ "elem.reviewGrade": reviewId }],
         }
       );
+
+      await newReviewGrade.save();
     }
 
     return NextResponse.json(

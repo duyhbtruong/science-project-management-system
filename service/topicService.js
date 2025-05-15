@@ -86,6 +86,27 @@ export const getTopicById = async (id) => {
   }
 };
 
+// TODO: Instead of fetching topics, fetch reports
+export const getReportsByTopicId = async (topicId) => {
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/topics/${topicId}?sections=true`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
+
+    if (!res) {
+      throw new Error("Failed to get reports by topic id.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getTopicsByInstructorId = async (selectedPeriod, instructorId) => {
   try {
     const res = await fetch(

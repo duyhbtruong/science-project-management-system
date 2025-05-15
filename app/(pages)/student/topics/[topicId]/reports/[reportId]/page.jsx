@@ -5,82 +5,94 @@ import { message } from "antd";
 import { SectionEditor } from "./section-editor";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 import { useParams } from "next/navigation";
-import { getTopicById, updateTopicById } from "@/service/topicService";
+import { getReportById, updateReportSection } from "@/service/reportService";
 import { useDebounce } from "@/hooks/use-debounce";
+import { getSections } from "@/service/sectionService";
 
 export default function ReportPage() {
   const params = useParams();
-  const topicId = params.topicId;
+  const reportId = params.reportId;
 
-  const [topic, setTopic] = useState();
+  const [report, setReport] = useState();
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msgApi, contextHolder] = message.useMessage();
 
-  const loadTopic = async () => {
-    const res = await getTopicById(topicId);
-    setTopic(await res.json());
+  const loadReport = async () => {
+    const res = await getReportById(reportId);
+    setReport(await res.json());
+  };
+
+  const loadSection = async () => {
+    const res = await getSections();
+    setSections(res);
   };
 
   useEffect(() => {
-    if (!topicId) return;
-    loadTopic();
-  }, [topicId]);
+    if (!reportId) return;
 
-  useEffect(() => {
-    if (!topic) return;
-    setSections(topic.sections);
+    const loadData = async () => {
+      await Promise.all([loadReport(), loadSection()]);
+    };
+
+    loadData();
     setLoading(false);
-  }, [topic]);
+  }, [reportId]);
 
-  const handleContentChange = useDebounce((id, newContent) => {
-    setSections((prev) => {
-      const updatedSections = prev.map((sec) =>
-        sec._id === id ? { ...sec, content: newContent } : sec
-      );
+  const handleContentChange = useDebounce(async (id, newContent) => {
+    try {
+      setSections((prev) => {
+        const updatedSections = prev.map((sec) =>
+          sec._id === id ? { ...sec, content: newContent } : sec
+        );
+        return updatedSections;
+      });
 
-      updateTopicById(topicId, {
-        ...topic,
-        sections: updatedSections,
-      })
-        .then(() => msgApi.success("Cập nhật thành công."))
-        .catch(() => msgApi.error("Cập nhật thất bại."));
-
-      console.log("UPDATED: ", updatedSections);
-
-      return updatedSections;
-    });
-  }, 300);
+      await updateReportSection(reportId, id, newContent);
+      loadReport();
+      msgApi.success("Cập nhật thành công.");
+    } catch (error) {
+      console.error("Error updating content:", error);
+      msgApi.error("Cập nhật thất bại.");
+    }
+  }, 1000);
 
   if (loading) {
     return <FullscreenLoader label="Loading" />;
   }
 
+  console.log("REPORT", report);
+
   return (
     <>
       {contextHolder}
       <form className="p-6 space-y-6 bg-white rounded-lg shadow">
-        {sections.map((sec) => (
-          <div key={sec._id} className="space-y-2">
-            <label
-              htmlFor={`section-${sec._id}`}
-              className="block text-base font-medium"
-            >
-              {sec.title}
-            </label>
+        {sections.map((sec) => {
+          const reportSection = report?.sections?.find(
+            (reportSec) => reportSec.title === sec.title
+          );
 
-            <div
-              id={`section-${sec.id}`}
-              className="border border-gray-200 rounded p-3 min-h-[150px]"
-            >
-              <SectionEditor
-                initialContent={sec.content}
-                onChange={(newHtml) => handleContentChange(sec._id, newHtml)}
-              />
+          return (
+            <div key={sec._id} className="space-y-2">
+              <label
+                htmlFor={`section-${sec._id}`}
+                className="block text-base font-medium"
+              >
+                {sec.title}
+              </label>
+
+              <div
+                id={`section-${sec.id}`}
+                className="border border-gray-200 rounded p-3 min-h-[150px]"
+              >
+                <SectionEditor
+                  initialContent={reportSection?.content || ""}
+                  onChange={(newHtml) => handleContentChange(sec._id, newHtml)}
+                />
+              </div>
             </div>
-          </div>
-        ))}
-        {/* you can add a submit button here if you want to post the form */}
+          );
+        })}
       </form>
     </>
   );

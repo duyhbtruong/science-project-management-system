@@ -1,6 +1,5 @@
 import mongoose, { model, models, Schema } from "mongoose";
-import { sectionSchema } from "./Section";
-
+import { Report } from "./Report";
 /**
  * Topic schema model.
  * Represents information of a registered topic.
@@ -90,7 +89,6 @@ const topicSchema = new Schema(
         },
       },
     ],
-    sections: { type: [sectionSchema], default: [], select: false },
     owner: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Student",
@@ -117,6 +115,12 @@ topicSchema.set("toJSON", { virtuals: true });
 
 topicSchema.virtual("files", {
   ref: "TopicFile",
+  localField: "_id",
+  foreignField: "topicId",
+});
+
+topicSchema.virtual("report", {
+  ref: "Report",
   localField: "_id",
   foreignField: "topicId",
 });
@@ -153,6 +157,32 @@ topicSchema.pre("save", async function (next) {
             status: "pending",
           });
           assignment.appraiseGrade = newAppraiseGrade._id;
+        }
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  if (this.isModified("reviewPassed")) {
+    try {
+      const Report = mongoose.model("Report");
+
+      const existingReport = await Report.findOne({ topicId: this._id });
+
+      if (this.reviewPassed === true) {
+        if (!existingReport) {
+          await Report.create({
+            studentId: this.owner,
+            instructorId: this.instructor,
+            topicId: this._id,
+            sections: [],
+            submittedDate: new Date(),
+          });
+        }
+      } else {
+        if (existingReport) {
+          await Report.findByIdAndDelete(existingReport._id);
         }
       }
     } catch (error) {

@@ -10,13 +10,6 @@ import { TopicDetails } from "./topic-details";
 import { StudentDetails } from "./student-details";
 import { InstructorDetails } from "./instructor-details";
 
-export const TOPIC_STATUS = {
-  REVIEWED: "Đã kiểm duyệt",
-  PENDING_REVIEW: "Chưa kiểm duyệt",
-  APPRAISED: "Đã thẩm định",
-  PENDING_APPRAISE: "Chưa thẩm định",
-};
-
 export default function TopicInformationPage({ params }) {
   const { topicId } = params;
 
@@ -65,8 +58,6 @@ export default function TopicInformationPage({ params }) {
   useEffect(() => {
     loadTopic();
   }, []);
-
-  console.log("TOPIC: ", topic);
 
   return (
     <div className="min-h-screen bg-gray-50">

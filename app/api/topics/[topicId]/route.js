@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 export async function GET(request, { params }) {
   try {
     const id = params.topicId;
+    const searchParams = request.nextUrl.searchParams;
+    const sections = searchParams.get("sections");
 
     if (!id || !mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -18,7 +20,13 @@ export async function GET(request, { params }) {
 
     await mongooseConnect();
 
-    const topic = await Topic.findOne({ _id: id })
+    let query = Topic.findOne({ _id: id });
+
+    if (sections === "true") {
+      query = query.select("+sections");
+    }
+
+    const topic = await query
       .populate({
         path: "instructor",
         populate: {
@@ -66,7 +74,8 @@ export async function GET(request, { params }) {
           },
         ],
       })
-      .populate("files");
+      .populate("files")
+      .populate("report");
 
     if (!topic) {
       return NextResponse.json(

@@ -151,7 +151,7 @@ export async function DELETE(request, { params }) {
     await AppraiseGrade.findByIdAndDelete(appraiseId);
 
     if (appraise.status !== "cancelled") {
-      const newAppraiseGrade = await AppraiseGrade.create({
+      const newAppraiseGrade = new AppraiseGrade({
         topicId: appraise.topicId,
         appraisalBoardId: appraise.appraisalBoardId,
         status: "pending",
@@ -169,6 +169,8 @@ export async function DELETE(request, { params }) {
           arrayFilters: [{ "elem.appraiseGrade": appraiseId }],
         }
       );
+
+      await newAppraiseGrade.save();
     }
 
     return NextResponse.json(

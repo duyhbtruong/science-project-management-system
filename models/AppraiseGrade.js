@@ -95,6 +95,9 @@ appraiseGradeSchema.post("save", async function () {
         topic.appraisePassed = averageGrade >= 70;
         await topic.save();
       }
+    } else {
+      topic.appraisePassed = false;
+      await topic.save();
     }
   } catch (error) {
     console.error("Error updating topic appraise status:", error);

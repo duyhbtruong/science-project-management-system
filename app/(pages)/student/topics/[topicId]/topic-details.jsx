@@ -140,7 +140,9 @@ export const TopicDetails = ({ topic, router }) => {
             type="primary"
             icon={<ArrowRightIcon className="size-4" />}
             onClick={() =>
-              router.push(`/student/topics/${topic?._id}/reports/123`)
+              router.push(
+                `/student/topics/${topic?._id}/reports/${topic?.report[0]?._id}`
+              )
             }
             iconPosition="end"
           >

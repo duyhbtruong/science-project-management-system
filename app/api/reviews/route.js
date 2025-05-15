@@ -90,7 +90,7 @@ export async function POST(request) {
       );
     }
 
-    await ReviewGrade.create({
+    const newReviewGrade = new ReviewGrade({
       topicId,
       instructorId,
       criteria,
@@ -99,6 +99,8 @@ export async function POST(request) {
       comment,
       submittedDate: new Date(),
     });
+
+    await newReviewGrade.save();
 
     return NextResponse.json(
       { message: "Tạo đánh giá thành công!" },

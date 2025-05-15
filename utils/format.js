@@ -13,3 +13,8 @@ export const dateFormat = (date) => {
 
   return `${day}/${month}/${year}`;
 };
+
+export const stripHtml = (html) => {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "").trim();
+};

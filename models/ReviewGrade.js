@@ -96,6 +96,9 @@ reviewGradeSchema.post("save", async function () {
         topic.reviewPassed = averageGrade >= 70;
         await topic.save();
       }
+    } else {
+      topic.reviewPassed = false;
+      await topic.save();
     }
   } catch (error) {
     console.error("Error updating topic review status:", error);
