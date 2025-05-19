@@ -54,6 +54,7 @@ export async function PUT(request, { params }) {
         {
           $push: {
             sections: {
+              _id: sectionId,
               title: section.title,
               order: section.order,
               content: content,

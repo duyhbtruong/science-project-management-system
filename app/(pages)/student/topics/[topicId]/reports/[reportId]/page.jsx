@@ -36,8 +36,12 @@ export default function ReportPage() {
     };
 
     loadData();
-    setLoading(false);
   }, [reportId]);
+
+  useEffect(() => {
+    if (!report || !sections) return;
+    setLoading(false);
+  }, [report, sections]);
 
   const handleContentChange = useDebounce(async (id, newContent) => {
     try {
@@ -61,15 +65,13 @@ export default function ReportPage() {
     return <FullscreenLoader label="Loading" />;
   }
 
-  console.log("REPORT", report);
-
   return (
     <>
       {contextHolder}
       <form className="p-6 space-y-6 bg-white rounded-lg shadow">
         {sections.map((sec) => {
           const reportSection = report?.sections?.find(
-            (reportSec) => reportSec.title === sec.title
+            (reportSec) => reportSec._id === sec._id
           );
 
           return (
@@ -82,7 +84,7 @@ export default function ReportPage() {
               </label>
 
               <div
-                id={`section-${sec.id}`}
+                id={`section-${sec._id}`}
                 className="border border-gray-200 rounded p-3 min-h-[150px]"
               >
                 <SectionEditor
