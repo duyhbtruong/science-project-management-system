@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import { getReportById, updateReportSection } from "@/service/reportService";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getSections } from "@/service/sectionService";
+import { Room } from "./room";
 
 export default function ReportPage() {
   const params = useParams();
@@ -66,7 +67,7 @@ export default function ReportPage() {
   }
 
   return (
-    <>
+    <Room>
       {contextHolder}
       <form className="p-6 space-y-6 bg-white rounded-lg shadow">
         {sections.map((sec) => {
@@ -88,6 +89,7 @@ export default function ReportPage() {
                 className="border border-gray-200 rounded p-3 min-h-[150px]"
               >
                 <SectionEditor
+                  field={sec._id}
                   initialContent={reportSection?.content || ""}
                   onChange={(newHtml) => handleContentChange(sec._id, newHtml)}
                 />
@@ -96,6 +98,6 @@ export default function ReportPage() {
           );
         })}
       </form>
-    </>
+    </Room>
   );
 }

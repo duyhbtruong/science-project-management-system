@@ -42,8 +42,6 @@ export async function PUT(request, { params }) {
       );
     }
 
-    console.log({ reportId, sectionId, embedding, content });
-
     const existingSection = report.sections.some(
       (section) => section._id.toString() === sectionId
     );

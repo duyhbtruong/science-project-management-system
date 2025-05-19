@@ -2,8 +2,17 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import {
+  useLiveblocksExtension,
+  FloatingToolbar,
+} from "@liveblocks/react-tiptap";
+import { Threads } from "./threads";
 
-export const SectionEditor = ({ initialContent, onChange }) => {
+import "@liveblocks/react-tiptap/styles.css";
+import "@liveblocks/react-ui/styles.css";
+
+export const SectionEditor = ({ initialContent, onChange, field }) => {
+  const liveblocks = useLiveblocksExtension({ field, initialContent });
   const editor = useEditor({
     immediatelyRender: false,
     editorProps: {
@@ -11,12 +20,23 @@ export const SectionEditor = ({ initialContent, onChange }) => {
         class: "focus:outline-none min-h-[100px]",
       },
     },
-    extensions: [StarterKit],
-    content: initialContent,
+    extensions: [
+      liveblocks,
+      StarterKit.configure({
+        history: false,
+      }),
+    ],
+    content: ``,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
   });
 
-  return <EditorContent editor={editor} />;
+  return (
+    <div>
+      <EditorContent editor={editor} />
+      <FloatingToolbar editor={editor} />
+      <Threads editor={editor} />
+    </div>
+  );
 };
