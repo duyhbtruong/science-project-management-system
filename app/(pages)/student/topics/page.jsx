@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import TopicTable from "./topic-table";
-import { useSession } from "next-auth/react";
 import { getAccountById } from "@/service/accountService";
 import { getTopicsByOwner } from "@/service/topicService";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
+import { useCustomSession } from "@/hooks/use-custom-session";
 
 export default function TopicsPage() {
-  const session = useSession();
+  const { session, status } = useCustomSession();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState();
   const [student, setStudent] = useState();
   const [listTopic, setListTopic] = useState([]);
@@ -31,8 +31,8 @@ export default function TopicsPage() {
   };
 
   useEffect(() => {
-    if (!session || session.status === "loading") return;
-    setUser(session.data.user);
+    if (!session || status === "loading") return;
+    setUser(session?.user);
   }, [session]);
 
   useEffect(() => {
@@ -43,10 +43,10 @@ export default function TopicsPage() {
   useEffect(() => {
     if (!student) return;
     loadListTopic();
-    setIsLoading(false);
+    setLoading(false);
   }, [student]);
 
-  if (isLoading) return <FullscreenLoader label="List topic loading..." />;
+  if (loading) return <FullscreenLoader label="List topic loading..." />;
 
   return (
     <div className="bg-gray-100 min-h-[100vh]">

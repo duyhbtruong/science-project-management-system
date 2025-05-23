@@ -7,7 +7,7 @@ import {
   FloatingToolbar,
 } from "@liveblocks/react-tiptap";
 import { Threads } from "./threads";
-
+import { CustomToolbar } from "./custom-tool-bar";
 import "@liveblocks/react-tiptap/styles.css";
 import "@liveblocks/react-ui/styles.css";
 
@@ -35,7 +35,7 @@ export const SectionEditor = ({ initialContent, onChange, field }) => {
   return (
     <div>
       <EditorContent editor={editor} />
-      <FloatingToolbar editor={editor} />
+      <CustomToolbar editor={editor} />
       <Threads editor={editor} />
     </div>
   );

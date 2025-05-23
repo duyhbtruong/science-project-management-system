@@ -103,6 +103,11 @@ export default function TopicPage() {
     });
   }, [student, listInstructor]);
 
+  // Add filtered instructors logic
+  const filteredInstructors = listInstructor?.filter(
+    (instructor) => instructor?.faculty === student?.faculty
+  );
+
   const isDateWithinRange = (periods) => {
     const today = new Date();
 
@@ -228,7 +233,7 @@ export default function TopicPage() {
                 </Divider>
                 <InstructorInfoSection
                   form={form}
-                  listInstructor={listInstructor}
+                  listInstructor={filteredInstructors}
                 />
                 <Form.Item>
                   <Space>
