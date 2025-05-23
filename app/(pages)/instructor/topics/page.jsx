@@ -3,15 +3,15 @@
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
 import { getTopicsByInstructorId } from "@/service/topicService";
-import { Select, Spin, Table, Tag } from "antd";
-import { useSession } from "next-auth/react";
+import { Select, Spin, Table } from "antd";
 import { useEffect, useState } from "react";
 import { getTableColumns } from "./table-columns";
+import { useCustomSession } from "@/hooks/use-custom-session";
 const { Option } = Select;
 
 export default function TopicsPage() {
-  const session = useSession();
-  const userId = session?.data?.user?.id;
+  const { session } = useCustomSession();
+  const userId = session?.user?.id;
 
   const [listTopic, setListTopic] = useState();
   const [listPeriod, setListPeriod] = useState();

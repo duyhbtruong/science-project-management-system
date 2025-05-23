@@ -6,9 +6,7 @@ import {
   getAppraiseById,
   updateAppraiseById,
 } from "@/service/appraiseGradeService";
-import { getTopicById } from "@/service/topicService";
 import { Button, Form, Spin, message } from "antd";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import emailjs from "@emailjs/browser";
@@ -18,11 +16,12 @@ import { InfoIcon } from "lucide-react";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 import AppraiseForm from "./appraise-form";
 import { getCriteria } from "@/service/criteriaService";
+import { useCustomSession } from "@/hooks/use-custom-session";
 
 export default function AppraiseTopicPage({ params }) {
   const { appraiseId } = params;
-  const session = useSession();
-  const userId = session?.data?.user?.id;
+  const { session } = useCustomSession();
+  const userId = session?.user?.id;
 
   const [account, setAccount] = useState();
   const [appraisalBoard, setAppraisalBoard] = useState();

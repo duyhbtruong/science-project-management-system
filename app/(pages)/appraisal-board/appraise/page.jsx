@@ -1,29 +1,21 @@
 "use client";
 
 import { Modal, Spin, Table, message, Tag, Space, Button, Select } from "antd";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
   deleteAppraiseById,
   getAppraisesByAppraisalBoardId,
 } from "@/service/appraiseGradeService";
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
-import {
-  CheckIcon,
-  EditIcon,
-  LoaderIcon,
-  PaperclipIcon,
-  TrashIcon,
-} from "lucide-react";
 import { getTableColumns } from "./table-columns";
+import { useCustomSession } from "@/hooks/use-custom-session";
 const { Option } = Select;
 
 export default function AppraiseTopicPage() {
-  const session = useSession();
-  const userId = session?.data?.user?.id;
+  const { session } = useCustomSession();
+  const userId = session?.user?.id;
   const router = useRouter();
 
   const [account, setAccount] = useState();

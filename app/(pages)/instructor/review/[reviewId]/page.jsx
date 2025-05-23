@@ -12,17 +12,17 @@ import { Button, Form, Spin, message } from "antd";
 import emailjs from "@emailjs/browser";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { InfoIcon } from "lucide-react";
 import ReviewForm from "./review-form";
 import DetailModal from "./detail-modal";
 import { getCriteria } from "@/service/criteriaService";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
+import { useCustomSession } from "@/hooks/use-custom-session";
 
 export default function ReviewTopicPage({ params }) {
   const { reviewId } = params;
-  const session = useSession();
-  const userId = session?.data?.user?.id;
+  const { session } = useCustomSession();
+  const userId = session?.user?.id;
 
   const [account, setAccount] = useState();
   const [instructor, setInstructor] = useState();

@@ -3,21 +3,19 @@
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
 import {
-  getReviewsByTopicId,
-  deleteReviewById,
   getReviewsByInstructorId,
+  deleteReviewById,
 } from "@/service/reviewService";
-import { getTopicsByReviewInstructorId } from "@/service/topicService";
 import { Spin, Table, Modal, message, Select } from "antd";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getTableColumns } from "./table-columns";
+import { useCustomSession } from "@/hooks/use-custom-session";
 const { Option } = Select;
 
 export default function ReviewPage() {
-  const session = useSession();
-  const userId = session?.data?.user?.id;
+  const { session } = useCustomSession();
+  const userId = session?.user?.id;
 
   const router = useRouter();
 
