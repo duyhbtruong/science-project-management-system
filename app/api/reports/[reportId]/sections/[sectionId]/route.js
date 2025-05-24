@@ -24,7 +24,7 @@ export async function PUT(request, { params }) {
     }
 
     await mongooseConnect();
-    const { cleanContent: content, embedding } = await request.json();
+    const { content, embedding } = await request.json();
 
     const report = await Report.findOne({ _id: reportId }).populate("sections");
     if (!report) {

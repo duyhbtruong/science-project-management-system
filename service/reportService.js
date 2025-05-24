@@ -33,7 +33,7 @@ export const updateReportSection = async (reportId, sectionId, content) => {
       `http://localhost:3000/api/reports/${reportId}/sections/${sectionId}`,
       {
         method: "PUT",
-        body: JSON.stringify({ cleanContent, embedding }),
+        body: JSON.stringify({ content, embedding }),
       }
     );
 
