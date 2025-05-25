@@ -63,11 +63,9 @@ export default function ReportPage() {
       await updateReportSection(reportId, id, newContent);
       loadReport();
       setSavingStatus("saved");
-      msgApi.success("Cập nhật thành công.");
     } catch (error) {
       console.error("Error updating content:", error);
       setSavingStatus("idle");
-      msgApi.error("Cập nhật thất bại.");
     }
   }, 1000);
 

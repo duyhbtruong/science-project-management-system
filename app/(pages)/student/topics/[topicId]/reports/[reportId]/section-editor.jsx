@@ -2,12 +2,10 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import {
-  useLiveblocksExtension,
-  FloatingToolbar,
-} from "@liveblocks/react-tiptap";
+import { useLiveblocksExtension } from "@liveblocks/react-tiptap";
 import { Threads } from "./threads";
-import { CustomToolbar } from "./custom-tool-bar";
+import { CustomToolbar } from "./custom-toolbar";
+import { CustomFloatingToolbar } from "./custom-floating-toolbar";
 import "@liveblocks/react-tiptap/styles.css";
 import "@liveblocks/react-ui/styles.css";
 
@@ -34,8 +32,9 @@ export const SectionEditor = ({ initialContent, onChange, field }) => {
 
   return (
     <div>
-      <EditorContent editor={editor} />
       <CustomToolbar editor={editor} />
+      <EditorContent editor={editor} />
+      <CustomFloatingToolbar editor={editor} />
       <Threads editor={editor} />
     </div>
   );
