@@ -113,7 +113,7 @@ export default function ReportPage() {
 
                 <div
                   id={`section-${sec._id}`}
-                  className="border border-gray-200 rounded p-3 min-h-[150px]"
+                  className="border border-gray-200 rounded min-h-[150px]"
                 >
                   <SectionEditor
                     field={sec._id}
@@ -121,6 +121,7 @@ export default function ReportPage() {
                     onChange={(newHtml) =>
                       handleContentChange(sec._id, newHtml)
                     }
+                    savingStatus={savingStatus}
                   />
                 </div>
               </div>

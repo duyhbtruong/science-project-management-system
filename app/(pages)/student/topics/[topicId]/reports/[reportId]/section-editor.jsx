@@ -9,13 +9,18 @@ import { CustomFloatingToolbar } from "./custom-floating-toolbar";
 import "@liveblocks/react-tiptap/styles.css";
 import "@liveblocks/react-ui/styles.css";
 
-export const SectionEditor = ({ initialContent, onChange, field }) => {
+export const SectionEditor = ({
+  initialContent,
+  onChange,
+  field,
+  savingStatus,
+}) => {
   const liveblocks = useLiveblocksExtension({ field, initialContent });
   const editor = useEditor({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: "focus:outline-none min-h-[100px]",
+        class: "focus:outline-none min-h-[100px] p-3",
       },
     },
     extensions: [
@@ -32,7 +37,11 @@ export const SectionEditor = ({ initialContent, onChange, field }) => {
 
   return (
     <div>
-      <CustomToolbar editor={editor} />
+      <CustomToolbar
+        editor={editor}
+        savingStatus={savingStatus}
+        field={field}
+      />
       <EditorContent editor={editor} />
       <CustomFloatingToolbar editor={editor} />
       <Threads editor={editor} />

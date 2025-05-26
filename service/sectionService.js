@@ -56,7 +56,7 @@ export const deleteSection = async (id) => {
 export const reorderSections = async (sections) => {
   const res = await fetch(`http://localhost:3000/api/sections/reorder`, {
     method: "PUT",
-    body: JSON.stringify(sections),
+    body: JSON.stringify({ sections }),
   });
 
   if (!res.ok) {

@@ -1,5 +1,24 @@
 import { stripHtml } from "@/utils/format";
 
+export const semanticSearchReports = async (sectionId) => {
+  try {
+    const res = await fetch(`/api/reports?sectionId=${sectionId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    console.log(res);
+
+    if (!res.ok) {
+      throw new Error("Failed to get reports");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getReportById = async (reportId) => {
   try {
     const res = await fetch(`/api/reports/${reportId}`, {

@@ -1,31 +1,33 @@
 import { NextResponse } from "next/server";
+import { SectionTemplate } from "@/models/Section";
 import { mongooseConnect } from "@/lib/mongoose";
-import { Section } from "@/models/Section";
 
 export async function PUT(request) {
   try {
-    const body = await request.json();
-    if (!Array.isArray(body)) {
+    await mongooseConnect();
+    const { sections } = await request.json();
+
+    if (!Array.isArray(sections)) {
       return NextResponse.json(
-        { message: "Expected an array of { id, order }" },
+        { message: "Invalid sections data" },
         { status: 400 }
       );
     }
 
-    await mongooseConnect();
-    const ops = body.map(({ id, order }) => ({
+    const ops = sections.map((section) => ({
       updateOne: {
-        filter: { _id: id },
-        update: { $set: { order } },
+        filter: { _id: section.id },
+        update: { $set: { order: section.order } },
       },
     }));
-    await Section.bulkWrite(ops);
 
-    const sections = await Section.find().sort("order");
-    return NextResponse.json(sections);
+    await SectionTemplate.bulkWrite(ops);
+
+    const updatedSections = await SectionTemplate.find().sort("order");
+    return NextResponse.json(updatedSections);
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi sắp xếp tiêu chí " + error },
+      { message: "Error reordering sections: " + error.message },
       { status: 500 }
     );
   }

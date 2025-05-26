@@ -18,6 +18,13 @@ export async function GET(request, { params }) {
 
     const report = await Report.findById(reportId);
 
+    if (!report) {
+      return NextResponse.json(
+        { message: "Không tìm thấy báo cáo" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(report, { status: 200 });
   } catch (error) {
     return NextResponse.json(

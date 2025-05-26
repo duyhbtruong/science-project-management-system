@@ -1,5 +1,4 @@
 import { Schema, models, model } from "mongoose";
-import { sectionSchema } from "./Section";
 
 /**
  * Report model schema.
@@ -10,7 +9,7 @@ import { sectionSchema } from "./Section";
  * - studentId: ID of student who submitted the report.
  * - instructorId: ID of instructor who instructed the report.
  * - topicId: ID of topic which student's report belongs to.
- * - sections: List of sections in report.
+ * - sections: List of references to Section documents.
  * - submittedDate: Date when student submitted the report.
  */
 export const reportSchema = new Schema(
@@ -22,7 +21,7 @@ export const reportSchema = new Schema(
       required: true,
     },
     topicId: { type: Schema.Types.ObjectId, ref: "Topic", required: true },
-    sections: { type: [sectionSchema], default: [] },
+    sections: [{ type: Schema.Types.ObjectId, ref: "Section" }],
     submittedDate: { type: Date, default: Date.now },
   },
   {

@@ -1,30 +1,36 @@
 import { NextResponse } from "next/server";
+import { SectionTemplate, Section } from "@/models/Section";
+import { Report } from "@/models/Report";
 import { mongooseConnect } from "@/lib/mongoose";
-import { Section } from "@/models/Section";
+import mongoose from "mongoose";
 
 export async function PUT(request, { params }) {
   try {
     const { id } = params;
-    const updates = await request.json();
-    const patch = {};
-    if (typeof updates.title === "string") patch.title = updates.title.trim();
-    if (typeof updates.order === "number") patch.order = updates.order;
+    if (!mongoose.isValidObjectId(id)) {
+      return NextResponse.json(
+        { message: "Invalid section ID" },
+        { status: 400 }
+      );
+    }
 
     await mongooseConnect();
-    const updated = await Section.findByIdAndUpdate(id, patch, {
+    const patch = await request.json();
+    const updated = await SectionTemplate.findByIdAndUpdate(id, patch, {
       new: true,
-      runValidators: true,
     });
+
     if (!updated) {
       return NextResponse.json(
-        { message: "Không tìm thấy tiêu chí." },
+        { message: "Section not found" },
         { status: 404 }
       );
     }
-    return NextResponse.json(updated, { status: 200 });
+
+    return NextResponse.json(updated);
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi cập nhật tiêu chí " + error },
+      { message: "Error updating section: " + error.message },
       { status: 500 }
     );
   }
@@ -33,18 +39,38 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const { id } = params;
+    if (!mongoose.isValidObjectId(id)) {
+      return NextResponse.json(
+        { message: "Invalid section ID" },
+        { status: 400 }
+      );
+    }
+
     await mongooseConnect();
-    const deleted = await Section.findByIdAndDelete(id);
+    const deleted = await SectionTemplate.findByIdAndDelete(id);
+
     if (!deleted) {
       return NextResponse.json(
-        { message: "Không tìm thấy tiêu chí." },
+        { message: "Section not found" },
         { status: 404 }
       );
     }
-    return NextResponse.json({ message: "Xóa tiêu chí thành công.", id });
+
+    const sections = await Section.find({ templateId: id });
+
+    for (const section of sections) {
+      await Report.updateOne(
+        { _id: section.reportId },
+        { $pull: { sections: section._id } }
+      );
+    }
+
+    await Section.deleteMany({ templateId: id });
+
+    return NextResponse.json({ message: "Section deleted successfully" });
   } catch (error) {
     return NextResponse.json(
-      { message: "Lỗi xóa tiêu chí " + error },
+      { message: "Error deleting section: " + error.message },
       { status: 500 }
     );
   }

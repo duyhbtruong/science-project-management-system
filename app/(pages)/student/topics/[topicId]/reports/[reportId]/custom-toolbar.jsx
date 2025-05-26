@@ -3,8 +3,9 @@ import parse from "html-react-parser";
 import { Button, Dropdown, message, Modal } from "antd";
 import { useState } from "react";
 import { Icon } from "@liveblocks/react-ui";
+import { semanticSearchReports } from "@/service/reportService";
 
-export const CustomToolbar = ({ editor }) => {
+export const CustomToolbar = ({ editor, savingStatus, field }) => {
   const [open, setOpen] = useState(false);
   const [msgApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,6 +38,17 @@ export const CustomToolbar = ({ editor }) => {
       onClick: () => handleAction("fixGrammar"),
     },
   ];
+
+  const handleSemanticSearch = async () => {
+    try {
+      console.log(field);
+      const res = await semanticSearchReports(field);
+      // const data = await res.json();
+      console.log(res);
+    } catch (error) {
+      msgApi.error("Lỗi khi tìm kiếm báo cáo " + error);
+    }
+  };
 
   const handleAction = (action) => {
     const { view, state } = editor;
@@ -94,7 +106,7 @@ export const CustomToolbar = ({ editor }) => {
 
   return (
     <>
-      <Toolbar editor={editor}>
+      <Toolbar editor={editor} className="border-b-[1px] border-gray-200">
         {contextHolder}
         <Dropdown
           menu={{ items }}
@@ -117,6 +129,14 @@ export const CustomToolbar = ({ editor }) => {
             <span className="mr-1">Ask AI</span>
           </Toolbar.Button>
         </Dropdown>
+        <Toolbar.Button
+          disabled={savingStatus === "saving"}
+          icon={<Icon.Search />}
+          name="Semantic Search"
+          onClick={handleSemanticSearch}
+        >
+          <span className="mr-1">Semantic Search</span>
+        </Toolbar.Button>
         <Toolbar.BlockSelector />
         <Toolbar.SectionInline />
         <Toolbar.Separator />
