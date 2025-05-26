@@ -1,11 +1,15 @@
-import { Toolbar } from "@liveblocks/react-tiptap";
-import parse from "html-react-parser";
-import { Button, Dropdown, message, Modal } from "antd";
+import { useParams } from "next/navigation";
 import { useState } from "react";
+import parse from "html-react-parser";
+import { Toolbar } from "@liveblocks/react-tiptap";
+import { Button, Dropdown, message, Modal } from "antd";
 import { Icon } from "@liveblocks/react-ui";
 import { semanticSearchReports } from "@/service/reportService";
 
 export const CustomToolbar = ({ editor, savingStatus, field }) => {
+  const params = useParams();
+  const reportId = params.reportId;
+
   const [open, setOpen] = useState(false);
   const [msgApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,10 +45,15 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
 
   const handleSemanticSearch = async () => {
     try {
+      const content = editor.getText();
+      if (!content.trim()) {
+        msgApi.error("Vui lòng nhập nội dung trước khi tìm kiếm.");
+        return;
+      }
       console.log(field);
-      const res = await semanticSearchReports(field);
+      // const res = await semanticSearchReports(field, reportId);
       // const data = await res.json();
-      console.log(res);
+      // console.log(res);
     } catch (error) {
       msgApi.error("Lỗi khi tìm kiếm báo cáo " + error);
     }

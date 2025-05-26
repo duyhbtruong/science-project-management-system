@@ -30,7 +30,8 @@ export async function GET(request, { params }) {
     const reviews = await ReviewGrade.find(filter)
       .populate({
         path: "topicId",
-        select: "vietnameseName englishName registrationPeriodId owner",
+        select:
+          "vietnameseName englishName registrationPeriodId owner createdAt updatedAt",
       })
       .populate({
         path: "instructorId",

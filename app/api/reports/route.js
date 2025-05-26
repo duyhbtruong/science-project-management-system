@@ -2,44 +2,53 @@ import { NextResponse } from "next/server";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Report } from "@/models/Report";
 import mongoose from "mongoose";
+import { Section } from "@/models/Section";
 
 export async function GET(request) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const sectionId = searchParams.get("sectionId");
+    const templateId = searchParams.get("templateId");
+    const reportId = searchParams.get("reportId");
 
     await mongooseConnect();
 
-    if (sectionId) {
-      if (!mongoose.isValidObjectId(sectionId)) {
+    if (templateId && reportId) {
+      if (!mongoose.isValidObjectId(templateId)) {
         return NextResponse.json(
-          { message: "Section id không hợp lệ" },
+          { message: "Template id không hợp lệ" },
           { status: 400 }
         );
       }
 
-      const report = await Report.findOne({
-        "sections._id": sectionId,
-      }).select("+sections.embedding");
-
-      if (!report) {
+      if (!mongoose.isValidObjectId(reportId)) {
         return NextResponse.json(
-          { message: "Không tìm thấy báo cáo" },
+          { message: "Report id không hợp lệ" },
+          { status: 400 }
+        );
+      }
+
+      const section = await Section.findOne({
+        reportId: reportId,
+        templateId: templateId,
+      });
+
+      if (!section) {
+        return NextResponse.json(
+          { message: "Không tìm thấy section" },
           { status: 404 }
         );
       }
 
-      const section = report.sections.find(
-        (section) => section._id.toString() === sectionId
-      );
-
-      console.log("SECTION: ", section);
-
-      const similarReports = await Report.aggregate([
+      const similarReports = await Section.aggregate([
         {
           $vectorSearch: {
-            index: "search_report",
-            path: "sections.embedding",
+            filter: {
+              reportId: {
+                $ne: mongoose.Types.ObjectId.createFromHexString(reportId),
+              },
+            },
+            index: "section_vector_search",
+            path: "embedding",
             queryVector: section.embedding,
             numCandidates: 100,
             limit: 5,
@@ -48,10 +57,9 @@ export async function GET(request) {
         {
           $project: {
             _id: 1,
-            studentId: 1,
-            instructorId: 1,
-            topicId: 1,
-            submittedDate: 1,
+            templateId: 1,
+            reportId: 1,
+            content: 1,
             score: {
               $meta: "vectorSearchScore",
             },

@@ -1,13 +1,14 @@
 import { stripHtml } from "@/utils/format";
 
-export const semanticSearchReports = async (sectionId) => {
+export const semanticSearchReports = async (templateId, reportId) => {
   try {
-    const res = await fetch(`/api/reports?sectionId=${sectionId}`, {
-      method: "GET",
-      cache: "no-store",
-    });
-
-    console.log(res);
+    const res = await fetch(
+      `/api/reports?templateId=${templateId}&reportId=${reportId}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
 
     if (!res.ok) {
       throw new Error("Failed to get reports");
@@ -36,27 +37,40 @@ export const getReportById = async (reportId) => {
   }
 };
 
-export const updateReportSection = async (reportId, sectionId, content) => {
+export const updateReportSection = async (reportId, templateId, content) => {
   try {
     const cleanContent = stripHtml(content);
-    const embeddingResponse = await fetch(
-      `http://localhost:3000/api/openai/embed`,
-      {
-        method: "POST",
-        body: JSON.stringify({ text: cleanContent }),
-      }
-    );
+    if (cleanContent) {
+      const embeddingResponse = await fetch(
+        `http://localhost:3000/api/openai/embed`,
+        {
+          method: "POST",
+          body: JSON.stringify({ text: cleanContent }),
+        }
+      );
 
-    const { embedding } = await embeddingResponse.json();
-    const response = await fetch(
-      `http://localhost:3000/api/reports/${reportId}/sections/${sectionId}`,
-      {
-        method: "PUT",
-        body: JSON.stringify({ content, embedding }),
-      }
-    );
+      const { embedding } = await embeddingResponse.json();
+      const response = await fetch(
+        `http://localhost:3000/api/reports/${reportId}/sections/${templateId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ content, embedding }),
+        }
+      );
 
-    return response;
+      return response;
+    } else {
+      const embedding = [];
+      const response = await fetch(
+        `http://localhost:3000/api/reports/${reportId}/sections/${templateId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ content, embedding }),
+        }
+      );
+
+      return response;
+    }
   } catch (error) {
     return error;
   }

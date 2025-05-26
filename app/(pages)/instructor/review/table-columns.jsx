@@ -21,12 +21,12 @@ export const getTableColumns = (router, handleDelete) => [
   },
   {
     title: "Ngày đăng ký",
-    dataIndex: "createdAt",
+    dataIndex: ["topicId", "createdAt"],
     key: "createdAt",
     width: "15%",
     render: (_, record) => (
       <span className="text-gray-500">
-        {dateFormat(new Date(record.createdAt))}
+        {dateFormat(new Date(record.topicId.createdAt))}
       </span>
     ),
   },
