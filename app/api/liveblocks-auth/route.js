@@ -30,9 +30,6 @@ export async function POST(request) {
   const isOwner = report.topicId.owner.accountId.equals(user.id);
   const isInstructor = report.topicId.instructor.accountId.equals(user.id);
 
-  console.log("IS OWNER: ", isOwner);
-  console.log("IS INSTRUCTOR: ", isInstructor);
-
   if (!isOwner && !isInstructor) {
     return new Response("Unauthorized", { status: 401 });
   }
