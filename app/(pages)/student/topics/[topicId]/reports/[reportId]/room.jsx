@@ -12,9 +12,17 @@ export function Room({ children }) {
   const params = useParams();
   return (
     <LiveblocksProvider
-      publicApiKey={
-        "pk_dev_U7jWjQN6D1VsC-Ty3cE43k_DqVJmSHRzasuWycF8zeuzMY4HmVh9fUnihPhomSZA"
-      }
+      authEndpoint={async () => {
+        const endpoint = "/api/liveblocks-auth";
+        const room = params.reportId;
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          body: JSON.stringify({ room }),
+        });
+
+        return await response.json();
+      }}
     >
       <RoomProvider id={params.reportId}>
         <ClientSideSuspense

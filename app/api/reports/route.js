@@ -55,11 +55,22 @@ export async function GET(request) {
           },
         },
         {
+          $lookup: {
+            from: "reports",
+            localField: "reportId",
+            foreignField: "_id",
+            as: "report",
+          },
+        },
+        {
+          $unwind: "$report",
+        },
+        {
           $project: {
             _id: 1,
             templateId: 1,
-            reportId: 1,
             content: 1,
+            report: 1,
             score: {
               $meta: "vectorSearchScore",
             },

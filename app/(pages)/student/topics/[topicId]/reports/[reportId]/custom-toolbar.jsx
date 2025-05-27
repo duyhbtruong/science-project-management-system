@@ -2,9 +2,10 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import parse from "html-react-parser";
 import { Toolbar } from "@liveblocks/react-tiptap";
-import { Button, Dropdown, message, Modal } from "antd";
+import { Button, Dropdown, message, Modal, Drawer, Card } from "antd";
 import { Icon } from "@liveblocks/react-ui";
 import { semanticSearchReports } from "@/service/reportService";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export const CustomToolbar = ({ editor, savingStatus, field }) => {
   const params = useParams();
@@ -14,6 +15,9 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
   const [msgApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [expandedCards, setExpandedCards] = useState({});
   const [comparisonData, setComparisonData] = useState({
     original: "",
     modified: "",
@@ -50,12 +54,15 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
         msgApi.error("Vui lòng nhập nội dung trước khi tìm kiếm.");
         return;
       }
-      console.log(field);
-      // const res = await semanticSearchReports(field, reportId);
-      // const data = await res.json();
-      // console.log(res);
+      setIsLoading(true);
+      const res = await semanticSearchReports(field, reportId);
+      const data = await res.json();
+      setSearchResults(data);
+      setIsDrawerOpen(true);
     } catch (error) {
       msgApi.error("Lỗi khi tìm kiếm báo cáo " + error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,6 +120,20 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
     setIsModalOpen(false);
   };
 
+  const toggleCard = (index) => {
+    setExpandedCards((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const truncateContent = (content) => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = content;
+    const text = tempDiv.textContent || tempDiv.innerText;
+    return text.length > 200 ? text.substring(0, 200) + "..." : text;
+  };
+
   return (
     <>
       <Toolbar editor={editor} className="border-b-[1px] border-gray-200">
@@ -151,6 +172,48 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
         <Toolbar.Separator />
         <Toolbar.SectionCollaboration />
       </Toolbar>
+
+      <Drawer
+        title="Kết quả tìm kiếm tương tự"
+        placement="right"
+        onClose={() => setIsDrawerOpen(false)}
+        open={isDrawerOpen}
+        width={600}
+      >
+        <div className="space-y-4">
+          {searchResults.map((result, index) => (
+            <Card key={index} className="shadow-sm">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-500">
+                    Điểm tương đồng: {(result.score * 100).toFixed(2)}%
+                  </span>
+                </div>
+                <div className="prose tiptap max-w-none">
+                  {expandedCards[index]
+                    ? parse(result.content)
+                    : parse(truncateContent(result.content))}
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    type="text"
+                    icon={
+                      expandedCards[index] ? (
+                        <ChevronUp className="size-4" />
+                      ) : (
+                        <ChevronDown className="size-4" />
+                      )
+                    }
+                    onClick={() => toggleCard(index)}
+                  >
+                    {expandedCards[index] ? "Thu gọn" : "Xem thêm"}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </Drawer>
 
       <Modal
         title="Xem lại thay đổi"
