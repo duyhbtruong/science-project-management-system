@@ -10,6 +10,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { getSections } from "@/service/sectionService";
 import { Room } from "./room";
 import { CheckCircleIcon, LoaderIcon } from "lucide-react";
+import { Avatars } from "./avatars";
 
 export default function ReportPage() {
   const params = useParams();
@@ -79,7 +80,10 @@ export default function ReportPage() {
       <div className="relative">
         <form className="p-6 space-y-6 bg-white rounded-lg shadow">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Báo cáo</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold h-9">Báo cáo</h1>
+              <Avatars />
+            </div>
             {savingStatus !== "idle" && (
               <div className="flex items-center gap-1.5 px-3 py-1 text-sm text-gray-600 border border-gray-200 rounded-full bg-gray-50">
                 {savingStatus === "saving" ? (
