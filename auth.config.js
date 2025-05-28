@@ -1,6 +1,6 @@
 const getAccountByEmail = async (email) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/auth?email=${email}`, {
+    const res = await fetch(`/api/auth?email=${email}`, {
       cache: "no-store",
     });
 
@@ -11,7 +11,8 @@ const getAccountByEmail = async (email) => {
       return account;
     }
   } catch (error) {
-    console.log("Error: ", error);
+    console.error("Error fetching account:", error);
+    return null;
   }
 };
 
