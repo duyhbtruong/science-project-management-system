@@ -16,7 +16,29 @@ export async function GET(request, { params }) {
 
     await mongooseConnect();
 
-    const report = await Report.findById(reportId);
+    const report = await Report.findById(reportId).populate([
+      {
+        path: "topicId",
+      },
+      {
+        path: "studentId",
+        populate: {
+          path: "accountId",
+        },
+      },
+      {
+        path: "instructorId",
+        populate: {
+          path: "accountId",
+        },
+      },
+      {
+        path: "sections",
+        populate: {
+          path: "templateId",
+        },
+      },
+    ]);
 
     if (!report) {
       return NextResponse.json(
