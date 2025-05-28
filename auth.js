@@ -8,7 +8,9 @@ import bcrypt from "bcrypt";
 
 const getAccountByEmail = async (email) => {
   try {
-    const res = await fetch(`/api/auth?email=${email}`, {
+    const baseUrl = process.env.AUTH_URL || "http://localhost:3000";
+
+    const res = await fetch(`${baseUrl}/api/auth?email=${email}`, {
       cache: "no-store",
     });
 
