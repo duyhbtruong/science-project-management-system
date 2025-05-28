@@ -1,6 +1,6 @@
 export const getCriteria = async () => {
   try {
-    const res = await fetch("http://localhost:3000/api/criteria", {
+    const res = await fetch("/api/criteria", {
       method: "GET",
       cache: "no-store",
     });
@@ -16,7 +16,7 @@ export const getCriteria = async () => {
 };
 
 export const createCriteria = async (criteriaData) => {
-  const res = await fetch(`http://localhost:3000/api/criteria`, {
+  const res = await fetch(`/api/criteria`, {
     method: "POST",
     body: JSON.stringify(criteriaData),
   });
@@ -30,7 +30,7 @@ export const createCriteria = async (criteriaData) => {
 };
 
 export const updateCriteria = async (id, updates) => {
-  const res = await fetch(`http://localhost:3000/api/criteria/${id}`, {
+  const res = await fetch(`/api/criteria/${id}`, {
     method: "PUT",
     body: JSON.stringify(updates),
   });
@@ -44,7 +44,7 @@ export const updateCriteria = async (id, updates) => {
 };
 
 export const deleteCriteria = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/criteria/${id}`, {
+  const res = await fetch(`/api/criteria/${id}`, {
     method: "DELETE",
   });
 
@@ -57,7 +57,7 @@ export const deleteCriteria = async (id) => {
 };
 
 export const reorderCriteria = async (criteria) => {
-  const res = await fetch(`http://localhost:3000/api/criteria/reorder`, {
+  const res = await fetch(`/api/criteria/reorder`, {
     method: "PUT",
     body: JSON.stringify(criteria),
   });

@@ -1,6 +1,6 @@
 export const getAllAppraisalBoards = async () => {
   try {
-    const res = await fetch(`http://localhost:3000/api/appraisal-boards`, {
+    const res = await fetch(`/api/appraisal-boards`, {
       method: "GET",
       cache: "no-store",
     });
@@ -17,13 +17,10 @@ export const getAllAppraisalBoards = async () => {
 
 export const getAllAppraisalBoardsByFaculty = async (faculty) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraisal-boards?faculty=${faculty}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/appraisal-boards?faculty=${faculty}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to get all appraisal boards.");
@@ -37,13 +34,10 @@ export const getAllAppraisalBoardsByFaculty = async (faculty) => {
 
 export const searchAppraisalBoards = async (searchValues) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraisal-boards?search=${searchValues}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/appraisal-boards?search=${searchValues}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to search appraisal boards.");
@@ -57,13 +51,10 @@ export const searchAppraisalBoards = async (searchValues) => {
 
 export const getAppraisalBoardById = async (id) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraisal-boards/${id}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/appraisal-boards/${id}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to fetch appraisal board info.");
@@ -77,7 +68,7 @@ export const getAppraisalBoardById = async (id) => {
 
 export const createAppraisalBoard = async (values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/appraisal-boards`, {
+    const res = await fetch(`/api/appraisal-boards`, {
       method: "POST",
       body: JSON.stringify(values),
     });
@@ -94,13 +85,10 @@ export const createAppraisalBoard = async (values) => {
 
 export const updateAppraisalBoardById = async (id, values) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraisal-boards/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(values),
-      }
-    );
+    const res = await fetch(`/api/appraisal-boards/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(values),
+    });
 
     if (!res) {
       throw new Error("Failed to update appraisal board.");
@@ -114,12 +102,9 @@ export const updateAppraisalBoardById = async (id, values) => {
 
 export const deleteAppraisalBoardById = async (id) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraisal-boards/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const res = await fetch(`/api/appraisal-boards/${id}`, {
+      method: "DELETE",
+    });
 
     if (!res) {
       throw new Error("Failed to delete appraisal board.");

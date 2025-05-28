@@ -1,6 +1,6 @@
 export const createTopic = async (formData) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/topics/`, {
+    const res = await fetch(`/api/topics/`, {
       method: "POST",
       body: JSON.stringify(formData),
     });
@@ -17,7 +17,7 @@ export const createTopic = async (formData) => {
 
 export const getTopics = async () => {
   try {
-    const res = await fetch(`http://localhost:3000/api/topics`, {
+    const res = await fetch(`/api/topics`, {
       method: "GET",
       cache: "no-store",
     });
@@ -34,13 +34,10 @@ export const getTopics = async () => {
 
 export const getTopicsByPeriod = async (periodId) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/topics?period=${periodId}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/topics?period=${periodId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to get topics by period.");
@@ -54,7 +51,7 @@ export const getTopicsByPeriod = async (periodId) => {
 
 export const getTopicsByOwner = async (owner) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/topics?owner=${owner}`, {
+    const res = await fetch(`/api/topics?owner=${owner}`, {
       method: "GET",
       cache: "no-store",
     });
@@ -71,7 +68,7 @@ export const getTopicsByOwner = async (owner) => {
 
 export const getTopicById = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
+    const res = await fetch(`/api/topics/${id}`, {
       method: "GET",
       cache: "no-store",
     });
@@ -89,13 +86,10 @@ export const getTopicById = async (id) => {
 // TODO: Instead of fetching topics, fetch reports
 export const getReportsByTopicId = async (topicId) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/topics/${topicId}?sections=true`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/topics/${topicId}?sections=true`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to get reports by topic id.");
@@ -110,7 +104,7 @@ export const getReportsByTopicId = async (topicId) => {
 export const getTopicsByInstructorId = async (selectedPeriod, instructorId) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/topics?instructor=${instructorId}&period=${selectedPeriod}`,
+      `/api/topics?instructor=${instructorId}&period=${selectedPeriod}`,
       {
         method: "GET",
         cache: "no-store",
@@ -133,7 +127,7 @@ export const getTopicsByReviewInstructorId = async (
 ) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/topics?reviewInstructor=${instructorId}&period=${selectedPeriod}`,
+      `/api/topics?reviewInstructor=${instructorId}&period=${selectedPeriod}`,
       {
         method: "GET",
         cache: "no-store",
@@ -156,7 +150,7 @@ export const getTopicsByAppraisalBoardStaffId = async (
 ) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/topics?staffId=${staffId}&period=${selectedPeriod}`,
+      `/api/topics?staffId=${staffId}&period=${selectedPeriod}`,
       {
         method: "GET",
         cache: "no-store",
@@ -176,7 +170,7 @@ export const getTopicsByAppraisalBoardStaffId = async (
 export const searchTopic = async (selectedPeriod, searchValue) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/topics?search=${searchValue.toUpperCase()}&period=${selectedPeriod}`,
+      `/api/topics?search=${searchValue.toUpperCase()}&period=${selectedPeriod}`,
       {
         method: "GET",
         cache: "no-store",
@@ -194,7 +188,7 @@ export const searchTopic = async (selectedPeriod, searchValue) => {
 
 export const updateTopicById = async (id, values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
+    const res = await fetch(`/api/topics/${id}`, {
       method: "PUT",
       body: JSON.stringify(values),
     });
@@ -211,7 +205,7 @@ export const updateTopicById = async (id, values) => {
 
 export const deleteTopicById = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
+    const res = await fetch(`/api/topics/${id}`, {
       method: "DELETE",
     });
 

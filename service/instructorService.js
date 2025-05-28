@@ -1,6 +1,6 @@
 export const getAllInstructors = async () => {
   try {
-    const res = await fetch(`http://localhost:3000/api/instructors`, {
+    const res = await fetch(`/api/instructors`, {
       method: "GET",
       cache: "no-store",
     });
@@ -17,13 +17,10 @@ export const getAllInstructors = async () => {
 
 export const getAllInstructorsByFaculty = async (faculty) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/instructors?faculty=${faculty}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/instructors?faculty=${faculty}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       throw new Error("Failed to fetch instructors.");
@@ -37,13 +34,10 @@ export const getAllInstructorsByFaculty = async (faculty) => {
 
 export const searchInstructors = async (searchValues) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/instructors?search=${searchValues}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/instructors?search=${searchValues}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       throw new Error("Failed to fetch instructors.");
@@ -57,7 +51,7 @@ export const searchInstructors = async (searchValues) => {
 
 export const getInstructorById = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/instructors/${id}`, {
+    const res = await fetch(`/api/instructors/${id}`, {
       method: "GET",
       cache: "no-store",
     });
@@ -74,7 +68,7 @@ export const getInstructorById = async (id) => {
 
 export const createInstructor = async (values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/instructors`, {
+    const res = await fetch(`/api/instructors`, {
       method: "POST",
       body: JSON.stringify(values),
     });
@@ -91,7 +85,7 @@ export const createInstructor = async (values) => {
 
 export const updateInstructorById = async (id, values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/instructors/${id}`, {
+    const res = await fetch(`/api/instructors/${id}`, {
       method: "PUT",
       body: JSON.stringify(values),
     });
@@ -108,7 +102,7 @@ export const updateInstructorById = async (id, values) => {
 
 export const deleteInstructorById = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/instructors/${id}`, {
+    const res = await fetch(`/api/instructors/${id}`, {
       method: "DELETE",
     });
 

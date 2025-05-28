@@ -1,12 +1,9 @@
 export const getAppraiseById = async (appraiseId) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraises/${appraiseId}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/appraises/${appraiseId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to get appraise by appraise id.");
@@ -24,7 +21,7 @@ export const getAppraisesByAppraisalBoardId = async (
 ) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/appraises?periodId=${periodId}&appraisalBoardId=${appraisalBoardId}`,
+      `/api/appraises?periodId=${periodId}&appraisalBoardId=${appraisalBoardId}`,
       {
         method: "GET",
         cache: "no-store",
@@ -43,7 +40,7 @@ export const getAppraisesByAppraisalBoardId = async (
 
 export const createAppraise = async (values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/appraises`, {
+    const res = await fetch(`/api/appraises`, {
       method: "POST",
       body: JSON.stringify(values),
     });
@@ -60,13 +57,10 @@ export const createAppraise = async (values) => {
 
 export const updateAppraiseById = async (appraiseId, values) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraises/${appraiseId}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(values),
-      }
-    );
+    const res = await fetch(`/api/appraises/${appraiseId}`, {
+      method: "PUT",
+      body: JSON.stringify(values),
+    });
 
     if (!res) {
       throw new Error("Failed to update appraise.");
@@ -80,12 +74,9 @@ export const updateAppraiseById = async (appraiseId, values) => {
 
 export const deleteAppraiseById = async (appraiseId) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/appraises/${appraiseId}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const res = await fetch(`/api/appraises/${appraiseId}`, {
+      method: "DELETE",
+    });
 
     if (!res) {
       throw new Error("Failed to delete appraise.");

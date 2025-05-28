@@ -1,5 +1,5 @@
 export const getSections = async () => {
-  const res = await fetch(`http://localhost:3000/api/sections`, {
+  const res = await fetch(`/api/sections`, {
     method: "GET",
     cache: "no-store",
   });
@@ -13,7 +13,7 @@ export const getSections = async () => {
 };
 
 export const createSection = async (title, order) => {
-  const res = await fetch(`http://localhost:3000/api/sections`, {
+  const res = await fetch(`/api/sections`, {
     method: "POST",
     body: JSON.stringify({ title, order }),
   });
@@ -27,7 +27,7 @@ export const createSection = async (title, order) => {
 };
 
 export const updateSection = async (id, updates) => {
-  const res = await fetch(`http://localhost:3000/api/sections/${id}`, {
+  const res = await fetch(`/api/sections/${id}`, {
     method: "PUT",
     body: JSON.stringify(updates),
   });
@@ -41,7 +41,7 @@ export const updateSection = async (id, updates) => {
 };
 
 export const deleteSection = async (id) => {
-  const res = await fetch(`http://localhost:3000/api/sections/${id}`, {
+  const res = await fetch(`/api/sections/${id}`, {
     method: "DELETE",
   });
 
@@ -54,7 +54,7 @@ export const deleteSection = async (id) => {
 };
 
 export const reorderSections = async (sections) => {
-  const res = await fetch(`http://localhost:3000/api/sections/reorder`, {
+  const res = await fetch(`/api/sections/reorder`, {
     method: "PUT",
     body: JSON.stringify({ sections }),
   });

@@ -41,17 +41,14 @@ export const updateReportSection = async (reportId, templateId, content) => {
   try {
     const cleanContent = stripHtml(content);
     if (cleanContent) {
-      const embeddingResponse = await fetch(
-        `http://localhost:3000/api/openai/embed`,
-        {
-          method: "POST",
-          body: JSON.stringify({ text: cleanContent }),
-        }
-      );
+      const embeddingResponse = await fetch(`/api/openai/embed`, {
+        method: "POST",
+        body: JSON.stringify({ text: cleanContent }),
+      });
 
       const { embedding } = await embeddingResponse.json();
       const response = await fetch(
-        `http://localhost:3000/api/reports/${reportId}/sections/${templateId}`,
+        `/api/reports/${reportId}/sections/${templateId}`,
         {
           method: "PUT",
           body: JSON.stringify({ content, embedding }),
@@ -62,7 +59,7 @@ export const updateReportSection = async (reportId, templateId, content) => {
     } else {
       const embedding = [];
       const response = await fetch(
-        `http://localhost:3000/api/reports/${reportId}/sections/${templateId}`,
+        `/api/reports/${reportId}/sections/${templateId}`,
         {
           method: "PUT",
           body: JSON.stringify({ content, embedding }),

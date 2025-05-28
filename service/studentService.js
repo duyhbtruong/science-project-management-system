@@ -1,6 +1,6 @@
 export const getAllStudents = async () => {
   try {
-    const res = await fetch(`http://localhost:3000/api/students`, {
+    const res = await fetch(`/api/students`, {
       method: "GET",
       cache: "no-store",
     });
@@ -17,13 +17,10 @@ export const getAllStudents = async () => {
 
 export const searchStudents = async (searchValues) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/students?search=${searchValues}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/students?search=${searchValues}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       throw new Error("Failed to fetch students.");
@@ -37,7 +34,7 @@ export const searchStudents = async (searchValues) => {
 
 export const getStudentById = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
+    const res = await fetch(`/api/students/${id}`, {
       method: "GET",
       cache: "no-store",
     });
@@ -54,7 +51,7 @@ export const getStudentById = async (id) => {
 
 export const createStudent = async (values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/students`, {
+    const res = await fetch(`/api/students`, {
       method: "POST",
       body: JSON.stringify(values),
     });
@@ -71,7 +68,7 @@ export const createStudent = async (values) => {
 
 export const updateStudentById = async (id, values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
+    const res = await fetch(`/api/students/${id}`, {
       method: "PUT",
       body: JSON.stringify(values),
     });
@@ -88,7 +85,7 @@ export const updateStudentById = async (id, values) => {
 
 export const deleteStudentById = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/students/${id}`, {
+    const res = await fetch(`/api/students/${id}`, {
       method: "DELETE",
     });
 

@@ -1,6 +1,6 @@
 export const getReviewById = async (id) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/reviews/${id}`, {
+    const res = await fetch(`/api/reviews/${id}`, {
       method: "GET",
       cache: "no-store",
     });
@@ -18,7 +18,7 @@ export const getReviewById = async (id) => {
 export const getReviewsByInstructorId = async (periodId, instructorId) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/reviews?periodId=${periodId}&instructorId=${instructorId}`,
+      `/api/reviews?periodId=${periodId}&instructorId=${instructorId}`,
       {
         method: "GET",
         cache: "no-store",
@@ -37,7 +37,7 @@ export const getReviewsByInstructorId = async (periodId, instructorId) => {
 
 export const createReview = async (values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/reviews`, {
+    const res = await fetch(`/api/reviews`, {
       method: "POST",
       body: JSON.stringify(values),
     });
@@ -54,7 +54,7 @@ export const createReview = async (values) => {
 
 export const updateReviewById = async (reviewId, values) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
+    const res = await fetch(`/api/reviews/${reviewId}`, {
       method: "PUT",
       body: JSON.stringify(values),
     });
@@ -71,7 +71,7 @@ export const updateReviewById = async (reviewId, values) => {
 
 export const deleteReviewById = async (reviewId) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
+    const res = await fetch(`/api/reviews/${reviewId}`, {
       method: "DELETE",
     });
 

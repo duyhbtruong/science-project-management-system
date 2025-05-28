@@ -1,6 +1,6 @@
 export const getAllPeriods = async () => {
   try {
-    const res = await fetch(`http://localhost:3000/api/registration-periods`, {
+    const res = await fetch(`/api/registration-periods`, {
       method: "GET",
       cache: "no-store",
     });
@@ -18,7 +18,7 @@ export const getAllPeriods = async () => {
 export const searchPeriods = async (searchedValues) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/registration-periods?search=${searchedValues}`,
+      `/api/registration-periods?search=${searchedValues}`,
       {
         method: "GET",
         cache: "no-store",
@@ -37,10 +37,10 @@ export const searchPeriods = async (searchedValues) => {
 
 export const getPeriodById = async (periodId) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/registration-periods/${periodId}`,
-      { method: "GET", cache: "no-store" }
-    );
+    const res = await fetch(`/api/registration-periods/${periodId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to get period info.");
@@ -54,7 +54,7 @@ export const getPeriodById = async (periodId) => {
 
 export const createPeriod = async (periodValues) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/registration-periods`, {
+    const res = await fetch(`/api/registration-periods`, {
       method: "POST",
       body: JSON.stringify(periodValues),
     });
@@ -71,10 +71,10 @@ export const createPeriod = async (periodValues) => {
 
 export const updatePeriodById = async (periodId, periodValues) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/registration-periods/${periodId}`,
-      { method: "PUT", body: JSON.stringify(periodValues) }
-    );
+    const res = await fetch(`/api/registration-periods/${periodId}`, {
+      method: "PUT",
+      body: JSON.stringify(periodValues),
+    });
 
     if (!res) {
       throw new Error("Failed to update period.");
@@ -88,10 +88,9 @@ export const updatePeriodById = async (periodId, periodValues) => {
 
 export const deletePeriodById = async (periodId) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/registration-periods/${periodId}`,
-      { method: "DELETE" }
-    );
+    const res = await fetch(`/api/registration-periods/${periodId}`, {
+      method: "DELETE",
+    });
 
     if (!res) {
       throw new Error("Failed to delete period.");

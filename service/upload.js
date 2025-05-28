@@ -1,7 +1,7 @@
 // TODO: registerFile is currently a link, change to a file object
 export const uploadRegisterFile = async (topicId, registerFile) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {
+    const res = await fetch(`/api/upload/${topicId}`, {
       method: "PUT",
       body: JSON.stringify({ registerFile }),
     });
@@ -18,7 +18,7 @@ export const uploadRegisterFile = async (topicId, registerFile) => {
 
 export const uploadSubmitFile = async (topicId, submitFile) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {
+    const res = await fetch(`/api/upload/${topicId}`, {
       method: "PUT",
       body: JSON.stringify({ submitFile }),
     });
@@ -35,7 +35,7 @@ export const uploadSubmitFile = async (topicId, submitFile) => {
 
 export const uploadContractFile = async (topicId, contractFile) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {
+    const res = await fetch(`/api/upload/${topicId}`, {
       method: "PUT",
       body: JSON.stringify({ contractFile }),
     });
@@ -52,7 +52,7 @@ export const uploadContractFile = async (topicId, contractFile) => {
 
 export const uploadPaymentFile = async (topicId, paymentFile) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/upload/${topicId}`, {
+    const res = await fetch(`/api/upload/${topicId}`, {
       method: "PUT",
       body: JSON.stringify({ paymentFile }),
     });
@@ -68,7 +68,7 @@ export const uploadPaymentFile = async (topicId, paymentFile) => {
 };
 
 export const deleteRegisterFile = async (filePath) => {
-  const res = await fetch(`http://localhost:3000/api/upload/delete`, {
+  const res = await fetch(`/api/upload/delete`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

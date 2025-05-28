@@ -1,6 +1,6 @@
 export const getAccounts = async () => {
   try {
-    const res = await fetch(`http://localhost:3000/api/accounts`, {
+    const res = await fetch(`/api/accounts`, {
       method: "GET",
       cache: "no-store",
     });
@@ -17,7 +17,7 @@ export const getAccounts = async () => {
 
 export const getAccountById = async (accountId) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/accounts/${accountId}`, {
+    const res = await fetch(`/api/accounts/${accountId}`, {
       method: "GET",
     });
 
@@ -33,13 +33,10 @@ export const getAccountById = async (accountId) => {
 
 export const searchAccounts = async (searchValues) => {
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/accounts?search=${searchValues}`,
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(`/api/accounts?search=${searchValues}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
     if (!res) {
       throw new Error("Failed to search accounts.");
@@ -53,7 +50,7 @@ export const searchAccounts = async (searchValues) => {
 
 export const deleteAccountById = async (accountId) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/accounts/${accountId}`, {
+    const res = await fetch(`/api/accounts/${accountId}`, {
       method: "DELETE",
     });
 
