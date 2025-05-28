@@ -12,12 +12,19 @@ import Image from "next/image";
 export const login = async (values) => {
   const { email, password } = values;
   try {
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       email,
       password,
-      redirectTo: DEFAULT_LOGIN_REDIRECT,
+      redirect: false,
     });
+
+    if (result?.error) {
+      return { error: result.error };
+    }
+
+    return { success: true };
   } catch (error) {
+    console.error("Login error:", error);
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
@@ -26,8 +33,7 @@ export const login = async (values) => {
           return { error: "Có gì đó sai sai." };
       }
     }
-
-    throw error;
+    return { error: "An unexpected error occurred." };
   }
 };
 

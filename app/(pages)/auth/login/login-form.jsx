@@ -4,14 +4,22 @@ import { useState, useTransition } from "react";
 import { Alert, Button, Form, Input } from "antd";
 import { login } from "@/app/(pages)/auth/login/page";
 import { LockIcon, MailIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
   const [loginError, setLoginError] = useState();
+  const router = useRouter();
 
   const onFinish = (values) => {
     startTransition(async () => {
-      setLoginError(await login(values));
+      const result = await login(values);
+      if (result.error) {
+        setLoginError(result.error);
+      } else if (result.success) {
+        router.push("/");
+        router.refresh();
+      }
     });
   };
 
@@ -40,21 +48,9 @@ export const LoginForm = () => {
         </Form.Item>
 
         <Form.Item
-          label="Password"
+          label="Mật khẩu"
           name="password"
-          rules={[
-            { required: true, message: "Chưa nhập mật khẩu!" },
-            {
-              validator(_, value) {
-                if (!value || value.length > 6) {
-                  return Promise.resolve();
-                }
-                return Promise.reject(
-                  new Error("Mật khẩu phải dài hơn 6 ký tự!")
-                );
-              },
-            },
-          ]}
+          rules={[{ required: true, message: "Chưa nhập mật khẩu!" }]}
           onFocus={() => setLoginError()}
         >
           <Input.Password
@@ -63,14 +59,18 @@ export const LoginForm = () => {
             disabled={isPending}
           />
         </Form.Item>
-        {loginError && loginError?.error && (
-          <Form.Item>
-            <Alert message={loginError.error} type="error" showIcon />
-          </Form.Item>
+
+        {loginError && (
+          <Alert message={loginError} type="error" showIcon className="mb-4" />
         )}
 
         <Form.Item>
-          <Button type="primary" block disabled={isPending} htmlType="submit">
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="w-full"
+            loading={isPending}
+          >
             Đăng nhập
           </Button>
         </Form.Item>

@@ -59,7 +59,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           if (passwordsMatch) {
             console.log("Authentication successful for:", email);
-            return account;
+            return {
+              id: account._id.toString(),
+              email: account.email,
+              name: account.name,
+              role: account.role,
+            };
           }
         } else {
           console.log("Invalid credentials format:", parsedCredentials.error);
@@ -68,8 +73,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/auth/login",
+  },
   secret: process.env.AUTH_SECRET,
-  debug: true, // Enable debug mode
+  debug: true,
   adapter: MongoDBAdapter(clientPromise),
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
 });
