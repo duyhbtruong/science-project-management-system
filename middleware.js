@@ -21,6 +21,8 @@ const ROLE_DEFAULT_PATH = {
 
 export default auth(async (req) => {
   const { nextUrl: url } = req;
+  const origin = url.origin;
+  console.log(origin);
 
   // 1) Let NextAuth handle its own API‐auth routes
   if (url.pathname.startsWith(apiAuthPrefix)) {
@@ -37,7 +39,7 @@ export default auth(async (req) => {
     // → already logged in? send to dashboard
     if (isLoggedIn) {
       const dest = ROLE_DEFAULT_PATH[userRole] ?? DEFAULT_LOGIN_REDIRECT;
-      return NextResponse.redirect(new URL(dest, url));
+      return NextResponse.redirect(new URL(dest, origin));
     }
 
     // → else let them see login/register
@@ -46,7 +48,7 @@ export default auth(async (req) => {
 
   // 4) If not logged in AND not a public page, force login
   if (!isLoggedIn && !publicRoutes.includes(url.pathname)) {
-    return NextResponse.redirect(new URL("/auth/login", url));
+    return NextResponse.redirect(new URL("/auth/login", origin));
   }
 
   // 5) If logged in AND has a role, ensure they're inside their role‐area
@@ -54,7 +56,7 @@ export default auth(async (req) => {
     // If at root path, redirect to role-specific path
     if (url.pathname === "/") {
       const dest = ROLE_DEFAULT_PATH[userRole] ?? DEFAULT_LOGIN_REDIRECT;
-      return NextResponse.redirect(new URL(dest, url));
+      return NextResponse.redirect(new URL(dest, origin));
     }
 
     const base = `/${userRole}`;
@@ -62,7 +64,7 @@ export default auth(async (req) => {
     if (!url.pathname.startsWith(base)) {
       // → send them to that role's default path
       const dest = ROLE_DEFAULT_PATH[userRole] ?? DEFAULT_LOGIN_REDIRECT;
-      return NextResponse.redirect(new URL(dest, url));
+      return NextResponse.redirect(new URL(dest, origin));
     }
   }
 
