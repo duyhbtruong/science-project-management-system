@@ -1,23 +1,3 @@
-const getAccountByEmail = async (email) => {
-  try {
-    const baseUrl = process.env.AUTH_URL || "http://localhost:3000";
-
-    const res = await fetch(`${baseUrl}/api/auth?email=${email}`, {
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch account.");
-    } else {
-      const { account } = await res.json();
-      return account;
-    }
-  } catch (error) {
-    console.error("Error fetching account:", error);
-    return null;
-  }
-};
-
 export const authConfig = {
   pages: {
     signIn: "/auth/login",
@@ -35,13 +15,11 @@ export const authConfig = {
       return session;
     },
 
-    async jwt({ token }) {
-      const dbAccount = await getAccountByEmail(token.email);
-
-      if (!dbAccount) return token;
-
-      token.id = dbAccount._id;
-      token.role = dbAccount.role;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
 
       return token;
     },
