@@ -6,6 +6,14 @@ import { login } from "@/app/(pages)/auth/login/page";
 import { LockIcon, MailIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+const ROLE_DEFAULT_PATH = {
+  admin: "/admin/accounts",
+  student: "/student/topics",
+  instructor: "/instructor/topics",
+  technologyScience: "/technologyScience/dashboard",
+  "appraisal-board": "/appraisal-board/appraise",
+};
+
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
   const [loginError, setLoginError] = useState();
@@ -17,7 +25,9 @@ export const LoginForm = () => {
       if (result.error) {
         setLoginError(result.error);
       } else if (result.success) {
+        // First push to root to trigger middleware
         router.push("/");
+        // Then refresh to update the session
         router.refresh();
       }
     });

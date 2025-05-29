@@ -36,7 +36,8 @@ export default auth(async (req) => {
   if (authRoutes.includes(url.pathname)) {
     // → already logged in? send to dashboard
     if (isLoggedIn) {
-      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, url));
+      const dest = ROLE_DEFAULT_PATH[userRole] ?? DEFAULT_LOGIN_REDIRECT;
+      return NextResponse.redirect(new URL(dest, url));
     }
 
     // → else let them see login/register
@@ -48,16 +49,18 @@ export default auth(async (req) => {
     return NextResponse.redirect(new URL("/auth/login", url));
   }
 
-  // 5) If logged in AND has a role, ensure they’re inside their role‐area
+  // 5) If logged in AND has a role, ensure they're inside their role‐area
   if (isLoggedIn && userRole) {
+    // If at root path, redirect to role-specific path
     if (url.pathname === "/") {
-      return NextResponse.next();
+      const dest = ROLE_DEFAULT_PATH[userRole] ?? DEFAULT_LOGIN_REDIRECT;
+      return NextResponse.redirect(new URL(dest, url));
     }
 
     const base = `/${userRole}`;
-    // If they’re outside of `/admin`, `/student`, etc.…
+    // If they're outside of `/admin`, `/student`, etc.…
     if (!url.pathname.startsWith(base)) {
-      // → send them to that role’s default path
+      // → send them to that role's default path
       const dest = ROLE_DEFAULT_PATH[userRole] ?? DEFAULT_LOGIN_REDIRECT;
       return NextResponse.redirect(new URL(dest, url));
     }
