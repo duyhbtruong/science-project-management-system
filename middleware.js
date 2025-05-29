@@ -33,6 +33,8 @@ export default auth(async (req) => {
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
   const isLoggedIn = !!token;
   const userRole = token?.role;
+  console.log(userRole);
+  console.log(token);
 
   // 3) If visiting a NEXT‐AUTH page…
   if (authRoutes.includes(url.pathname)) {
