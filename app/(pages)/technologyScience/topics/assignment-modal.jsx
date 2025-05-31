@@ -12,6 +12,7 @@ const AssignmentModal = ({
   setSelectedStaffs,
   listReviewInstructor,
   listAppraiseStaff,
+  topicInstructor,
 }) => {
   const handleInstructorChange = (value) => {
     if (value === "Không có") {
@@ -38,6 +39,10 @@ const AssignmentModal = ({
     const staff = listAppraiseStaff?.find((s) => s._id === id);
     return staff?.account.name || "Unknown";
   };
+
+  const availableReviewers = listReviewInstructor?.filter(
+    (instructor) => instructor._id !== topicInstructor?._id
+  );
 
   return (
     <Modal
@@ -66,7 +71,7 @@ const AssignmentModal = ({
             optionFilterProp="children"
             showSearch
           >
-            {listReviewInstructor?.map((instructor, index) => (
+            {availableReviewers?.map((instructor, index) => (
               <Option key={`review-instructor-${index}`} value={instructor._id}>
                 {instructor.account.name}
               </Option>

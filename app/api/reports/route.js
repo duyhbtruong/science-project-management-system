@@ -50,8 +50,8 @@ export async function GET(request) {
             index: "section_vector_search",
             path: "embedding",
             queryVector: section.embedding,
-            numCandidates: 100,
-            limit: 5,
+            numCandidates: 500,
+            limit: 10,
           },
         },
         {
@@ -75,6 +75,17 @@ export async function GET(request) {
               $meta: "vectorSearchScore",
             },
           },
+        },
+        {
+          $match: {
+            // score: { $gte: 0.75 },
+          },
+        },
+        {
+          $sort: { score: -1 },
+        },
+        {
+          $limit: 5,
         },
       ]);
 

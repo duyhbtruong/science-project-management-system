@@ -110,7 +110,6 @@ export default function TopicsManagePage() {
         throw new Error("Failed to update assignments");
       }
 
-      // Refresh the topic list
       await loadTopics();
       setIsModalVisible(false);
       setSelectedTopic(null);
@@ -118,7 +117,6 @@ export default function TopicsManagePage() {
       setSelectedStaffs([]);
     } catch (error) {
       console.error("Error updating assignments:", error);
-      // You might want to show an error message to the user here
     }
 
     setListReviewInstructor();
@@ -140,9 +138,6 @@ export default function TopicsManagePage() {
 
     loadTopics();
   }, [selectedPeriod]);
-
-  console.log(listReviewInstructor);
-  console.log(listAppraiseStaff);
 
   return (
     <div className="bg-gray-100 min-h-[100vh]">
@@ -230,6 +225,7 @@ export default function TopicsManagePage() {
           setSelectedStaffs={setSelectedStaffs}
           listReviewInstructor={listReviewInstructor}
           listAppraiseStaff={listAppraiseStaff}
+          topicInstructor={selectedTopic?.instructor}
         />
       </div>
     </div>

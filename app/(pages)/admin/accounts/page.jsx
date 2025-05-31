@@ -41,7 +41,7 @@ const AccountsPage = () => {
 
   const handleAccountSearch = async (searchValue) => {
     const res = await searchAccounts(searchValue);
-    setAccounts(res);
+    setAccounts(await res.json());
   };
 
   const handleSearchChange = (event) => {
@@ -76,13 +76,13 @@ const AccountsPage = () => {
               Tạo tài khoản
             </Button>
             {/* TODO: Add import list of students through a spreadsheet file */}
-            <Button
+            {/* <Button
               type="default"
               icon={<ImportIcon className="size-4" />}
               className="flex items-center justify-center"
             >
               Nhập danh sách
-            </Button>
+            </Button> */}
           </div>
         </div>
 

@@ -13,7 +13,6 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
       <Form.Item
         label="Tên đề tài (tiếng Việt) - ghi bằng IN HOA"
         name="vietnameseName"
-        hasFeedback
         rules={[
           {
             required: true,
@@ -39,7 +38,6 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
       <Form.Item
         label="Tên đề tài (tiếng Anh) - ghi bằng IN HOA"
         name="englishName"
-        hasFeedback
         rules={[
           {
             required: true,
@@ -86,22 +84,25 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
       <Form.Item
         label="Tóm tắt nội dung đề tài"
         name="summary"
-        hasFeedback
         rules={[
           {
             required: true,
             message: "Không được để trống tóm tắt đề tài.",
           },
           {
-            max: 300,
-            message: "Không được dài quá 300 chữ!",
+            validator(_, value) {
+              if (!value) return Promise.resolve();
+              const wordCount = value.trim().split(/\s+/).length;
+              if (wordCount > 300) {
+                return Promise.reject(new Error("Không được dài quá 300 từ!"));
+              }
+              return Promise.resolve();
+            },
           },
         ]}
       >
         <Input.TextArea
-          showCount
-          maxLength={300}
-          rows={5}
+          autoSize={{ minRows: 5 }}
           style={{ resize: "none" }}
           placeholder="Nhập tóm tắt nội dung đề tài..."
         />
@@ -109,7 +110,6 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
 
       <Form.List
         name="references"
-        hasFeedback
         rules={[
           {
             validator: async (_, references) => {
@@ -184,23 +184,26 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
       <Form.Item
         label="Dự kiến kết quả"
         name="expectedResult"
-        hasFeedback
         rules={[
           {
             required: true,
             message: "Không được để trống nội dung dự kiến kết quả.",
           },
           {
-            max: 300,
-            message: "Không được dài quá 300 chữ!",
+            validator(_, value) {
+              if (!value) return Promise.resolve();
+              const wordCount = value.trim().split(/\s+/).length;
+              if (wordCount > 300) {
+                return Promise.reject(new Error("Không được dài quá 300 từ!"));
+              }
+              return Promise.resolve();
+            },
           },
         ]}
       >
         <Input.TextArea
           placeholder="Nhập kết quả dự kiến của đề tài..."
-          showCount
-          maxLength={300}
-          rows={5}
+          autoSize={{ minRows: 5 }}
           style={{ resize: "none" }}
         />
       </Form.Item>
