@@ -2,14 +2,17 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { Account } from "@/models/users/Account";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
   try {
     console.log("Connecting to MongoDB...");
     await mongooseConnect();
     console.log("MongoDB connected successfully");
 
-    const email = request.nextUrl.searchParams.get("email");
-    const id = request.nextUrl.searchParams.get("id");
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get("email");
+    const id = searchParams.get("id");
 
     console.log("Looking up account with email:", email);
 
