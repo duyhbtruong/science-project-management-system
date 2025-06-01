@@ -64,9 +64,13 @@ export async function PUT(request, { params }) {
 
     const start = new Date(startDate);
     const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
     const review = new Date(reviewDeadline);
+    review.setHours(23, 59, 59, 999);
     const submit = new Date(submitDeadline);
+    submit.setHours(23, 59, 59, 999);
     const appraise = new Date(appraiseDeadline);
+    appraise.setHours(23, 59, 59, 999);
 
     if (start >= end) {
       return NextResponse.json(

@@ -7,9 +7,30 @@ import {
   ClientSideSuspense,
 } from "@liveblocks/react/suspense";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
+import { getAccounts } from "@/service/accountService";
+import { useEffect, useMemo, useState } from "react";
 
 export function Room({ children }) {
   const params = useParams();
+
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = useMemo(
+    () => async () => {
+      try {
+        const res = await getAccounts();
+        setUsers(await res.json());
+      } catch (error) {
+        console.log("Error: ", error);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
   return (
     <LiveblocksProvider
       authEndpoint={async () => {
@@ -22,6 +43,11 @@ export function Room({ children }) {
         });
 
         return await response.json();
+      }}
+      resolveUsers={({ userIds }) => {
+        return userIds.map(
+          (userId) => users.find((user) => user._id === userId) ?? undefined
+        );
       }}
     >
       <RoomProvider id={params.reportId}>
