@@ -125,7 +125,12 @@ export async function PUT(request, { params }) {
     );
 
     const isOverlapping = periods.some((period) => {
-      return isDateOverlapping(start, end, period.startDate, period.endDate);
+      return isDateOverlapping(
+        start,
+        appraise,
+        period.startDate,
+        period.appraiseDeadline
+      );
     });
 
     if (isOverlapping) {

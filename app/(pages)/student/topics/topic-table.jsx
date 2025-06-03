@@ -27,6 +27,7 @@ const TopicTable = ({ listTopic }) => {
             setActiveExpRow(expanded ? [record._id] : []);
           },
         }}
+        className="min-w-[1000px]"
       />
     </>
   );

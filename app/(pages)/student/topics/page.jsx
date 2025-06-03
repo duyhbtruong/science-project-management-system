@@ -50,7 +50,7 @@ export default function TopicsPage() {
 
   return (
     <div className="bg-gray-100 min-h-[100vh]">
-      <div className="flex flex-col py-6 mx-32">
+      <div className="flex flex-col p-6">
         <TopicTable listTopic={listTopic} />
       </div>
     </div>

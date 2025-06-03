@@ -83,7 +83,6 @@ export const getTopicById = async (id) => {
   }
 };
 
-// TODO: Instead of fetching topics, fetch reports
 export const getReportsByTopicId = async (topicId) => {
   try {
     const res = await fetch(`/api/topics/${topicId}?sections=true`, {

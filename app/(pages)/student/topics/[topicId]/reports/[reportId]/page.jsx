@@ -135,10 +135,14 @@ export default function ReportPage() {
               </div>
               <Button
                 type="primary"
-                icon={<DownloadIcon className="size-4" />}
-                loading={savingStatus === "saving"}
                 onClick={handleExportPdf}
+                disabled={savingStatus === "saving"}
               >
+                {savingStatus === "saving" ? (
+                  <LoaderIcon className="size-4 animate-spin" />
+                ) : (
+                  <DownloadIcon className="size-4" />
+                )}
                 Xuất báo cáo
               </Button>
               <div className="hidden">

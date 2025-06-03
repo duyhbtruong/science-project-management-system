@@ -30,16 +30,17 @@ export const getTableColumns = () => [
     render: (_, { updatedAt }) => <p>{dateFormat(new Date(updatedAt))}</p>,
   },
   {
-    title: "Hành động",
+    title: "Đợt đăng ký",
+    dataIndex: ["registrationPeriod", "title"],
+    key: "registrationPeriod",
+  },
+  {
     key: "action",
+    width: "10%",
     render: (_, { _id }) => (
-      <Button
-        type="primary"
-        icon={<ArrowRightIcon className="size-4" />}
-        iconPosition="end"
-        href={`/student/topics/${_id}`}
-      >
-        Xem chi tiết
+      <Button type="primary" href={`/student/topics/${_id}`}>
+        Xem
+        <ArrowRightIcon className="size-4" />
       </Button>
     ),
   },

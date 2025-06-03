@@ -195,17 +195,12 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
                     : parse(truncateContent(result.content))}
                 </div>
                 <div className="flex justify-end">
-                  <Button
-                    type="text"
-                    icon={
-                      expandedCards[index] ? (
-                        <ChevronUp className="size-4" />
-                      ) : (
-                        <ChevronDown className="size-4" />
-                      )
-                    }
-                    onClick={() => toggleCard(index)}
-                  >
+                  <Button type="text" onClick={() => toggleCard(index)}>
+                    {expandedCards[index] ? (
+                      <ChevronUp className="size-4" />
+                    ) : (
+                      <ChevronDown className="size-4" />
+                    )}
                     {expandedCards[index] ? "Thu gọn" : "Xem thêm"}
                   </Button>
                 </div>

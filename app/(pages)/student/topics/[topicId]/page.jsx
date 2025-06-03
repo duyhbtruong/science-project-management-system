@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteTopicById, getTopicById } from "@/service/topicService";
-import { CloseOutlined } from "@ant-design/icons";
+import { XIcon } from "lucide-react";
 import { Button, Modal, Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -77,10 +77,10 @@ export default function TopicInformationPage({ params }) {
               }
             }}
             disabled={!topic || topic.reviewAssignments.length > 0}
-            icon={<CloseOutlined />}
             danger
             className="flex items-center gap-2"
           >
+            <XIcon className="size-4" />
             Hủy đăng ký
           </Button>
         </div>
@@ -88,7 +88,11 @@ export default function TopicInformationPage({ params }) {
         <div className="grid grid-cols-1 gap-6">
           <Spin spinning={!topic}>
             <div className="p-6 bg-white rounded-lg shadow-sm">
-              <TopicDetails topic={topic} router={router} />
+              <TopicDetails
+                topic={topic}
+                router={router}
+                loadTopic={loadTopic}
+              />
             </div>
           </Spin>
 
