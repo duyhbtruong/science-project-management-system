@@ -2,7 +2,7 @@
 
 import { Menu } from "antd";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AppLogo } from "@/components/logo";
 import Image from "next/image";

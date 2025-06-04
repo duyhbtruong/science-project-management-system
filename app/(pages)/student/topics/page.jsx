@@ -49,10 +49,8 @@ export default function TopicsPage() {
   if (loading) return <FullscreenLoader label="List topic loading..." />;
 
   return (
-    <div className="bg-gray-100 min-h-[100vh]">
-      <div className="flex flex-col p-6">
-        <TopicTable listTopic={listTopic} />
-      </div>
+    <div className="flex flex-col p-6">
+      <TopicTable listTopic={listTopic} />
     </div>
   );
 }

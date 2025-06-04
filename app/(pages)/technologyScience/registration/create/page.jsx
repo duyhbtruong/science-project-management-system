@@ -50,7 +50,7 @@ export default function CreatePeriodPage() {
   return (
     <>
       {contextHolder}
-      <div className="bg-gray-100 min-h-[100vh]">
+      <div className="bg-gray-100 ">
         <div className="py-6 mx-32">
           <div className="flex justify-center pb-6 text-xl font-semibold">
             Tạo Đợt Đăng ký Đề tài mới

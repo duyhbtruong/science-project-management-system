@@ -127,10 +127,9 @@ export default function Dashboard() {
   //   console.log(">>> chartsData: ", chartsData);
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
+    <div className="p-6">
       <h1 className="mb-4 text-2xl font-bold">Dashboard</h1>
 
-      {/* Overview Statistics */}
       <Row gutter={[16, 16]} className="mb-6">
         <Col span={6}>
           <Card className="shadow-lg">

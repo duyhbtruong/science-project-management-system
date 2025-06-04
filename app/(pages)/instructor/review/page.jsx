@@ -122,72 +122,69 @@ export default function ReviewPage() {
     <>
       {modalContextHolder}
       {messageContextHolder}
-      <div className="bg-gray-50 min-h-[100vh]">
-        <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Kiểm duyệt đề tài
-            </h1>
-            <p className="mt-2 text-sm text-gray-600">
-              Quản lý và kiểm duyệt các đề tài nghiên cứu khoa học
-            </p>
-          </div>
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Kiểm duyệt đề tài
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Quản lý và kiểm duyệt các đề tài nghiên cứu khoa học
+          </p>
+        </div>
 
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 max-w-sm">
-                  <Select
-                    className="w-full"
-                    placeholder="Chọn đợt đăng ký..."
-                    onChange={handlePeriodChange}
-                    value={selectedPeriod}
-                    size="large"
-                    loading={loading}
-                  >
-                    {listPeriod?.map((period, index) => (
-                      <Option
-                        key={`registration-period-${index}`}
-                        value={period._id}
-                      >
-                        {period.title}
-                      </Option>
-                    ))}
-                  </Select>
-                </div>
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 max-w-sm">
+                <Select
+                  className="w-full"
+                  placeholder="Chọn đợt đăng ký..."
+                  onChange={handlePeriodChange}
+                  value={selectedPeriod}
+                  size="large"
+                  loading={loading}
+                >
+                  {listPeriod?.map((period, index) => (
+                    <Option
+                      key={`registration-period-${index}`}
+                      value={period._id}
+                    >
+                      {period.title}
+                    </Option>
+                  ))}
+                </Select>
               </div>
             </div>
+          </div>
 
-            <div className="p-6">
-              {!selectedPeriod ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="text-center">
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">
-                      Chưa chọn đợt đăng ký
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Vui lòng chọn đợt đăng ký để xem danh sách kiểm duyệt đề
-                      tài
-                    </p>
-                  </div>
+          <div className="p-6">
+            {!selectedPeriod ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="text-center">
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">
+                    Chưa chọn đợt đăng ký
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Vui lòng chọn đợt đăng ký để xem danh sách kiểm duyệt đề tài
+                  </p>
                 </div>
-              ) : (
-                <Spin spinning={loading}>
-                  <Table
-                    rowKey={(record) => record._id}
-                    tableLayout="fixed"
-                    columns={columns}
-                    dataSource={listReview}
-                    pagination={{
-                      pageSize: 8,
-                      showSizeChanger: true,
-                      showTotal: (total) => `Tổng số ${total} đề tài`,
-                    }}
-                    className="review-table"
-                  />
-                </Spin>
-              )}
-            </div>
+              </div>
+            ) : (
+              <Spin spinning={loading}>
+                <Table
+                  rowKey={(record) => record._id}
+                  tableLayout="fixed"
+                  columns={columns}
+                  dataSource={listReview}
+                  pagination={{
+                    pageSize: 8,
+                    showSizeChanger: true,
+                    showTotal: (total) => `Tổng số ${total} đề tài`,
+                  }}
+                  className="review-table"
+                />
+              </Spin>
+            )}
           </div>
         </div>
       </div>

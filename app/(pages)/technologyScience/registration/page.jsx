@@ -82,7 +82,7 @@ export default function RegistrationPeriodPage() {
 
   return (
     <>
-      <div className="bg-gray-100 min-h-[100vh]">
+      <div className="bg-gray-100 ">
         <div className="flex flex-col py-6 mx-32">
           <SearchBar
             onSearch={handleSearch}

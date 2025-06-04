@@ -36,31 +36,29 @@ export default function TopicInformationPage({ params }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container px-4 py-8 mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Hướng dẫn đề tài</h1>
-        </div>
+    <div className="container px-4 py-8 mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Hướng dẫn đề tài</h1>
+      </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          <Spin spinning={!topic}>
-            <div className="p-6 bg-white rounded-lg shadow-sm">
-              <TopicDetails topic={topic} router={router} />
-            </div>
-          </Spin>
+      <div className="grid grid-cols-1 gap-6">
+        <Spin spinning={!topic}>
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <TopicDetails topic={topic} router={router} />
+          </div>
+        </Spin>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="p-6 bg-white rounded-lg shadow-sm">
-              <Spin spinning={!account || !student}>
-                <StudentDetails student={student} account={account} />
-              </Spin>
-            </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <Spin spinning={!account || !student}>
+              <StudentDetails student={student} account={account} />
+            </Spin>
+          </div>
 
-            <div className="p-6 bg-white rounded-lg shadow-sm">
-              <Spin spinning={!instructor}>
-                <InstructorDetails instructor={instructor} />
-              </Spin>
-            </div>
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <Spin spinning={!instructor}>
+              <InstructorDetails instructor={instructor} />
+            </Spin>
           </div>
         </div>
       </div>

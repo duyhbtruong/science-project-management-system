@@ -2,6 +2,7 @@
 
 import { Layout } from "antd";
 import NavigationBar from "./nav-bar";
+import { Header } from "@/components/header";
 const { Content, Sider } = Layout;
 
 export default function AdminLayout({ children }) {
@@ -11,7 +12,10 @@ export default function AdminLayout({ children }) {
         <NavigationBar />
       </Sider>
       <Layout className="h-screen overflow-y-auto">
-        <Content>{children}</Content>
+        <Header />
+        <Content className="h-[calc(100vh-56px)] bg-gray-100">
+          {children}
+        </Content>
       </Layout>
     </Layout>
   );

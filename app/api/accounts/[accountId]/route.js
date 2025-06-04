@@ -6,6 +6,7 @@ import { Student } from "@/models/users/Student";
 import { TechnologyScience } from "@/models/users/TechnologyScience";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 
 export async function GET(request, { params }) {
   try {
@@ -98,6 +99,45 @@ export async function GET(request, { params }) {
       {
         status: 500,
       }
+    );
+  }
+}
+
+export async function PUT(request, { params }) {
+  try {
+    const accountId = params.accountId;
+
+    if (!accountId || !mongoose.isValidObjectId(accountId)) {
+      return NextResponse.json(
+        { message: "Thiếu id hoặc id không hợp lệ." },
+        { status: 400 }
+      );
+    }
+
+    await mongooseConnect();
+
+    const { password } = await request.json();
+
+    const account = await Account.findOne({ _id: accountId });
+
+    if (!account) {
+      return NextResponse.json(
+        { message: "Không tìm thấy tài khoản." },
+        { status: 404 }
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await Account.findByIdAndUpdate(accountId, { password: hashedPassword });
+
+    return NextResponse.json(
+      { message: "Mật khẩu đã được cập nhật thành công." },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Lỗi cập nhật tài khoản " + error },
+      { status: 500 }
     );
   }
 }

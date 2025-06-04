@@ -2,6 +2,7 @@
 
 import NavigationBar from "@/app/(pages)/appraisal-board/nav-bar";
 import { Layout } from "antd";
+import { Header } from "@/components/header";
 const { Content, Sider } = Layout;
 
 export default function AppraiseLayout({ children }) {
@@ -10,8 +11,11 @@ export default function AppraiseLayout({ children }) {
       <Sider collapsible theme="light" className="h-screen">
         <NavigationBar />
       </Sider>
-      <Layout className="h-screen overflow-y-auto">
-        <Content>{children}</Content>
+      <Layout>
+        <Header />
+        <Content className="h-[calc(100vh-56px)] bg-gray-100">
+          {children}
+        </Content>
       </Layout>
     </Layout>
   );

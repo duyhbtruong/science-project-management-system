@@ -197,7 +197,7 @@ export default function TopicPage() {
   if (listPeriod && !period) return <NoRegistrationPeriod />;
 
   return (
-    <div className="bg-gray-100 min-h-[100vh]">
+    <div className="bg-gray-100 ">
       {contextHolder}
 
       {listPeriod && period && (

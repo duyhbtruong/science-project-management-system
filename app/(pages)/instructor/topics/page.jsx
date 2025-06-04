@@ -61,7 +61,7 @@ export default function TopicsPage() {
   const columns = getTableColumns();
 
   return (
-    <div className="bg-gray-100 min-h-[100vh]">
+    <div className="bg-gray-100 ">
       <div className="flex flex-col py-6 mx-32">
         <div className="mb-4 space-x-4">
           {selectedPeriod && (

@@ -1,7 +1,7 @@
 "use client";
 
 import { ClientSideSuspense } from "@liveblocks/react";
-import { shallow, useOthers, useSelf } from "@liveblocks/react/suspense";
+import { useOthers, useSelf } from "@liveblocks/react/suspense";
 
 const AVATAR_SIZE = 36;
 

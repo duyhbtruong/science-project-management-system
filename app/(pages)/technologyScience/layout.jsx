@@ -1,7 +1,8 @@
 "use client";
 
 import NavigationBar from "@/app/(pages)/technologyScience/nav-bar";
-import { Layout, message } from "antd";
+import { Layout } from "antd";
+import { Header } from "@/components/header";
 const { Content, Sider } = Layout;
 
 export default function TechnologyScienceLayout({ children }) {
@@ -11,7 +12,10 @@ export default function TechnologyScienceLayout({ children }) {
         <NavigationBar />
       </Sider>
       <Layout className="h-screen overflow-y-auto">
-        <Content>{children}</Content>
+        <Header />
+        <Content className="h-[calc(100vh-56px)] bg-gray-100">
+          {children}
+        </Content>
       </Layout>
     </Layout>
   );

@@ -2,7 +2,7 @@ import { Card } from "antd";
 
 export const NoRegistrationPeriod = () => {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex items-center justify-center bg-gray-100 h-[calc(100vh-56px)]">
       <Card
         className="w-full max-w-md rounded-lg shadow-lg"
         bordered={false}

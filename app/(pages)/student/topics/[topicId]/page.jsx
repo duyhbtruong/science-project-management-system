@@ -60,58 +60,51 @@ export default function TopicInformationPage({ params }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container px-4 py-8 mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Quản lý Đề tài cá nhân
-          </h1>
-          <Button
-            onClick={async () => {
-              const confirmed = await modal.confirm(config);
-              if (confirmed) {
-                await deleteTopicById(topicId).finally(() =>
-                  handleDeleteFile(topic.registerFile)
-                );
-                router.replace(`/student/topics`);
-              }
-            }}
-            disabled={!topic || topic.reviewAssignments.length > 0}
-            danger
-            className="flex items-center gap-2"
-          >
-            <XIcon className="size-4" />
-            Hủy đăng ký
-          </Button>
-        </div>
+    <div className="container px-4 py-8 mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Quản lý Đề tài cá nhân
+        </h1>
+        <Button
+          onClick={async () => {
+            const confirmed = await modal.confirm(config);
+            if (confirmed) {
+              await deleteTopicById(topicId).finally(() =>
+                handleDeleteFile(topic.registerFile)
+              );
+              router.replace(`/student/topics`);
+            }
+          }}
+          disabled={!topic || topic.reviewAssignments.length > 0}
+          danger
+          className="flex items-center gap-2"
+        >
+          <XIcon className="size-4" />
+          Hủy đăng ký
+        </Button>
+      </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          <Spin spinning={!topic}>
-            <div className="p-6 bg-white rounded-lg shadow-sm">
-              <TopicDetails
-                topic={topic}
-                router={router}
-                loadTopic={loadTopic}
-              />
-            </div>
-          </Spin>
+      <div className="grid grid-cols-1 gap-6">
+        <Spin spinning={!topic}>
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <TopicDetails topic={topic} router={router} loadTopic={loadTopic} />
+          </div>
+        </Spin>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="p-6 bg-white rounded-lg shadow-sm">
-              <Spin spinning={!account || !student}>
-                <StudentDetails student={student} account={account} />
-              </Spin>
-            </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <Spin spinning={!account || !student}>
+              <StudentDetails student={student} account={account} />
+            </Spin>
+          </div>
 
-            <div className="p-6 bg-white rounded-lg shadow-sm">
-              <Spin spinning={!instructor}>
-                <InstructorDetails instructor={instructor} />
-              </Spin>
-            </div>
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <Spin spinning={!instructor}>
+              <InstructorDetails instructor={instructor} />
+            </Spin>
           </div>
         </div>
       </div>
-
       {modalContextHolder}
     </div>
   );
