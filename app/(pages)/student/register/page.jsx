@@ -6,13 +6,9 @@ import { useCustomSession } from "@/hooks/use-custom-session";
 import { Divider, Form, Space, Spin, message } from "antd";
 
 import { createTopic, getTopicsByPeriod } from "@/service/topicService";
-import { uploadRegisterFile } from "@/service/upload";
 import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
 import { getAllInstructors } from "@/service/instructorService";
-
-import { storage } from "@/lib/firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 import { TopicInfoSection } from "./topic-info-section";
 import { RegistrationModal } from "./registration-modal";
@@ -20,6 +16,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { StudentInfoSection } from "./student-info-section";
 import { NoRegistrationPeriod } from "./no-registration-period";
 import { InstructorInfoSection } from "./instructor-info-section";
+import { uploadFile } from "@/service/uploadService";
 
 export default function TopicPage() {
   const { session } = useCustomSession();
@@ -103,7 +100,6 @@ export default function TopicPage() {
     });
   }, [student, listInstructor]);
 
-  // Add filtered instructors logic
   const filteredInstructors = listInstructor?.filter(
     (instructor) => instructor?.faculty === student?.faculty
   );
@@ -163,7 +159,7 @@ export default function TopicPage() {
     }
   };
 
-  const handleRegisterFileUpload = (topicId) => {
+  const handleRegisterFileUpload = async (topicId) => {
     if (listFile.length === 0) {
       return;
     }
@@ -174,24 +170,29 @@ export default function TopicPage() {
     const periodDir = `${period.title}-${startDate}-${endDate}`;
 
     const file = listFile[0];
-    const fileName = file.name;
-    const fileRef = ref(
-      storage,
-      `${periodDir}/${student?.studentId}/${listFile[0].name}`
-    );
-    uploadBytes(fileRef, file?.originFileObj)
-      .then((snapshot) => {
-        const fileRef = snapshot.ref._location.path_;
-        return getDownloadURL(ref(storage, fileRef));
-      })
-      .then((downloadLink) => {
-        const registerFile = {
-          name: fileName,
-          url: downloadLink,
-        };
-        uploadRegisterFile(topicId, registerFile);
-      })
-      .catch((error) => console.log("Upload file failed: ", error));
+    const formData = new FormData();
+    formData.append("file", file.originFileObj);
+    formData.append("fileType", "register");
+    formData.append("fileName", file.name);
+    formData.append("periodDir", periodDir);
+    formData.append("studentId", student?.studentId);
+
+    const res = await uploadFile(topicId, formData);
+    if (res.ok) {
+      const data = await res.json();
+      messageApi.open({
+        type: "success",
+        content: data.message,
+        duration: 2,
+      });
+    } else {
+      const data = await res.json();
+      messageApi.open({
+        type: "error",
+        content: data.message,
+        duration: 2,
+      });
+    }
   };
 
   if (listPeriod && !period) return <NoRegistrationPeriod />;

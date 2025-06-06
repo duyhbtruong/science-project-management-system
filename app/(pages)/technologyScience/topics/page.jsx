@@ -140,94 +140,89 @@ export default function TopicsManagePage() {
   }, [selectedPeriod]);
 
   return (
-    <div className="bg-gray-100 ">
-      <div className="flex flex-col py-6 mx-32">
-        <div className="flex justify-between mb-4">
-          <div className="space-x-4">
-            {selectedPeriod && (
-              <Select
-                className="w-64"
-                placeholder="Chọn đợt đăng ký..."
-                onChange={handlePeriodChange}
-                value={selectedPeriod}
-              >
-                {listPeriod.map((period, index) => (
-                  <Option
-                    key={`registration-period-${index}`}
-                    value={period._id}
-                  >
-                    {period.title}
-                  </Option>
-                ))}
-              </Select>
-            )}
-
-            {selectedPeriod && (
-              <Search
-                className="w-[450px] "
-                placeholder="Tìm kiếm đề tài..."
-                enterButton
-                onSearch={handleSearchTopic}
-                onChange={handleSearchChange}
-              />
-            )}
-          </div>
-
-          <Button
-            loading={!listTopic && selectedPeriod}
-            disabled={!selectedPeriod}
-            onClick={handleExport}
-            icon={<DownloadIcon className="size-4" />}
-            type="primary"
-            className="flex items-center justify-center"
-          >
-            Xuất danh sách
-          </Button>
-        </div>
-
-        {!selectedPeriod ? (
-          <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow">
+    <div className="flex flex-col py-6 mx-32">
+      <div className="flex justify-between mb-4">
+        <div className="space-x-4">
+          {selectedPeriod && (
             <Select
-              className="w-64 mb-4"
+              className="w-64"
               placeholder="Chọn đợt đăng ký..."
               onChange={handlePeriodChange}
               value={selectedPeriod}
             >
-              {listPeriod?.map((period, index) => (
+              {listPeriod.map((period, index) => (
                 <Option key={`registration-period-${index}`} value={period._id}>
                   {period.title}
                 </Option>
               ))}
             </Select>
-            <p className="text-gray-500">
-              Vui lòng chọn đợt đăng ký để xem danh sách đề tài
-            </p>
-          </div>
-        ) : (
-          <Spin spinning={!listTopic}>
-            <TopicTable
-              listTopic={listTopic}
-              listReviewInstructor={listReviewInstructor}
-              listAppraiseStaff={listAppraiseStaff}
-              loadTopics={loadTopics}
-              showModal={showModal}
-            />
-          </Spin>
-        )}
+          )}
 
-        <AssignmentModal
-          isVisible={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={handleModalCancel}
-          selectedInstructors={selectedInstructors}
-          selectedStaffs={selectedStaffs}
-          setSelectedInstructors={setSelectedInstructors}
-          setSelectedStaffs={setSelectedStaffs}
-          listReviewInstructor={listReviewInstructor}
-          listAppraiseStaff={listAppraiseStaff}
-          topicInstructor={selectedTopic?.instructor}
-        />
+          {selectedPeriod && (
+            <Search
+              className="w-[450px] "
+              placeholder="Tìm kiếm đề tài..."
+              enterButton
+              onSearch={handleSearchTopic}
+              onChange={handleSearchChange}
+            />
+          )}
+        </div>
+
+        <Button
+          loading={!listTopic && selectedPeriod}
+          disabled={!selectedPeriod}
+          onClick={handleExport}
+          icon={<DownloadIcon className="size-4" />}
+          type="primary"
+          className="flex items-center justify-center"
+        >
+          Xuất danh sách
+        </Button>
       </div>
+
+      {!selectedPeriod ? (
+        <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow">
+          <Select
+            className="w-64 mb-4"
+            placeholder="Chọn đợt đăng ký..."
+            onChange={handlePeriodChange}
+            value={selectedPeriod}
+          >
+            {listPeriod?.map((period, index) => (
+              <Option key={`registration-period-${index}`} value={period._id}>
+                {period.title}
+              </Option>
+            ))}
+          </Select>
+          <p className="text-gray-500">
+            Vui lòng chọn đợt đăng ký để xem danh sách đề tài
+          </p>
+        </div>
+      ) : (
+        <Spin spinning={!listTopic}>
+          <TopicTable
+            listTopic={listTopic}
+            listReviewInstructor={listReviewInstructor}
+            listAppraiseStaff={listAppraiseStaff}
+            loadTopics={loadTopics}
+            showModal={showModal}
+          />
+        </Spin>
+      )}
+
+      <AssignmentModal
+        isVisible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        selectedInstructors={selectedInstructors}
+        selectedStaffs={selectedStaffs}
+        setSelectedInstructors={setSelectedInstructors}
+        setSelectedStaffs={setSelectedStaffs}
+        listReviewInstructor={listReviewInstructor}
+        listAppraiseStaff={listAppraiseStaff}
+        topicInstructor={selectedTopic?.instructor}
+      />
     </div>
   );
 }

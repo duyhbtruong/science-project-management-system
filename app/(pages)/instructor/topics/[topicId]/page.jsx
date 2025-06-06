@@ -1,10 +1,9 @@
 "use client";
 
 import { getTopicById } from "@/service/topicService";
-import { Modal, Spin } from "antd";
+import { Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { deleteRegisterFile } from "@/service/upload";
 import { TopicDetails } from "./topic-details";
 import { StudentDetails } from "./student-details";
 import { InstructorDetails } from "./instructor-details";

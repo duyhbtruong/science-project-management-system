@@ -5,7 +5,7 @@ import { XIcon } from "lucide-react";
 import { Button, Modal, Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { deleteRegisterFile } from "@/service/upload";
+import { deleteFile } from "@/service/uploadService";
 import { TopicDetails } from "./topic-details";
 import { StudentDetails } from "./student-details";
 import { InstructorDetails } from "./instructor-details";
@@ -30,14 +30,9 @@ export default function TopicInformationPage({ params }) {
     ),
   };
 
-  const handleDeleteFile = async (filePath) => {
+  const handleDeleteFile = async () => {
     try {
-      const res = await deleteRegisterFile(filePath);
-      if (res.ok) {
-        console.log("Xóa file thành công.");
-      } else {
-        console.error("Lỗi xóa file.");
-      }
+      await deleteFile(topicId, "register");
     } catch (error) {
       console.error("Lỗi xóa file ", error);
     }
@@ -69,9 +64,7 @@ export default function TopicInformationPage({ params }) {
           onClick={async () => {
             const confirmed = await modal.confirm(config);
             if (confirmed) {
-              await deleteTopicById(topicId).finally(() =>
-                handleDeleteFile(topic.registerFile)
-              );
+              await deleteTopicById(topicId).finally(() => handleDeleteFile());
               router.replace(`/student/topics`);
             }
           }}

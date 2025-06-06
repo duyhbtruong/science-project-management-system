@@ -14,6 +14,7 @@ import {
   FileText,
   LineChartIcon,
   LogOutIcon,
+  FileIcon,
 } from "lucide-react";
 
 const NavigationBar = () => {
@@ -24,6 +25,7 @@ const NavigationBar = () => {
     if (pathname.includes("dashboard")) return "dashboard";
     if (pathname.includes("section")) return "section";
     if (pathname.includes("criteria")) return "criteria";
+    if (pathname.includes("files")) return "files";
   });
 
   const items = [
@@ -60,6 +62,11 @@ const NavigationBar = () => {
       label: <Link href="/technologyScience/dashboard">Thống kê đề tài</Link>,
       key: "dashboard",
       icon: <LineChartIcon className="size-4" />,
+    },
+    {
+      label: <Link href="/technologyScience/files">Quản lý tài liệu</Link>,
+      key: "files",
+      icon: <FileIcon className="size-4" />,
     },
     {
       label: "Đăng xuất",
