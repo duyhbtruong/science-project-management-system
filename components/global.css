@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --font-inter: var(--font-inter);
+  }
+
+  body {
+    font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  img {
+    display: initial;
+  }
+}
+
 .tiptap {
   /* Link styles */
   a {
@@ -196,10 +211,4 @@
 
 div[data-radix-popper-content-wrapper] {
   z-index: 50 !important;
-}
-
-@layer base {
-  img {
-    display: initial;
-  }
 }
