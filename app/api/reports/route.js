@@ -51,7 +51,7 @@ export async function GET(request) {
             path: "embedding",
             queryVector: section.embedding,
             numCandidates: 500,
-            limit: 10,
+            limit: 50,
           },
         },
         {
@@ -76,16 +76,25 @@ export async function GET(request) {
             },
           },
         },
-        {
-          $match: {
-            // score: { $gte: 0.75 },
-          },
-        },
+        // {
+        //   $match: {
+        //     score: { $gte: 0.75 },
+        //   },
+        // },
         {
           $sort: { score: -1 },
         },
         {
-          $limit: 5,
+          $group: {
+            _id: "$reportId",
+            section: { $first: "$$ROOT" },
+          },
+        },
+        {
+          $replaceRoot: { newRoot: "$section" },
+        },
+        {
+          $limit: 10,
         },
       ]);
 
