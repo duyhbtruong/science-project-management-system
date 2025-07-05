@@ -74,7 +74,13 @@ export async function GET(request, { params }) {
           },
         ],
       })
-      .populate("files")
+      .populate({
+        path: "files",
+        populate: {
+          path: "uploadedBy",
+          select: "name email role",
+        },
+      })
       .populate("report");
 
     if (!topic) {

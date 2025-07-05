@@ -2,7 +2,7 @@
 
 import { deleteTopicById, getTopicById } from "@/service/topicService";
 import { XIcon } from "lucide-react";
-import { Button, Modal, Spin } from "antd";
+import { App, Button, Spin } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { deleteRegisterFile } from "@/service/upload";
@@ -18,7 +18,7 @@ export default function TopicInformationPage({ params }) {
   const [instructor, setInstructor] = useState();
   const [period, setPeriod] = useState();
   const [topic, setTopic] = useState();
-  const [modal, modalContextHolder] = Modal.useModal();
+  const { modal, message } = App.useApp();
   const router = useRouter();
 
   const config = {
@@ -61,7 +61,7 @@ export default function TopicInformationPage({ params }) {
 
   return (
     <div className="container px-4 py-8 mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
           Quản lý Đề tài cá nhân
         </h1>
@@ -70,14 +70,17 @@ export default function TopicInformationPage({ params }) {
             const confirmed = await modal.confirm(config);
             if (confirmed) {
               await deleteTopicById(topicId).finally(() =>
-                handleDeleteFile(topic.registerFile)
+                handleDeleteFile(
+                  topic.files.find((file) => file.fileType === "register")
+                    ?.fileUrl
+                )
               );
               router.replace(`/student/topics`);
             }
           }}
           disabled={!topic || topic.reviewAssignments.length > 0}
           danger
-          className="flex items-center gap-2"
+          className="flex gap-2 items-center"
         >
           <XIcon className="size-4" />
           Hủy đăng ký
@@ -87,7 +90,12 @@ export default function TopicInformationPage({ params }) {
       <div className="grid grid-cols-1 gap-6">
         <Spin spinning={!topic}>
           <div className="p-6 bg-white rounded-lg shadow-sm">
-            <TopicDetails topic={topic} router={router} loadTopic={loadTopic} />
+            <TopicDetails
+              topic={topic}
+              router={router}
+              loadTopic={loadTopic}
+              message={message}
+            />
           </div>
         </Spin>
 
@@ -105,7 +113,6 @@ export default function TopicInformationPage({ params }) {
           </div>
         </div>
       </div>
-      {modalContextHolder}
     </div>
   );
 }

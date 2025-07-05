@@ -18,11 +18,19 @@ const NavigationBar = () => {
 
   const items = [
     {
-      label: <AppLogo fontSize={`text-md`} className="w-[300px]" />,
+      label: <AppLogo fontSize={`text-md`} />,
       key: "logo",
       disabled: true,
       className: "hover:cursor-default",
-      icon: <Image src="/logo.svg" alt="logo" width={24} height={24} />,
+      icon: (
+        <Image
+          src="/logo.svg"
+          alt="logo"
+          width="0"
+          height="0"
+          className="w-[24px] h-auto"
+        />
+      ),
     },
     {
       label: <Link href="/instructor/topics">Hướng dẫn đề tài</Link>,

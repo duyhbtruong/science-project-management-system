@@ -1,5 +1,5 @@
 import "@/components/global.css";
-import { ConfigProvider } from "antd";
+import { App, ConfigProvider } from "antd";
 import { Inter } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 
@@ -24,7 +24,9 @@ export default function RootLayout({ children }) {
             },
           }}
         >
-          <SessionProvider>{children}</SessionProvider>
+          <SessionProvider>
+            <App>{children}</App>
+          </SessionProvider>
         </ConfigProvider>
       </body>
     </html>

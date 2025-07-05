@@ -25,9 +25,7 @@ export const LoginForm = () => {
       if (result.error) {
         setLoginError(result.error);
       } else if (result.success) {
-        // First push to root to trigger middleware
         router.push("/");
-        // Then refresh to update the session
         router.refresh();
       }
     });
@@ -45,28 +43,33 @@ export const LoginForm = () => {
           label="Email"
           name="email"
           rules={[
-            { required: true, message: "Chưa nhập email!" },
-            { type: "email", message: "Sai định dạng email!" },
+            { required: true, message: "Vui lòng nhập email" },
+            { type: "email", message: "Email không đúng định dạng" },
           ]}
           onFocus={() => setLoginError()}
         >
           <Input
             prefix={<MailIcon className="mr-1 text-border size-4" />}
-            placeholder="Nhập tên tài khoản..."
+            placeholder="Nhập email..."
             disabled={isPending}
+            spellCheck={false}
           />
         </Form.Item>
 
         <Form.Item
           label="Mật khẩu"
           name="password"
-          rules={[{ required: true, message: "Chưa nhập mật khẩu!" }]}
+          rules={[
+            { required: true, message: "Vui lòng nhập mật khẩu" },
+            { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự" },
+          ]}
           onFocus={() => setLoginError()}
         >
           <Input.Password
             prefix={<LockIcon className="mr-1 text-border size-4" />}
             placeholder="Nhập mật khẩu..."
             disabled={isPending}
+            spellCheck={false}
           />
         </Form.Item>
 

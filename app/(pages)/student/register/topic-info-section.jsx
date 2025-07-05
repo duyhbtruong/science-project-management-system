@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select, Upload } from "antd";
+import { Button, Form, Input, Select, Tooltip, Upload } from "antd";
 import {
   LightbulbIcon,
   MinusCircleIcon,
@@ -6,12 +6,13 @@ import {
   UploadIcon,
   Users2Icon,
 } from "lucide-react";
+import { RESEARCH_TYPE } from "@/constant/research-types";
 
 export const TopicInfoSection = ({ listFile, setListFile }) => {
   return (
     <>
       <Form.Item
-        label="Tên đề tài (tiếng Việt) - ghi bằng IN HOA"
+        label="Tên đề tài (tiếng Việt)"
         name="vietnameseName"
         rules={[
           {
@@ -32,11 +33,12 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
         <Input
           placeholder="Nhập tên tiếng Việt của đề tài..."
           prefix={<LightbulbIcon className="mr-1 text-border size-4" />}
+          spellCheck={false}
         />
       </Form.Item>
 
       <Form.Item
-        label="Tên đề tài (tiếng Anh) - ghi bằng IN HOA"
+        label="Tên đề tài (tiếng Anh)"
         name="englishName"
         rules={[
           {
@@ -57,6 +59,7 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
         <Input
           placeholder="Nhập tên tiếng Anh của đề tài..."
           prefix={<LightbulbIcon className="mr-1 text-border size-4" />}
+          spellCheck={false}
         />
       </Form.Item>
 
@@ -72,12 +75,10 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
       >
         <Select
           placeholder="Chọn loại hình nghiên cứu..."
-          options={[
-            {
-              value: "Nghiên cứu cơ bản",
-              label: "Nghiên cứu cơ bản",
-            },
-          ]}
+          options={RESEARCH_TYPE.map((type) => ({
+            value: type,
+            label: type,
+          }))}
         />
       </Form.Item>
 
@@ -105,6 +106,7 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
           autoSize={{ minRows: 5 }}
           style={{ resize: "none" }}
           placeholder="Nhập tóm tắt nội dung đề tài..."
+          spellCheck={false}
         />
       </Form.Item>
 
@@ -136,39 +138,44 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
                   required={true}
                   key={key}
                 >
-                  <Form.Item
-                    {...restProps}
-                    validateTrigger={["onChange", "onBlur"]}
-                    rules={[
-                      {
-                        required: true,
-                        whitespace: true,
-                        message:
-                          "Nhập tài liệu tham khảo hoặc xóa trường này đi.",
-                      },
-                    ]}
-                    noStyle
-                  >
-                    <Input
-                      placeholder={`[${index + 1}] Nhập tài liệu tham khảo...`}
-                      style={{
-                        width: references.length < 2 ? "100%" : "95%",
-                      }}
-                    />
-                  </Form.Item>
-                  {references.length > 1 && (
-                    <MinusCircleIcon
-                      className="inline-block ml-2 size-4 hover:cursor-pointer"
-                      onClick={() => remove(reference.name)}
-                    />
-                  )}
+                  <div className="flex gap-2 items-center">
+                    <Form.Item
+                      {...restProps}
+                      validateTrigger={["onChange", "onBlur"]}
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          message:
+                            "Nhập tài liệu tham khảo hoặc xóa trường này đi.",
+                        },
+                      ]}
+                      noStyle
+                    >
+                      <Input
+                        placeholder={`[${
+                          index + 1
+                        }] Nhập tài liệu tham khảo...`}
+                        style={{
+                          width: references.length < 2 ? "100%" : "95%",
+                        }}
+                        spellCheck={false}
+                      />
+                    </Form.Item>
+                    {references.length > 1 && (
+                      <MinusCircleIcon
+                        className="flex-shrink-0 text-red-500 size-4 hover:cursor-pointer hover:text-red-700"
+                        onClick={() => remove(reference.name)}
+                      />
+                    )}
+                  </div>
                 </Form.Item>
               );
             })}
 
             <Form.Item>
               <Button
-                className="flex items-center justify-center w-full"
+                className="flex justify-center items-center w-full"
                 type="dashed"
                 onClick={() => add()}
                 icon={<PlusIcon className="size-4" />}
@@ -205,6 +212,7 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
           placeholder="Nhập kết quả dự kiến của đề tài..."
           autoSize={{ minRows: 5 }}
           style={{ resize: "none" }}
+          spellCheck={false}
         />
       </Form.Item>
 
@@ -242,41 +250,44 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
                   required={true}
                   key={key}
                 >
-                  <Form.Item
-                    {...restProps}
-                    validateTrigger={["onChange", "onBlur"]}
-                    rules={[
-                      {
-                        required: true,
-                        whitespace: true,
-                        message:
-                          "Nhập tên thành viên hoặc xóa dòng này nếu không cần thiết.",
-                      },
-                    ]}
-                    noStyle
-                  >
-                    <Input
-                      placeholder={`Nhập tên thành viên thứ ${index + 1}... `}
-                      style={{
-                        width: fields.length < 2 ? "100%" : "95%",
-                      }}
-                      prefix={
-                        <Users2Icon className="mr-1 text-border size-4" />
-                      }
-                    />
-                  </Form.Item>
-                  {fields.length > 1 && (
-                    <MinusCircleIcon
-                      className="inline-block ml-2 size-4 hover:cursor-pointer"
-                      onClick={() => remove(field.name)}
-                    />
-                  )}
+                  <div className="flex gap-2 items-center">
+                    <Form.Item
+                      {...restProps}
+                      validateTrigger={["onChange", "onBlur"]}
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          message:
+                            "Nhập tên thành viên hoặc xóa dòng này nếu không cần thiết.",
+                        },
+                      ]}
+                      noStyle
+                    >
+                      <Input
+                        placeholder={`Nhập tên thành viên thứ ${index + 1}... `}
+                        style={{
+                          width: fields.length < 2 ? "100%" : "95%",
+                        }}
+                        prefix={
+                          <Users2Icon className="mr-1 text-border size-4" />
+                        }
+                        spellCheck={false}
+                      />
+                    </Form.Item>
+                    {fields.length > 1 && (
+                      <MinusCircleIcon
+                        className="flex-shrink-0 text-red-500 size-4 hover:cursor-pointer hover:text-red-700"
+                        onClick={() => remove(field.name)}
+                      />
+                    )}
+                  </div>
                 </Form.Item>
               );
             })}
             <Form.Item>
               <Button
-                className="flex items-center justify-center w-full"
+                className="flex justify-center items-center w-full"
                 type="dashed"
                 onClick={() => add()}
                 icon={<PlusIcon className="size-4" />}
@@ -289,7 +300,23 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
         )}
       </Form.List>
 
-      <Form.Item label="Hồ sơ đăng ký" required={true}>
+      <Form.Item
+        label="Hồ sơ đăng ký"
+        name="registerFile"
+        rules={[
+          {
+            required: true,
+            validator: (_, value) => {
+              if (!listFile || listFile.length === 0) {
+                return Promise.reject(
+                  new Error("Vui lòng tải lên hồ sơ đăng ký")
+                );
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
         <Upload
           className="w-full"
           accept=".pdf"
@@ -297,12 +324,14 @@ export const TopicInfoSection = ({ listFile, setListFile }) => {
           onChange={({ fileList }) => setListFile(fileList)}
           fileList={listFile}
         >
-          <Button
-            className="flex items-center justify-center w-full"
-            icon={<UploadIcon className="size-4" />}
-          >
-            Nộp hồ sơ
-          </Button>
+          <Tooltip title="Chỉ chấp nhận file PDF">
+            <Button
+              className="flex justify-center items-center w-full"
+              icon={<UploadIcon className="size-4" />}
+            >
+              Nộp hồ sơ
+            </Button>
+          </Tooltip>
         </Upload>
       </Form.Item>
     </>

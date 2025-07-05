@@ -18,7 +18,7 @@ const ExpandedRow = ({ record }) => {
         <Link
           target="_blank"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${record.instructor.email}`}
-          className="flex items-center justify-center"
+          className="flex justify-center items-center"
         >
           <LinkIcon className="mr-1 size-4" />
           {record.instructor.accountId.email}
@@ -74,7 +74,7 @@ const ExpandedRow = ({ record }) => {
         <p>
           {record.reference.map((ref, index) => (
             <span key={`reference-${index}`}>
-              {index + 1}. {ref}
+              [{index + 1}] {ref}
               <br />
             </span>
           ))}

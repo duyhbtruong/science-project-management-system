@@ -5,13 +5,6 @@ import { updateAppraisalBoardById } from "@/service/appraiseService";
 import { updateInstructorById } from "@/service/instructorService";
 import { updateStudentById } from "@/service/studentService";
 import { updateTechnologyScienceById } from "@/service/technologyScienceService";
-import { validatePhoneNumber } from "@/utils/validator";
-import {
-  LockOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
 import { Form, Button, Input, message, Card, Select, Spin } from "antd";
 import {
   IdCardIcon,
@@ -87,27 +80,17 @@ export default function UpdateAccount({ params }) {
       res = await updateAppraisalBoardById(appraisalBoard._id, values);
     }
 
-    const { message } = await res.json();
+    const { message: apiMessage } = await res.json();
 
     if (res.status === 200) {
-      messageApi
-        .open({
-          type: "success",
-          content: message,
-          duration: 2,
-        })
-        .then(() => router.push(`/admin/accounts`));
+      messageApi.success(apiMessage).then(() => router.push(`/admin/accounts`));
     } else {
-      messageApi.open({
-        type: "error",
-        content: message,
-        duration: 2,
-      });
+      messageApi.error(apiMessage);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 py-6 bg-gray-100">
+    <div className="flex flex-col gap-6 justify-center items-center py-6 bg-gray-100">
       {contextHolder}
       <div className="text-lg font-semibold">Cập nhật tài khoản</div>
       <Card className="shadow-md">
@@ -127,14 +110,14 @@ export default function UpdateAccount({ params }) {
               rules={[
                 {
                   required: true,
-                  message: "Chưa nhập tên tài khoản!",
+                  message: "Vui lòng nhập tên tài khoản",
                 },
               ]}
-              hasFeedback
             >
               <Input
                 prefix={<User2Icon className="mr-1 text-border size-4" />}
                 placeholder="Nhập tên tài khoản..."
+                spellCheck={false}
               />
             </Form.Item>
 
@@ -144,17 +127,18 @@ export default function UpdateAccount({ params }) {
               rules={[
                 {
                   required: true,
-                  message: "Chưa nhập email",
+                  message: "Vui lòng nhập email",
                 },
                 {
                   type: "email",
-                  message: "Sai định dạng email",
+                  message: "Email không đúng định dạng",
                 },
               ]}
             >
               <Input
                 prefix={<MailIcon className="mr-1 text-border size-4" />}
                 placeholder="Nhập email..."
+                spellCheck={false}
               />
             </Form.Item>
 
@@ -163,24 +147,38 @@ export default function UpdateAccount({ params }) {
               name="phone"
               rules={[
                 {
-                  validator(_, value) {
-                    if (!value) {
-                      return Promise.resolve();
-                    }
-                    if (!validatePhoneNumber(value)) {
-                      return Promise.reject(
-                        new Error("Số điện thoại chỉ được chứa chữ số!")
-                      );
-                    }
-                    return Promise.resolve();
-                  },
+                  pattern: /^[0-9]*$/,
+                  message: "Vui lòng chỉ nhập số",
+                },
+                {
+                  pattern:
+                    /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$/,
+                  message: "Số điện thoại không hợp lệ",
                 },
               ]}
-              hasFeedback
             >
               <Input
                 prefix={<PhoneIcon className="mr-1 text-border size-4" />}
                 placeholder="Nhập số điện thoại..."
+                onKeyDown={(e) => {
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    ![
+                      "Backspace",
+                      "Delete",
+                      "Tab",
+                      "Escape",
+                      "Enter",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "ArrowUp",
+                      "ArrowDown",
+                    ].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                spellCheck={false}
               />
             </Form.Item>
 
@@ -189,20 +187,15 @@ export default function UpdateAccount({ params }) {
               name="password"
               rules={[
                 {
-                  validator(_, value) {
-                    if (!value || value.length > 6) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error("Mật khẩu phải dài hơn 6 ký tự!")
-                    );
-                  },
+                  min: 6,
+                  message: "Mật khẩu phải có ít nhất 6 ký tự",
                 },
               ]}
-              hasFeedback
             >
               <Input.Password
                 prefix={<LockIcon className="mr-1 text-border size-4" />}
+                placeholder="Nhập mật khẩu..."
+                spellCheck={false}
               />
             </Form.Item>
 
@@ -212,7 +205,7 @@ export default function UpdateAccount({ params }) {
               rules={[
                 {
                   required: true,
-                  message: "Chưa chọn chức năng!",
+                  message: "Vui lòng chọn chức năng",
                 },
               ]}
             >
@@ -241,20 +234,23 @@ export default function UpdateAccount({ params }) {
                   label="Mã số sinh viên"
                   name="studentId"
                   rules={[
-                    { required: true, message: "Chưa nhập Mã số sinh viên." },
+                    {
+                      required: true,
+                      message: "Vui lòng nhập mã số sinh viên",
+                    },
                   ]}
-                  hasFeedback
                 >
                   <Input
                     prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
                     placeholder="Nhập MSSV..."
+                    spellCheck={false}
                   />
                 </Form.Item>
 
                 <Form.Item
                   label="Khoa"
                   name="faculty"
-                  rules={[{ required: true, message: "Chưa chọn khoa." }]}
+                  rules={[{ required: true, message: "Vui lòng chọn khoa" }]}
                 >
                   <Select
                     placeholder="Chọn khoa..."
@@ -284,6 +280,7 @@ export default function UpdateAccount({ params }) {
                         label: "Khoa học và Kỹ thuật Thông tin",
                       },
                     ]}
+                    spellCheck={false}
                   />
                 </Form.Item>
 
@@ -293,7 +290,7 @@ export default function UpdateAccount({ params }) {
                   rules={[
                     {
                       required: true,
-                      message: "Chưa chọn chương trình đào tạo.",
+                      message: "Vui lòng chọn chương trình đào tạo",
                     },
                   ]}
                 >
@@ -309,6 +306,7 @@ export default function UpdateAccount({ params }) {
                         label: "Đại trà",
                       },
                     ]}
+                    spellCheck={false}
                   />
                 </Form.Item>
               </>
@@ -322,13 +320,14 @@ export default function UpdateAccount({ params }) {
                   rules={[
                     {
                       required: true,
-                      message: "Chưa nhập Mã số Phòng thẩm định.",
+                      message: "Vui lòng nhập mã số Phòng Thẩm định",
                     },
                   ]}
                 >
                   <Input
                     prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
-                    placeholder="Nhập mã số Phòng thẩm định..."
+                    placeholder="Nhập mã số Phòng Thẩm định..."
+                    spellCheck={false}
                   />
                 </Form.Item>
               </>
@@ -342,13 +341,14 @@ export default function UpdateAccount({ params }) {
                   rules={[
                     {
                       required: true,
-                      message: "Chưa nhập Mã số Phòng Khoa học Công nghệ.",
+                      message: "Vui lòng nhập mã số Phòng Khoa học Công nghệ",
                     },
                   ]}
                 >
                   <Input
                     prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
                     placeholder="Nhập mã số Phòng Khoa học Công nghệ..."
+                    spellCheck={false}
                   />
                 </Form.Item>
               </>
@@ -357,18 +357,19 @@ export default function UpdateAccount({ params }) {
             {role === "instructor" && (
               <>
                 <Form.Item
-                  label="Mã số Giảng viên"
+                  label="Mã số giảng viên"
                   name="instructorId"
                   rules={[
                     {
                       required: true,
-                      message: "Chưa nhập Mã số Giảng viên.",
+                      message: "Vui lòng nhập mã số giảng viên",
                     },
                   ]}
                 >
                   <Input
                     prefix={<IdCardIcon className="mr-1 size-4 text-border" />}
-                    placeholder="Nhập mã số Giảng viên..."
+                    placeholder="Nhập mã số giảng viên..."
+                    spellCheck={false}
                   />
                 </Form.Item>
 
@@ -378,7 +379,7 @@ export default function UpdateAccount({ params }) {
                   rules={[
                     {
                       required: true,
-                      message: "Chọn học hàm, học vị của GVHD...",
+                      message: "Vui lòng chọn học hàm, học vị",
                     },
                   ]}
                 >
@@ -390,13 +391,14 @@ export default function UpdateAccount({ params }) {
                       { title: "GS.TS", value: "GS.TS" },
                       { title: "PGS.TS", value: "PGS.TS" },
                     ]}
+                    spellCheck={false}
                   />
                 </Form.Item>
 
                 <Form.Item
                   label="Khoa"
                   name="faculty"
-                  rules={[{ required: true, message: "Chưa chọn khoa." }]}
+                  rules={[{ required: true, message: "Vui lòng chọn khoa" }]}
                 >
                   <Select
                     placeholder="Chọn khoa..."
@@ -426,6 +428,7 @@ export default function UpdateAccount({ params }) {
                         label: "Khoa học và Kỹ thuật Thông tin",
                       },
                     ]}
+                    spellCheck={false}
                   />
                 </Form.Item>
               </>

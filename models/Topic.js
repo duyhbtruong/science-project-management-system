@@ -15,7 +15,6 @@ import { Report } from "./Report";
  * - registrationPeriod: Which timeline was the topic registered in.
  * - reviewAssignments: List of assigned reviewers to topic.
  * - appraiseAssignments: List of assigned appraisal boards to topic.
- * - sections: Content of report.
  * - owner: Owner of this project topic.
  * - instructor: Instructor who guides and monitors the project.
  * - files: Files related to project.
@@ -259,6 +258,8 @@ topicSchema.methods.updateReviewers = async function (newReviewerIds) {
     }
 
     await this.save();
+
+    await this.updateReviewPassedStatus();
   } catch (error) {
     throw new Error(`Failed to update reviewers: ${error.message}`);
   }
@@ -330,8 +331,99 @@ topicSchema.methods.updateAppraisers = async function (newAppraiserIds) {
     }
 
     await this.save();
+
+    await this.updateAppraisePassedStatus();
   } catch (error) {
     throw new Error(`Failed to update appraisers: ${error.message}`);
+  }
+};
+
+topicSchema.methods.updateReviewPassedStatus = async function () {
+  try {
+    await this.populate("reviewAssignments.reviewGrade");
+
+    const activeAssignments = this.reviewAssignments.filter(
+      (assignment) => assignment.status !== "removed"
+    );
+
+    if (activeAssignments.length === 0) {
+      this.reviewPassed = false;
+      await this.save();
+      return;
+    }
+
+    const allGraded = activeAssignments.every(
+      (assignment) =>
+        assignment.reviewGrade && assignment.reviewGrade.status === "completed"
+    );
+
+    if (allGraded) {
+      const validGrades = activeAssignments
+        .map((assignment) => assignment.reviewGrade.finalGrade)
+        .filter((grade) => grade !== null);
+
+      if (validGrades.length > 0) {
+        const averageGrade =
+          validGrades.reduce((sum, grade) => sum + grade, 0) /
+          validGrades.length;
+        this.reviewPassed = averageGrade >= 70;
+      } else {
+        this.reviewPassed = false;
+      }
+    } else {
+      this.reviewPassed = false;
+    }
+
+    await this.save();
+  } catch (error) {
+    console.error("Error updating review passed status:", error);
+    throw new Error(`Failed to update review passed status: ${error.message}`);
+  }
+};
+
+topicSchema.methods.updateAppraisePassedStatus = async function () {
+  try {
+    await this.populate("appraiseAssignments.appraiseGrade");
+
+    const activeAssignments = this.appraiseAssignments.filter(
+      (assignment) => assignment.status !== "removed"
+    );
+
+    if (activeAssignments.length === 0) {
+      this.appraisePassed = false;
+      await this.save();
+      return;
+    }
+
+    const allGraded = activeAssignments.every(
+      (assignment) =>
+        assignment.appraiseGrade &&
+        assignment.appraiseGrade.status === "completed"
+    );
+
+    if (allGraded) {
+      const validGrades = activeAssignments
+        .map((assignment) => assignment.appraiseGrade.finalGrade)
+        .filter((grade) => grade !== null);
+
+      if (validGrades.length > 0) {
+        const averageGrade =
+          validGrades.reduce((sum, grade) => sum + grade, 0) /
+          validGrades.length;
+        this.appraisePassed = averageGrade >= 70;
+      } else {
+        this.appraisePassed = false;
+      }
+    } else {
+      this.appraisePassed = false;
+    }
+
+    await this.save();
+  } catch (error) {
+    console.error("Error updating appraise passed status:", error);
+    throw new Error(
+      `Failed to update appraise passed status: ${error.message}`
+    );
   }
 };
 

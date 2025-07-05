@@ -13,6 +13,7 @@ const AssignmentModal = ({
   listReviewInstructor,
   listAppraiseStaff,
   topicInstructor,
+  confirmLoading,
 }) => {
   const handleInstructorChange = (value) => {
     if (value === "Không có") {
@@ -54,6 +55,7 @@ const AssignmentModal = ({
       cancelText="Hủy bỏ"
       className="p-4"
       width={600}
+      confirmLoading={confirmLoading}
     >
       <div className="flex flex-col space-y-6">
         <div>

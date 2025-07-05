@@ -68,12 +68,18 @@ export const uploadPaymentFile = async (topicId, paymentFile) => {
 };
 
 export const deleteRegisterFile = async (filePath) => {
-  const res = await fetch(`/api/upload/delete`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ filePath }),
-  });
-  return res;
+  try {
+    const res = await fetch(`/api/upload/delete`, {
+      method: "DELETE",
+      body: JSON.stringify({ filePath }),
+    });
+
+    if (!res) {
+      throw new Error("Failed to delete register file.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
 };

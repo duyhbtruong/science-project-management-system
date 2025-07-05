@@ -8,32 +8,29 @@ import {
   Space,
   Form,
   Select,
-  message,
+  List,
+  Tooltip,
 } from "antd";
 import {
   UsersIcon,
   BookOpenIcon,
   ClipboardListIcon,
   TargetIcon,
-  ArrowRightIcon,
   EditIcon,
   SaveIcon,
   XIcon,
+  ArrowUpRightIcon,
+  PencilLineIcon,
 } from "lucide-react";
 import ReviewAssignmentsCard from "@/components/review-assignments-card";
 import AppraiseAssignmentsCard from "@/components/appraise-assignments-card";
 import { useState } from "react";
 import { updateTopicById } from "@/service/topicService";
+import { RESEARCH_TYPE } from "@/constant/research-types";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
-const RESEARCH_TYPES = [
-  "Nghiên cứu cơ bản",
-  "Nghiên cứu ứng dụng",
-  "Nghiên cứu triển khai",
-];
-
-export const TopicDetails = ({ topic, router, loadTopic }) => {
+export const TopicDetails = ({ topic, router, loadTopic, message }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTopic, setEditedTopic] = useState(topic);
   const [form] = Form.useForm();
@@ -68,7 +65,7 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
         expectedResult: values.expectedResult,
       };
 
-      const res = await updateTopicById(topic?._id, updatedTopic);
+      await updateTopicById(topic?._id, updatedTopic);
 
       setEditedTopic(updatedTopic);
       loadTopic();
@@ -104,10 +101,10 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
           ]}
           className="!mb-0"
         >
-          <Input className="text-lg" />
+          <Input />
         </Form.Item>
       ) : (
-        <Text className="text-lg">{topic?.vietnameseName}</Text>
+        <Text>{topic?.vietnameseName}</Text>
       ),
       span: 2,
     },
@@ -130,10 +127,10 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
           ]}
           className="!mb-0"
         >
-          <Input className="text-lg" />
+          <Input />
         </Form.Item>
       ) : (
-        <Text className="text-lg">{topic?.englishName}</Text>
+        <Text>{topic?.englishName}</Text>
       ),
       span: 2,
     },
@@ -168,8 +165,7 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
           className="!mb-0"
         >
           <Select
-            className="text-lg"
-            options={RESEARCH_TYPES.map((type) => ({
+            options={RESEARCH_TYPE.map((type) => ({
               label: type,
               value: type,
             }))}
@@ -189,9 +185,13 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
       children: (
         <Tag
           color={
-            topic?.reviewAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            topic?.reviewAssignments.length === 0 ||
+            topic?.reviewAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.reviewAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "warning"
               : topic?.reviewPassed
               ? "success"
@@ -199,9 +199,13 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
           }
         >
           <span>
-            {topic?.reviewAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            {topic?.reviewAssignments.length === 0 ||
+            topic?.reviewAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.reviewAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "Đang chờ"
               : topic?.reviewPassed
               ? "Đạt"
@@ -217,9 +221,13 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
       children: (
         <Tag
           color={
-            topic?.appraiseAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            topic?.appraiseAssignments.length === 0 ||
+            topic?.appraiseAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.appraiseAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "warning"
               : topic?.appraisePassed
               ? "success"
@@ -227,9 +235,13 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
           }
         >
           <span>
-            {topic?.appraiseAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            {topic?.appraiseAssignments.length === 0 ||
+            topic?.appraiseAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.appraiseAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "Đang chờ"
               : topic?.appraisePassed
               ? "Đạt"
@@ -241,12 +253,10 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
     },
   ];
 
-  console.log("TOPIC: ", topic);
-
   return (
     <div className="space-y-6">
       <Card className="shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex justify-between items-center mb-4">
           <Title level={4} className="!mb-0">
             Thông tin Đề tài
           </Title>
@@ -289,21 +299,47 @@ export const TopicDetails = ({ topic, router, loadTopic }) => {
       </Card>
 
       <Card className="shadow-sm">
-        <div className="flex items-center justify-between">
-          <Title level={4}>Tài liệu đính kèm</Title>
-          <Button
-            disabled={!topic?.reviewPassed}
-            type="primary"
-            onClick={() =>
-              router.push(
-                `/student/topics/${topic?._id}/reports/${topic?.report[0]?._id}`
-              )
-            }
-          >
-            Viết báo cáo
-            <ArrowRightIcon className="size-4" />
-          </Button>
+        <div className="flex justify-between items-center mb-4">
+          <Title level={4} className="!mb-0">
+            Tài liệu đính kèm
+          </Title>
+          <Tooltip title="Bạn chỉ có thể viết báo cáo khi đề tài được kiểm duyệt">
+            <Button
+              type="primary"
+              href={`/student/topics/${topic?._id}/report`}
+              disabled={!topic?.reviewPassed}
+            >
+              <PencilLineIcon className="size-4" />
+              Viết báo cáo
+            </Button>
+          </Tooltip>
         </div>
+        {topic?.files?.length > 0 && (
+          <List
+            itemLayout="horizontal"
+            dataSource={topic?.files}
+            renderItem={(file) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={
+                    file.fileType === "register"
+                      ? "Hồ sơ đăng ký"
+                      : file.fileType === "contract"
+                      ? "Hợp đồng"
+                      : file.fileType === "submit"
+                      ? "Báo cáo"
+                      : "Báo cáo tài chính"
+                  }
+                  description={file.fileName}
+                />
+                <Button href={file.fileUrl} target="_blank">
+                  Đường dẫn
+                  <ArrowUpRightIcon className="size-4" />
+                </Button>
+              </List.Item>
+            )}
+          />
+        )}
       </Card>
 
       <Card className="shadow-sm">

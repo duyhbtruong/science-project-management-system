@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useCustomSession } from "@/hooks/use-custom-session";
 
-import { Divider, Form, Space, Spin, message } from "antd";
+import { App, Divider, Form, Spin, message } from "antd";
 
 import { createTopic, getTopicsByPeriod } from "@/service/topicService";
 import { uploadRegisterFile } from "@/service/upload";
@@ -34,7 +34,8 @@ export default function TopicPage() {
   const [listFile, setListFile] = useState([]);
   const [listPeriod, setListPeriod] = useState();
   const [listInstructor, setListInstructor] = useState();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadStudent = async () => {
     try {
@@ -103,7 +104,6 @@ export default function TopicPage() {
     });
   }, [student, listInstructor]);
 
-  // Add filtered instructors logic
   const filteredInstructors = listInstructor?.filter(
     (instructor) => instructor?.faculty === student?.faculty
   );
@@ -124,6 +124,17 @@ export default function TopicPage() {
   };
 
   const handleFinish = async (values) => {
+    if (!listFile || listFile.length === 0) {
+      message.open({
+        type: "error",
+        content: "Vui lòng tải lên hồ sơ đăng ký trước khi đăng ký đề tài.",
+        duration: 2,
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
     const formData = {
       vietnameseName: values.vietnameseName,
       englishName: values.englishName,
@@ -137,29 +148,40 @@ export default function TopicPage() {
       instructor: values.listInstructor,
     };
 
-    let res = await createTopic(formData);
+    try {
+      let res = await createTopic(formData);
 
-    if (res.status === 201) {
-      res = await res.json();
-      const { topicId, message } = res;
-      handleRegisterFileUpload(topicId);
-      messageApi
-        .open({
-          type: "success",
-          content: message,
+      if (res.status === 201) {
+        res = await res.json();
+        const { topicId, message: messageRes } = res;
+        handleRegisterFileUpload(topicId);
+
+        message
+          .open({
+            type: "success",
+            content: messageRes,
+            duration: 2,
+          })
+          .then(() => {
+            loadStudent();
+          });
+      } else {
+        res = await res.json();
+        const { message: messageRes } = res;
+        message.open({
+          type: "error",
+          content: messageRes,
           duration: 2,
-        })
-        .then(() => {
-          loadStudent();
         });
-    } else {
-      res = await res.json();
-      const { message } = res;
-      messageApi.open({
+      }
+    } catch (error) {
+      message.open({
         type: "error",
-        content: message,
+        content: "Có lỗi xảy ra khi đăng ký đề tài. Vui lòng thử lại.",
         duration: 2,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -197,9 +219,7 @@ export default function TopicPage() {
   if (listPeriod && !period) return <NoRegistrationPeriod />;
 
   return (
-    <div className="bg-gray-100 ">
-      {contextHolder}
-
+    <div className="bg-gray-100">
       {listPeriod && period && (
         <div className="py-6 mx-32">
           <div className="flex justify-center pb-6 text-xl font-semibold">
@@ -236,9 +256,9 @@ export default function TopicPage() {
                   listInstructor={filteredInstructors}
                 />
                 <Form.Item>
-                  <Space>
-                    <SubmitButton form={form}>Đăng ký</SubmitButton>
-                  </Space>
+                  <SubmitButton form={form} loading={isSubmitting}>
+                    Đăng ký
+                  </SubmitButton>
                 </Form.Item>
               </Form>
             </div>

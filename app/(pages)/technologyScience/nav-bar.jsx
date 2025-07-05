@@ -32,7 +32,15 @@ const NavigationBar = () => {
       key: "logo",
       disabled: true,
       className: "hover:cursor-default",
-      icon: <Image src="/logo.svg" alt="logo" width={24} height={24} />,
+      icon: (
+        <Image
+          src="/logo.svg"
+          alt="logo"
+          width="0"
+          height="0"
+          className="w-[24px] h-auto"
+        />
+      ),
     },
     {
       label: <Link href="/technologyScience/topics">Quản lý đề tài</Link>,
