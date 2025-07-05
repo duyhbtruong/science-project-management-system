@@ -1,0 +1,85 @@
+// TODO: registerFile is currently a link, change to a file object
+export const uploadRegisterFile = async (topicId, registerFile) => {
+  try {
+    const res = await fetch(`/api/upload/${topicId}`, {
+      method: "PUT",
+      body: JSON.stringify({ registerFile }),
+    });
+
+    if (!res) {
+      throw new Error("Failed to update register file reference.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const uploadSubmitFile = async (topicId, submitFile) => {
+  try {
+    const res = await fetch(`/api/upload/${topicId}`, {
+      method: "PUT",
+      body: JSON.stringify({ submitFile }),
+    });
+
+    if (!res) {
+      throw new Error("Failed to update submit file reference.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const uploadContractFile = async (topicId, contractFile) => {
+  try {
+    const res = await fetch(`/api/upload/${topicId}`, {
+      method: "PUT",
+      body: JSON.stringify({ contractFile }),
+    });
+
+    if (!res) {
+      throw new Error("Failed to update contract file reference.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const uploadPaymentFile = async (topicId, paymentFile) => {
+  try {
+    const res = await fetch(`/api/upload/${topicId}`, {
+      method: "PUT",
+      body: JSON.stringify({ paymentFile }),
+    });
+
+    if (!res) {
+      throw new Error("Failed to update payment file reference.");
+    }
+
+    return res.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const deleteRegisterFile = async (filePath) => {
+  try {
+    const res = await fetch(`/api/upload/delete`, {
+      method: "DELETE",
+      body: JSON.stringify({ filePath }),
+    });
+
+    if (!res) {
+      throw new Error("Failed to delete register file.");
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};

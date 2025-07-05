@@ -54,10 +54,10 @@ export const Header = () => {
   ];
 
   return (
-    <div className="flex items-center justify-end px-6 bg-white border-b h-14">
+    <div className="flex justify-end items-center px-6 h-14 bg-white border-b">
       {session && (
         <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
-          <div className="flex items-center gap-3 transition-opacity cursor-pointer">
+          <div className="flex gap-3 items-center transition-opacity cursor-pointer">
             <Avatar
               size="default"
               style={{ backgroundColor: getColor(session?.user?.name) }}

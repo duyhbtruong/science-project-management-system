@@ -5,8 +5,21 @@ import { ClipboardCheck } from "lucide-react";
 const { Title } = Typography;
 
 export default function ReviewAssignmentsCard({ reviewAssignments }) {
-  if (!reviewAssignments?.length) {
-    return <p>Chưa có giảng viên kiểm duyệt</p>;
+  if (
+    !reviewAssignments?.length ||
+    reviewAssignments.every((a) => a.status === "removed")
+  ) {
+    return (
+      <Card className="shadow-sm">
+        <div className="flex items-center mb-4 space-x-2">
+          <ClipboardCheck className="text-gray-500 size-5" />
+          <Title level={4} className="!mb-0">
+            Kết quả kiểm duyệt
+          </Title>
+        </div>
+        <p>Chưa có giảng viên kiểm duyệt</p>
+      </Card>
+    );
   }
 
   return (
@@ -17,12 +30,12 @@ export default function ReviewAssignmentsCard({ reviewAssignments }) {
           Kết quả kiểm duyệt
         </Title>
       </div>
-      <div className="grid grid-cols-1 gap-4 overflow-auto md:grid-cols-2">
+      <div className="grid overflow-auto grid-cols-1 gap-4 md:grid-cols-2">
         {reviewAssignments
           .filter((assignment) => assignment.status !== "removed")
           .map((assignment, index) => (
             <Card key={`review-${index}`} size="small" className="shadow-sm">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex justify-between items-center mb-2">
                 <h4 className="font-medium">
                   Giảng viên kiểm duyệt {index + 1}
                 </h4>

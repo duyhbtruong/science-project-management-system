@@ -3,7 +3,6 @@ import { Topic } from "@/models/Topic";
 import { Student } from "@/models/users/Student";
 import { Instructor } from "@/models/users/Instructor";
 import { RegistrationPeriod } from "@/models/RegistrationPeriod";
-import { Section } from "@/models/Section";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
@@ -103,7 +102,13 @@ export async function GET(request) {
           },
         ],
       })
-      .populate("files");
+      .populate({
+        path: "files",
+        populate: {
+          path: "uploadedBy",
+          select: "name email role",
+        },
+      });
 
     return NextResponse.json(topics, { status: 200 });
   } catch (error) {
@@ -133,7 +138,6 @@ export async function POST(request) {
 
     await mongooseConnect();
 
-    // Kiểm tra tính hợp lệ của đợt đăng ký
     if (!registrationPeriod || !mongoose.isValidObjectId(registrationPeriod)) {
       return NextResponse.json(
         { message: "Thiếu id đợt đăng ký hoặc id không hợp lệ." },
@@ -164,7 +168,6 @@ export async function POST(request) {
       );
     }
 
-    // Kiểm tra tính hợp lệ của sinh viên đăng ký
     if (!owner || !mongoose.isValidObjectId(owner)) {
       return NextResponse.json(
         { message: "Thiếu id chủ nhiệm đề tài hoặc id không hợp lệ." },
@@ -181,14 +184,18 @@ export async function POST(request) {
       );
     }
 
-    if (await Topic.findOne({ owner: owner, period: period })) {
+    if (
+      await Topic.findOne({
+        owner: owner,
+        registrationPeriod: registrationPeriod,
+      })
+    ) {
       return NextResponse.json(
-        { message: "Sinh viên đã đăng ký đề tài." },
+        { message: "Sinh viên đã đăng ký đề tài trong đợt này." },
         { status: 409 }
       );
     }
 
-    // Kiểm tra tính hợp lệ của giảng viên hướng dẫn
     if (!instructor || !mongoose.isValidObjectId(instructor)) {
       return NextResponse.json(
         { message: "Thiếu id giảng viên hướng dẫn hoặc id không hợp lệ." },
@@ -207,10 +214,6 @@ export async function POST(request) {
       );
     }
 
-    // Lấy danh sách tiêu chí
-    const sections = await Section.find().sort({ order: 1 });
-
-    // Lưu thông tin đăng ký
     const newTopic = await Topic.create({
       vietnameseName,
       englishName,
@@ -220,7 +223,6 @@ export async function POST(request) {
       expectedResult,
       participants,
       registrationPeriod,
-      sections,
       owner,
       instructor,
     });

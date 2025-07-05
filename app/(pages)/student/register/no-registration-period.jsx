@@ -2,14 +2,11 @@ import { Card } from "antd";
 
 export const NoRegistrationPeriod = () => {
   return (
-    <div className="flex items-center justify-center bg-gray-100 h-[calc(100vh-56px)]">
+    <div className="flex justify-center items-center bg-gray-100 h-[calc(100vh-56px)]">
       <Card
         className="w-full max-w-md rounded-lg shadow-lg"
-        bordered={false}
-        style={{
-          borderRadius: "10px",
-          overflow: "hidden",
-        }}
+        style={{ borderRadius: "10px" }}
+        variant="borderless"
       >
         <div className="p-4">
           <h2 className="mb-4 text-2xl font-semibold text-center text-gray-800">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button, Form } from "antd";
 
-export const SubmitButton = ({ form, children }) => {
+export const SubmitButton = ({ form, loading, children }) => {
   const [submittable, setSubmittable] = useState(false);
 
   const values = Form.useWatch([], form);
@@ -24,7 +24,13 @@ export const SubmitButton = ({ form, children }) => {
   }, [form, values]);
 
   return (
-    <Button type="primary" htmlType="submit" disabled={!submittable}>
+    <Button
+      type="primary"
+      htmlType="submit"
+      disabled={!submittable}
+      block
+      loading={loading}
+    >
       {children}
     </Button>
   );

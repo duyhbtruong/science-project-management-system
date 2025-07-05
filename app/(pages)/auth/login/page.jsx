@@ -4,7 +4,6 @@ import { LoginForm } from "@/app/(pages)/auth/login/login-form.jsx";
 import { Card } from "antd";
 
 import { signIn, signOut } from "@/auth";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
 import { AppLogo } from "@/components/logo";
 import Image from "next/image";
@@ -44,10 +43,16 @@ export const logout = async () => {
 
 export default async function LoginPage() {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex justify-center items-center h-screen bg-gray-100">
       <Card className="shadow-md">
-        <div className="flex justify-center text-2xl font-bold gap-x-2">
-          <Image src="/logo.svg" alt="logo" height={50} width={50} />
+        <div className="flex gap-x-2 justify-center text-2xl font-bold">
+          <Image
+            src="/logo.svg"
+            alt="logo"
+            width="0"
+            height="0"
+            className="w-[50px] h-auto"
+          />
           <AppLogo fontSize={`text-3xl`} />
         </div>
         <LoginForm />

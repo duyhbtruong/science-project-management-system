@@ -4,7 +4,7 @@ import parse from "html-react-parser";
 export const ReportPdfTemplate = forwardRef(
   ({ owner, instructor, topic, sections }, ref) => {
     const renderParticipants = () => (
-      <table className="w-full my-3 text-sm border-separate border-spacing-0">
+      <table className="my-3 w-full text-sm border-separate border-spacing-0">
         <thead>
           <tr>
             <th className="p-2 font-bold text-center bg-gray-100 border border-gray-800">
@@ -77,7 +77,12 @@ export const ReportPdfTemplate = forwardRef(
                 TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN
               </div>
               <div className="flex justify-center my-10">
-                <img src="/logo-uit.jpg" alt="UIT Logo" width={150} />
+                <img
+                  src="/logo-uit.jpg"
+                  alt="UIT Logo"
+                  width={150}
+                  height="auto"
+                />
               </div>
               <div className="mb-2 text-xl font-bold">BÁO CÁO TỔNG KẾT</div>
               <div className="mb-6 text-base">
@@ -117,8 +122,8 @@ export const ReportPdfTemplate = forwardRef(
         </div>
 
         <div>
-          <div className="flex items-start justify-between p-10">
-            <div className="flex items-start gap-4">
+          <div className="flex justify-between items-start p-10">
+            <div className="flex gap-4 items-start">
               <img src="/logo-uit.jpg" alt="Logo" className="w-20 h-20" />
               <div className="text-center">
                 <p className="m-0 font-bold uppercase">

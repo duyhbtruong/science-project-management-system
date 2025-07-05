@@ -2,28 +2,58 @@ import { Button, Space, Tag } from "antd";
 import { CheckIcon, LoaderIcon, TrashIcon, UserPlus2Icon } from "lucide-react";
 import { dateFormat } from "@/utils/format";
 
-const getStatusTag = (record) => {
-  const hasReviewAssignments = record.reviewAssignments?.length > 0;
-  const hasAppraiseAssignments = record.appraiseAssignments?.length > 0;
-
-  if (!hasReviewAssignments && !hasAppraiseAssignments) {
+const getReviewStatus = (record) => {
+  if (
+    record.reviewAssignments.length === 0 ||
+    record.reviewAssignments.every((a) => a.status === "removed")
+  ) {
     return <Tag color="default">Chưa phân công</Tag>;
   }
 
-  const reviewStatus = record.reviewAssignments?.some(
-    (a) => a.status === "completed"
-  );
-  const appraiseStatus = record.appraiseAssignments?.some(
-    (a) => a.status === "completed"
-  );
-
-  if (reviewStatus && appraiseStatus) {
-    return <Tag color="success">Hoàn thành</Tag>;
-  } else if (reviewStatus || appraiseStatus) {
-    return <Tag color="processing">Đang thực hiện</Tag>;
-  } else {
+  if (
+    record.reviewAssignments
+      .filter((a) => a.status !== "removed")
+      .some((a) => a.status === "pending")
+  ) {
     return <Tag color="warning">Đang chờ</Tag>;
   }
+
+  if (
+    record.reviewAssignments
+      .filter((a) => a.status !== "removed")
+      .every((a) => a.status === "completed")
+  ) {
+    return <Tag color="success">Hoàn thành</Tag>;
+  }
+
+  return <Tag color="processing">Đang thực hiện</Tag>;
+};
+
+const getAppraiseStatus = (record) => {
+  if (
+    record.appraiseAssignments.length === 0 ||
+    record.appraiseAssignments.every((a) => a.status === "removed")
+  ) {
+    return <Tag color="default">Chưa phân công</Tag>;
+  }
+
+  if (
+    record.appraiseAssignments
+      .filter((a) => a.status !== "removed")
+      .some((a) => a.status === "pending")
+  ) {
+    return <Tag color="warning">Đang chờ</Tag>;
+  }
+
+  if (
+    record.appraiseAssignments
+      .filter((a) => a.status !== "removed")
+      .every((a) => a.status === "completed")
+  ) {
+    return <Tag color="success">Hoàn thành</Tag>;
+  }
+
+  return <Tag color="processing">Đang thực hiện</Tag>;
 };
 
 export const getTableColumns = (showModal, deleteTopic) => [
@@ -48,10 +78,16 @@ export const getTableColumns = (showModal, deleteTopic) => [
     width: "15%",
   },
   {
-    title: "Trạng thái",
-    key: "status",
+    title: "Trạng thái kiểm duyệt",
+    key: "reviewStatus",
     width: "15%",
-    render: (_, record) => getStatusTag(record),
+    render: (_, record) => getReviewStatus(record),
+  },
+  {
+    title: "Trạng thái thẩm định",
+    key: "appraiseStatus",
+    width: "15%",
+    render: (_, record) => getAppraiseStatus(record),
   },
   {
     title: "Ngày đăng ký",
