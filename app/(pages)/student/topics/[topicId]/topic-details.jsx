@@ -10,8 +10,6 @@ import {
   Select,
   List,
   Tooltip,
-  List,
-  Tooltip,
 } from "antd";
 import {
   UsersIcon,
@@ -23,20 +21,16 @@ import {
   XIcon,
   ArrowUpRightIcon,
   PencilLineIcon,
-  ArrowUpRightIcon,
-  PencilLineIcon,
 } from "lucide-react";
 import ReviewAssignmentsCard from "@/components/review-assignments-card";
 import AppraiseAssignmentsCard from "@/components/appraise-assignments-card";
 import { useState } from "react";
 import { updateTopicById } from "@/service/topicService";
 import { RESEARCH_TYPE } from "@/constant/research-types";
-import { RESEARCH_TYPE } from "@/constant/research-types";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
-export const TopicDetails = ({ topic, router, loadTopic, message }) => {
-export const TopicDetails = ({ topic, router, loadTopic, message }) => {
+export const TopicDetails = ({ topic, loadTopic, message }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTopic, setEditedTopic] = useState(topic);
   const [form] = Form.useForm();
@@ -109,10 +103,8 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           className="!mb-0"
         >
           <Input />
-          <Input />
         </Form.Item>
       ) : (
-        <Text>{topic?.vietnameseName}</Text>
         <Text>{topic?.vietnameseName}</Text>
       ),
       span: 2,
@@ -140,7 +132,6 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           <Input />
         </Form.Item>
       ) : (
-        <Text>{topic?.englishName}</Text>
         <Text>{topic?.englishName}</Text>
       ),
       span: 2,
@@ -177,7 +168,6 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
         >
           <Select
             options={RESEARCH_TYPE.map((type) => ({
-            options={RESEARCH_TYPE.map((type) => ({
               label: type,
               value: type,
             }))}
@@ -204,13 +194,6 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
             topic?.reviewAssignments.every(
               (assignment) => assignment.status === "removed"
             )
-            topic?.reviewAssignments.length === 0 ||
-            topic?.reviewAssignments.some(
-              (assignment) => assignment.status === "pending"
-            ) ||
-            topic?.reviewAssignments.every(
-              (assignment) => assignment.status === "removed"
-            )
               ? "warning"
               : topic?.reviewPassed
               ? "success"
@@ -218,13 +201,6 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           }
         >
           <span>
-            {topic?.reviewAssignments.length === 0 ||
-            topic?.reviewAssignments.some(
-              (assignment) => assignment.status === "pending"
-            ) ||
-            topic?.reviewAssignments.every(
-              (assignment) => assignment.status === "removed"
-            )
             {topic?.reviewAssignments.length === 0 ||
             topic?.reviewAssignments.some(
               (assignment) => assignment.status === "pending"
@@ -254,13 +230,6 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
             topic?.appraiseAssignments.every(
               (assignment) => assignment.status === "removed"
             )
-            topic?.appraiseAssignments.length === 0 ||
-            topic?.appraiseAssignments.some(
-              (assignment) => assignment.status === "pending"
-            ) ||
-            topic?.appraiseAssignments.every(
-              (assignment) => assignment.status === "removed"
-            )
               ? "warning"
               : topic?.appraisePassed
               ? "success"
@@ -268,13 +237,6 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           }
         >
           <span>
-            {topic?.appraiseAssignments.length === 0 ||
-            topic?.appraiseAssignments.some(
-              (assignment) => assignment.status === "pending"
-            ) ||
-            topic?.appraiseAssignments.every(
-              (assignment) => assignment.status === "removed"
-            )
             {topic?.appraiseAssignments.length === 0 ||
             topic?.appraiseAssignments.some(
               (assignment) => assignment.status === "pending"
@@ -296,7 +258,6 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
   return (
     <div className="space-y-6">
       <Card className="shadow-sm">
-        <div className="flex justify-between items-center mb-4">
         <div className="flex justify-between items-center mb-4">
           <Title level={4} className="!mb-0">
             Thông tin Đề tài

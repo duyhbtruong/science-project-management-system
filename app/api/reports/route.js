@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Report } from "@/models/Report";
 import mongoose from "mongoose";
-import { Section } from "@/models/Section";
+import { Section, SectionTemplate } from "@/models/Section";
 
 export async function GET(request) {
   try {
@@ -50,8 +50,8 @@ export async function GET(request) {
             index: "section_vector_search",
             path: "embedding",
             queryVector: section.embedding,
-            numCandidates: 500,
-            limit: 50,
+            numCandidates: 1000,
+            limit: 100,
           },
         },
         {
@@ -66,11 +66,34 @@ export async function GET(request) {
           $unwind: "$report",
         },
         {
+          $lookup: {
+            from: "topics",
+            localField: "report.topicId",
+            foreignField: "_id",
+            as: "topic",
+          },
+        },
+        {
+          $unwind: "$topic",
+        },
+        {
+          $lookup: {
+            from: "sectiontemplates",
+            localField: "templateId",
+            foreignField: "_id",
+            as: "template",
+          },
+        },
+        {
+          $unwind: "$template",
+        },
+        {
           $project: {
             _id: 1,
-            templateId: 1,
+            reportId: 1,
             content: 1,
-            report: 1,
+            topic: 1,
+            template: 1,
             score: {
               $meta: "vectorSearchScore",
             },
@@ -87,11 +110,11 @@ export async function GET(request) {
         {
           $group: {
             _id: "$reportId",
-            section: { $first: "$$ROOT" },
+            bestSection: { $first: "$$ROOT" },
           },
         },
         {
-          $replaceRoot: { newRoot: "$section" },
+          $replaceRoot: { newRoot: "$bestSection" },
         },
         {
           $limit: 10,
@@ -101,10 +124,11 @@ export async function GET(request) {
       return NextResponse.json(similarReports, { status: 200 });
     }
 
-    const reports = await Report.find();
+    const reports = await Report.find().populate(["topicId", "sections"]);
 
     return NextResponse.json(reports, { status: 200 });
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { message: "Lỗi khi lấy danh sách báo cáo " + error },
       { status: 500 }

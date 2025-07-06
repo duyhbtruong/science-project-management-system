@@ -2,10 +2,10 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import parse from "html-react-parser";
 import { Toolbar } from "@liveblocks/react-tiptap";
-import { Button, Dropdown, Modal, Drawer, Card, App } from "antd";
+import { Button, Dropdown, Modal, Drawer, Card, App, Divider } from "antd";
 import { Icon } from "@liveblocks/react-ui";
-import { semanticSearchReports } from "@/service/reportService";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { getReportById, semanticSearchReports } from "@/service/reportService";
+import { ArrowRightIcon, ChevronDown, ChevronUp } from "lucide-react";
 
 export const CustomToolbar = ({ editor, savingStatus, field }) => {
   const params = useParams();
@@ -23,6 +23,8 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
     modified: "",
     selection: null,
   });
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const items = [
     {
@@ -143,6 +145,17 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
     return text.length > 200 ? text.substring(0, 200) + "..." : text;
   };
 
+  const handleViewReport = async (reportId) => {
+    const res = await getReportById(reportId);
+    if (res.ok) {
+      const data = await res.json();
+      setSelectedReport(data);
+      setIsReportModalOpen(true);
+    } else {
+      message.error("Lỗi khi lấy thông tin báo cáo");
+    }
+  };
+
   return (
     <>
       <Toolbar editor={editor} className="border-b-[1px] border-gray-200">
@@ -191,25 +204,58 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
         <div className="space-y-4">
           {searchResults.map((result, index) => (
             <Card key={index} className="shadow-sm">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-500">
-                    Điểm tương đồng: {(result.score * 100).toFixed(2)}%
-                  </span>
+              <div className="space-y-3">
+                {result.topic && (
+                  <div className="pb-2 border-b border-gray-100">
+                    <h4 className="mb-1 font-semibold text-blue-600">
+                      {result.topic.vietnameseName}
+                    </h4>
+                    <p className="mb-1 text-sm text-gray-600">
+                      {result.topic.englishName}
+                    </p>
+                    <div className="flex gap-4 items-center text-xs text-gray-500">
+                      <span>Loại: {result.topic.type || "N/A"}</span>
+                      <span>
+                        Thời gian:{" "}
+                        {new Date(result.topic.createdAt).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {result.template && (
+                  <div className="flex justify-between pb-2 border-b border-gray-100">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">
+                        {result.template.order}. {result.template.title}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-500">
+                        Điểm tương đồng: {(result.score * 100).toFixed(2)}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="max-w-none prose tiptap h-[150px] overflow-y-hidden relative">
+                  <div className="absolute bottom-0 left-0 right-0 h-[100px] bg-gradient-to-t from-white to-transparent" />
+                  {parse(result.content)}
                 </div>
-                <div className="max-w-none prose tiptap">
-                  {expandedCards[index]
-                    ? parse(result.content)
-                    : parse(truncateContent(result.content))}
-                </div>
-                <div className="flex justify-end">
-                  <Button type="text" onClick={() => toggleCard(index)}>
-                    {expandedCards[index] ? (
-                      <ChevronUp className="size-4" />
-                    ) : (
-                      <ChevronDown className="size-4" />
-                    )}
-                    {expandedCards[index] ? "Thu gọn" : "Xem thêm"}
+
+                <div className="flex justify-end pt-2 border-t border-gray-100">
+                  <Button
+                    type="text"
+                    size="small"
+                    onClick={() => {
+                      handleViewReport(result.reportId);
+                    }}
+                  >
+                    Xem báo cáo
+                    <ArrowRightIcon className="size-4" />
                   </Button>
                 </div>
               </div>
@@ -254,6 +300,62 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
             </div>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        title="Thông tin báo cáo"
+        open={isReportModalOpen}
+        onCancel={() => setIsReportModalOpen(false)}
+        width={1200}
+        centered
+        footer={[
+          <Button key="close" onClick={() => setIsReportModalOpen(false)}>
+            Đóng
+          </Button>,
+        ]}
+      >
+        {selectedReport && (
+          <div className="space-y-4">
+            <div className="pb-4">
+              <Divider orientation="center">Thông tin đề tài</Divider>
+              <div className="space-y-2">
+                <div>
+                  <span className="font-medium">Tên tiếng Việt:</span>
+                  <p className="text-gray-700">
+                    {selectedReport.topicId?.vietnameseName}
+                  </p>
+                </div>
+                <div>
+                  <span className="font-medium">Tên tiếng Anh:</span>
+                  <p className="text-gray-700">
+                    {selectedReport.topicId?.englishName}
+                  </p>
+                </div>
+                <div>
+                  <span className="font-medium">Loại đề tài:</span>
+                  <p className="text-gray-700">
+                    {selectedReport.topicId?.type || "N/A"}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <Divider orientation="center">Nội dung báo cáo</Divider>
+            <div>
+              {selectedReport.sections.map((section, index) => (
+                <div key={`selected-report-section-${index}`}>
+                  {section.templateId && (
+                    <h3 className="mb-2 text-lg font-semibold text-gray-800">
+                      {section.templateId.order}. {section.templateId.title}
+                    </h3>
+                  )}
+                  <div className="p-4 bg-gray-50 rounded-lg tiptap">
+                    {parse(section.content)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Modal>
 
       {isLoading && (
