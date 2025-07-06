@@ -156,8 +156,6 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
     }
   };
 
-  console.log(searchResults);
-
   return (
     <>
       <Toolbar editor={editor} className="border-b-[1px] border-gray-200">

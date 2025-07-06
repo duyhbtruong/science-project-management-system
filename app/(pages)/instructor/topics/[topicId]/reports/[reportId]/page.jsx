@@ -106,17 +106,9 @@ export default function ReportPage() {
 
             return (
               <div key={sec._id} className="space-y-2">
-                <label
-                  htmlFor={`section-${sec._id}`}
-                  className="block text-base font-medium"
-                >
-                  {sec.title}
-                </label>
+                <span className="block text-base font-medium">{sec.title}</span>
 
-                <div
-                  id={`section-${sec._id}`}
-                  className="border border-gray-200 rounded min-h-[150px]"
-                >
+                <div className="border border-gray-200 rounded min-h-[150px]">
                   <SectionEditor
                     field={sec._id}
                     initialContent={reportSection?.content || ""}

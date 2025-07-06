@@ -57,7 +57,9 @@ export async function PUT(request, { params }) {
 
     const fileRef = ref(storage, `${periodDir}/${studentId}/${fileName}`);
     const fileBuffer = await file.arrayBuffer();
-    const snapshot = await uploadBytes(fileRef, fileBuffer);
+    const snapshot = await uploadBytes(fileRef, fileBuffer, {
+      contentType: "application/pdf",
+    });
     const downloadLink = await getDownloadURL(snapshot.ref);
 
     const existingFile = await TopicFile.findOne({

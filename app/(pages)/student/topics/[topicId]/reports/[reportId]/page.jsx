@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Button } from "antd";
+import { Button, App } from "antd";
 import { SectionEditor } from "./section-editor";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 import { useParams } from "next/navigation";
@@ -12,11 +12,12 @@ import { Room } from "./room";
 import { CheckCircleIcon, DownloadIcon, LoaderIcon } from "lucide-react";
 import { Avatars } from "./avatars";
 import { ReportPdfTemplate } from "./report-pdf-template";
+import { uploadFile } from "@/service/uploadService";
 
 export default function ReportPage() {
   const params = useParams();
   const reportId = params.reportId;
-
+  const { message } = App.useApp();
   const pdfRef = useRef();
 
   const [report, setReport] = useState();
@@ -49,7 +50,7 @@ export default function ReportPage() {
     setLoading(false);
   }, [report, sections]);
 
-  const handleExportPdf = () => {
+  const handleExportPdf = async () => {
     const html2pdf = require("html2pdf.js");
     const pdf = document.querySelector("#report-pdf-template");
 
@@ -63,13 +64,21 @@ export default function ReportPage() {
         .join("");
     };
 
-    html2pdf()
+    const fileName = `NCKH-SV.${
+      report.studentId.studentId
+    }.BaoCaoNT.${formatString(report.topicId.vietnameseName)}.pdf`;
+
+    let startDate = new Date(report.topicId.registrationPeriod.startDate);
+    let endDate = new Date(report.topicId.registrationPeriod.endDate);
+    startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
+    endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
+    const periodDir = `${report.topicId.registrationPeriod.title}-${startDate}-${endDate}`;
+
+    const pdfBlob = await html2pdf()
       .from(pdf)
       .set({
         margin: [15, 0, 15, 0],
-        filename: `NCKH-SV.${
-          report.studentId.studentId
-        }.BaoCaoNT.${formatString(report.topicId.vietnameseName)}.pdf`,
+        filename: fileName,
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: {
           scale: 2,
@@ -77,7 +86,36 @@ export default function ReportPage() {
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["avoid-all", "css", "legacy"] },
       })
-      .save();
+      .outputPdf("blob");
+
+    const submitFile = new File([pdfBlob], fileName, {
+      type: "application/pdf",
+    });
+
+    const formData = new FormData();
+    formData.append("file", submitFile);
+    formData.append("fileType", "submit");
+    formData.append("fileName", fileName);
+    formData.append("periodDir", periodDir);
+    formData.append("studentId", report.studentId.studentId);
+
+    const res = await uploadFile(report.topicId._id, formData);
+    if (res.ok) {
+      const data = await res.json();
+      message.open({
+        type: "success",
+        content: data.message,
+        duration: 2,
+      });
+      window.open(data.fileUrl, "_blank");
+    } else {
+      const data = await res.json();
+      message.open({
+        type: "error",
+        content: data.message,
+        duration: 2,
+      });
+    }
   };
 
   const handleContentChange = useDebounce(async (id, newContent) => {

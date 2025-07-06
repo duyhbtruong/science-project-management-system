@@ -203,14 +203,14 @@ export default function TopicPage() {
     const res = await uploadFile(topicId, formData);
     if (res.ok) {
       const data = await res.json();
-      messageApi.open({
+      message.open({
         type: "success",
         content: data.message,
         duration: 2,
       });
     } else {
       const data = await res.json();
-      messageApi.open({
+      message.open({
         type: "error",
         content: data.message,
         duration: 2,

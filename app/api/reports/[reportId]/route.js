@@ -19,6 +19,10 @@ export async function GET(request, { params }) {
     const report = await Report.findById(reportId).populate([
       {
         path: "topicId",
+        populate: {
+          path: "registrationPeriod",
+          select: "title startDate endDate",
+        },
       },
       {
         path: "studentId",
