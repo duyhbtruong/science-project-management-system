@@ -204,7 +204,7 @@ export const ReportPdfTemplate = forwardRef(
               <div className="mb-2 text-base font-bold">
                 {idx + 1}. {sec.templateId?.title}
               </div>
-              <div className="text-sm tiptap">{parse(sec.content)}</div>
+              <div className="ml-4 text-sm tiptap">{parse(sec.content)}</div>
             </div>
           ))}
         </div>

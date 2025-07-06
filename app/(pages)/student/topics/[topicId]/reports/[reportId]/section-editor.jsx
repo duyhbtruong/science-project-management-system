@@ -42,7 +42,7 @@ export const SectionEditor = ({
         savingStatus={savingStatus}
         field={field}
       />
-      <EditorContent editor={editor} />
+      <EditorContent editor={editor} spellCheck={false} />
       <CustomFloatingToolbar editor={editor} />
       <Threads editor={editor} />
     </div>

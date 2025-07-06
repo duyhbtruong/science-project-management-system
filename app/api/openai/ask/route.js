@@ -10,25 +10,26 @@ export async function POST(req) {
   let fullPrompt = prompt;
 
   if (action === "lengthen") {
-    fullPrompt = `Make the following content longer and more detailed:\n\n${currentContent}`;
+    fullPrompt = `Làm cho nội dung sau dài hơn và chi tiết hơn:\n\n${currentContent}`;
   } else if (action === "shorten") {
-    fullPrompt = `Make the following content more concise:\n\n${currentContent}`;
+    fullPrompt = `Làm cho nội dung sau ngắn gọn hơn:\n\n${currentContent}`;
   } else if (action === "improve") {
-    fullPrompt = `Improve the following content:\n\n${currentContent}`;
+    fullPrompt = `Cải thiện nội dung sau:\n\n${currentContent}`;
   } else if (action === "fixGrammar") {
-    fullPrompt = `Fix the grammar of the following content:\n\n${currentContent}`;
+    fullPrompt = `Sửa lỗi ngữ pháp trong nội dung sau:\n\n${currentContent}`;
   }
 
-  if (!fullPrompt) return new Response("Prompt is required.", { status: 400 });
+  if (!fullPrompt) return new Response("Yêu cầu nhập prompt.", { status: 400 });
 
   const response = await client.responses.create({
     model: "gpt-4o-mini",
     input: fullPrompt,
     instructions:
-      "Format the response in HTML with headings, paragraphs, and styled tags where appropriate. The response does not need to have <html> and <head> tag.",
+      "Định dạng phản hồi bằng HTML với các thẻ tiêu đề, đoạn văn. Phản hồi không cần có thẻ <html> và <head>.",
   });
 
-  if (!response) return new Response("Cannot call to OpenAI.", { status: 401 });
+  if (!response)
+    return new Response("Không thể kết nối đến OpenAI.", { status: 401 });
 
   return new Response(JSON.stringify(response), { status: 200 });
 }

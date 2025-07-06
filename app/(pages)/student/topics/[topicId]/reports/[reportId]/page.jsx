@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Button, message } from "antd";
+import { Button } from "antd";
 import { SectionEditor } from "./section-editor";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 import { useParams } from "next/navigation";
@@ -12,7 +12,6 @@ import { Room } from "./room";
 import { CheckCircleIcon, DownloadIcon, LoaderIcon } from "lucide-react";
 import { Avatars } from "./avatars";
 import { ReportPdfTemplate } from "./report-pdf-template";
-import html2pdf from "html2pdf.js";
 
 export default function ReportPage() {
   const params = useParams();
@@ -23,7 +22,6 @@ export default function ReportPage() {
   const [report, setReport] = useState();
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [msgApi, contextHolder] = message.useMessage();
   const [savingStatus, setSavingStatus] = useState("idle");
 
   const loadReport = async () => {
@@ -52,15 +50,17 @@ export default function ReportPage() {
   }, [report, sections]);
 
   const handleExportPdf = () => {
+    const html2pdf = require("html2pdf.js");
     const pdf = document.querySelector("#report-pdf-template");
 
     const formatString = (str) => {
       return str
-        .replace(/\s+/g, "") // Remove all spaces
-        .replace(/^(.)/, (match) => match.toUpperCase()) // Capitalize the first letter
-        .replace(/ (.)/g, (match) => match.toUpperCase()) // Capitalize letters after spaces
-        .replace(/([A-Z])/g, (match) => match.toLowerCase()) // Convert all letters to lowercase
-        .replace(/^(.)/, (match) => match.toUpperCase()); // Capitalize the first letter again
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join("");
     };
 
     html2pdf()
@@ -111,15 +111,14 @@ export default function ReportPage() {
 
   return (
     <Room>
-      {contextHolder}
       <div className="relative">
         <form className="p-6 space-y-6 bg-white rounded-lg shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold h-9">Báo cáo</h1>
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex gap-3 items-center">
+              <h1 className="h-9 text-2xl font-bold">Báo cáo</h1>
               <Avatars />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex gap-3 items-center">
               <div className="flex items-center gap-1.5 px-3 py-1 text-sm text-gray-600 border border-gray-200 rounded-full bg-gray-50">
                 {savingStatus === "saving" ? (
                   <>
@@ -139,7 +138,7 @@ export default function ReportPage() {
                 disabled={savingStatus === "saving"}
               >
                 {savingStatus === "saving" ? (
-                  <LoaderIcon className="size-4 animate-spin" />
+                  <LoaderIcon className="animate-spin size-4" />
                 ) : (
                   <DownloadIcon className="size-4" />
                 )}
@@ -164,20 +163,12 @@ export default function ReportPage() {
 
             return (
               <div key={sec._id} className="space-y-2">
-                <label
-                  htmlFor={`section-${sec._id}`}
-                  className="block text-base font-medium"
-                >
-                  {sec.title}
-                </label>
+                <span className="block text-base font-medium">{sec.title}</span>
 
-                <div
-                  id={`section-${sec._id}`}
-                  className="border border-gray-200 rounded min-h-[150px]"
-                >
+                <div className="border border-gray-200 rounded min-h-[150px]">
                   <SectionEditor
                     field={sec._id}
-                    initialContent={reportSection?.content || ""}
+                    initialContent={reportSection?.content ?? ""}
                     onChange={(newHtml) =>
                       handleContentChange(sec._id, newHtml)
                     }
