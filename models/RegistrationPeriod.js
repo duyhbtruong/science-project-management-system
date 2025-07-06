@@ -15,7 +15,7 @@ import { model, models, Schema } from "mongoose";
  * students' topics.
  */
 const registrationPeriodSchema = new Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: true, unique: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   reviewDeadline: { type: Date, required: true },

@@ -37,6 +37,7 @@ const { Option } = Select;
 
 export default function FilesPage() {
   const [listFile, setListFile] = useState([]);
+  const [listFileUpload, setListFileUpload] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
@@ -92,7 +93,7 @@ export default function FilesPage() {
 
         if (res.ok) {
           message.success("Xóa tệp tin thành công");
-          loadFiles(searchValue);
+          loadFiles();
         } else {
           message.error(result.message || "Lỗi xóa tệp tin");
         }
@@ -126,20 +127,36 @@ export default function FilesPage() {
     setUploadLoading(true);
     try {
       const { file, topicId, fileType } = values;
-      const fileList = file?.fileList || [];
 
-      if (fileList.length === 0) {
+      if (
+        !file ||
+        !file.fileList ||
+        file.fileList.length === 0 ||
+        !file.fileList[0].originFileObj
+      ) {
         message.error("Vui lòng chọn file để tải lên");
         return;
       }
 
-      const selectedFile = fileList[0];
+      const selectedTopic = topics.find((topic) => topic._id === topicId);
+      if (!selectedTopic) {
+        message.error("Không tìm thấy thông tin đề tài");
+        return;
+      }
+
+      let startDate = new Date(selectedTopic.registrationPeriod?.startDate);
+      let endDate = new Date(selectedTopic.registrationPeriod?.endDate);
+      startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
+      endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
+      const periodDir = `${selectedTopic.registrationPeriod?.title}-${startDate}-${endDate}`;
+
+      const selectedFile = file.fileList[0];
       const formData = new FormData();
       formData.append("file", selectedFile.originFileObj);
       formData.append("fileType", fileType);
       formData.append("fileName", selectedFile.name);
-      formData.append("periodDir", "files"); // Default directory
-      formData.append("studentId", "admin"); // Default for admin upload
+      formData.append("periodDir", periodDir);
+      formData.append("studentId", selectedTopic.owner.studentId);
 
       const res = await uploadFile(topicId, formData);
       const result = await res.json();
@@ -163,7 +180,12 @@ export default function FilesPage() {
   const uploadProps = {
     accept: ".pdf",
     maxCount: 1,
-    beforeUpload: () => false, // Prevent auto upload
+    beforeUpload: () => false,
+    onChange: (info) => {
+      if (info.fileList.length > 1) {
+        info.fileList = [info.fileList[info.fileList.length - 1]];
+      }
+    },
   };
 
   const columns = [
@@ -308,7 +330,6 @@ export default function FilesPage() {
         </div>
       </div>
 
-      {/* Upload Modal */}
       <Modal
         title="Tải lên tệp tin"
         open={isUploadModalVisible}
@@ -356,9 +377,19 @@ export default function FilesPage() {
           <Form.Item
             label="Tệp tin"
             name="file"
-            rules={[{ required: true, message: "Vui lòng chọn tệp tin" }]}
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng chọn tệp tin",
+              },
+            ]}
           >
-            <Upload.Dragger {...uploadProps}>
+            <Upload.Dragger
+              {...uploadProps}
+              maxCount={1}
+              fileList={listFileUpload}
+              onChange={({ fileList }) => setListFileUpload(fileList)}
+            >
               <p className="ant-upload-drag-icon">
                 <UploadIcon className="text-gray-400 size-8" />
               </p>

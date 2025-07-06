@@ -96,6 +96,15 @@ export async function POST(request, { params }) {
 
     await mongooseConnect();
 
+    // Check if period title already exists
+    const existingPeriod = await RegistrationPeriod.findOne({ title: title });
+    if (existingPeriod) {
+      return NextResponse.json(
+        { message: "Tên đợt đăng ký đã tồn tại. Vui lòng chọn tên khác." },
+        { status: 409 }
+      );
+    }
+
     const periods = await RegistrationPeriod.find(
       {},
       { startDate: 1, appraiseDeadline: 1 }
