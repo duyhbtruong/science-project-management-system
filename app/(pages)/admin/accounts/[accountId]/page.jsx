@@ -5,7 +5,7 @@ import { updateAppraisalBoardById } from "@/service/appraiseService";
 import { updateInstructorById } from "@/service/instructorService";
 import { updateStudentById } from "@/service/studentService";
 import { updateTechnologyScienceById } from "@/service/technologyScienceService";
-import { Form, Button, Input, message, Card, Select, Spin } from "antd";
+import { Form, Button, Input, Card, Select, Spin, App } from "antd";
 import {
   IdCardIcon,
   LockIcon,
@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 
 export default function UpdateAccount({ params }) {
   const id = params.accountId;
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
   const [account, setAccount] = useState();
   const [student, setStudent] = useState();
   const [technologyScience, setTechnologyScience] = useState();
@@ -83,15 +83,14 @@ export default function UpdateAccount({ params }) {
     const { message: apiMessage } = await res.json();
 
     if (res.status === 200) {
-      messageApi.success(apiMessage).then(() => router.push(`/admin/accounts`));
+      message.success(apiMessage).then(() => router.push(`/admin/accounts`));
     } else {
-      messageApi.error(apiMessage);
+      message.error(apiMessage);
     }
   };
 
   return (
     <div className="flex flex-col gap-6 justify-center items-center py-6 bg-gray-100">
-      {contextHolder}
       <div className="text-lg font-semibold">Cập nhật tài khoản</div>
       <Card className="shadow-md">
         <Spin spinning={!account}>

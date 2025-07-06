@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FileTextIcon } from "lucide-react";
-import { Form, Input, message, Space, DatePicker } from "antd";
+import { Form, Input, Space, DatePicker, App } from "antd";
 
 import { createPeriod } from "@/service/registrationService";
 import { SubmitButton } from "@/components/submit-button";
@@ -10,7 +10,7 @@ import { SubmitButton } from "@/components/submit-button";
 export default function CreatePeriodPage() {
   const router = useRouter();
   const [form] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const onFinish = async (formValues) => {
     let period = {
@@ -26,11 +26,11 @@ export default function CreatePeriodPage() {
 
     if (res.status === 201) {
       res = await res.json();
-      const { message } = res;
-      messageApi
+      const { message: messageApi } = res;
+      message
         .open({
           type: "success",
-          content: message,
+          content: messageApi,
           duration: 2,
         })
         .then(() => {
@@ -38,10 +38,10 @@ export default function CreatePeriodPage() {
         });
     } else {
       res = await res.json();
-      const { message } = res;
-      messageApi.open({
+      const { message: messageApi } = res;
+      message.open({
         type: "error",
-        content: message,
+        content: messageApi,
         duration: 2,
       });
     }
@@ -49,8 +49,7 @@ export default function CreatePeriodPage() {
 
   return (
     <>
-      {contextHolder}
-      <div className="bg-gray-100 ">
+      <div className="bg-gray-100">
         <div className="py-6 mx-32">
           <div className="flex justify-center pb-6 text-xl font-semibold">
             Tạo Đợt Đăng ký Đề tài mới

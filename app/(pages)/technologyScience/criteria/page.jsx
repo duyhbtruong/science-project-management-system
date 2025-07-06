@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Input, InputNumber, message, Space } from "antd";
+import { Button, Input, InputNumber, App } from "antd";
 import {
   DndContext,
   closestCenter,
@@ -36,7 +36,7 @@ export default function CriteriaManager() {
   const [adding, setAdding] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -79,24 +79,24 @@ export default function CriteriaManager() {
 
     try {
       await reorderCriteria(newCriteria);
-      messageApi.success("Sắp xếp thành công.");
+      message.success("Sắp xếp thành công.");
     } catch (err) {
-      messageApi.error("Sắp xếp thất bại.");
+      message.error("Sắp xếp thất bại.");
       loadCriteria();
     }
   };
 
   const validateGradeRange = () => {
     if (newMinGrade >= newMaxGrade) {
-      messageApi.error("Điểm tối thiểu phải nhỏ hơn điểm tối đa");
+      message.error("Điểm tối thiểu phải nhỏ hơn điểm tối đa");
       return false;
     }
     if (newStep <= 0) {
-      messageApi.error("Bước phải lớn hơn 0");
+      message.error("Bước phải lớn hơn 0");
       return false;
     }
     if ((newMaxGrade - newMinGrade) % newStep !== 0) {
-      messageApi.error("Khoảng điểm phải chia hết cho giá trị bước");
+      message.error("Khoảng điểm phải chia hết cho giá trị bước");
       return false;
     }
     return true;
@@ -104,7 +104,7 @@ export default function CriteriaManager() {
 
   const addCriteria = async () => {
     if (!newTitle.trim()) {
-      messageApi.error("Tiêu đề là bắt buộc");
+      message.error("Tiêu đề là bắt buộc");
       return;
     }
 
@@ -133,9 +133,9 @@ export default function CriteriaManager() {
       ]);
 
       setNewTitle("");
-      messageApi.success("Tiêu chí đã được thêm thành công.");
+      message.success("Tiêu chí đã được thêm thành công.");
     } catch (err) {
-      messageApi.error("Thêm tiêu chí thất bại.");
+      message.error("Thêm tiêu chí thất bại.");
     } finally {
       setAdding(false);
     }
@@ -148,7 +148,7 @@ export default function CriteriaManager() {
     try {
       await updateCriteriaService(id, updatedCriteria);
     } catch (err) {
-      messageApi.error("Failed to update criteria.");
+      message.error("Failed to update criteria.");
       loadCriteria();
     }
   };
@@ -157,9 +157,9 @@ export default function CriteriaManager() {
     setCriteria((prev) => prev.filter((c) => c.id !== id));
     try {
       await deleteCriteriaService(id);
-      messageApi.success("Tiêu chí đã được xóa thành công.");
+      message.success("Tiêu chí đã được xóa thành công.");
     } catch (err) {
-      messageApi.error("Xóa tiêu chí thất bại.");
+      message.error("Xóa tiêu chí thất bại.");
       loadCriteria();
     }
   };
@@ -168,7 +168,6 @@ export default function CriteriaManager() {
 
   return (
     <div className="p-4">
-      {contextHolder}
       <div className="space-y-4">
         <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow">
           <h2 className="text-lg font-medium">Thêm Tiêu chí Mới</h2>
@@ -214,7 +213,7 @@ export default function CriteriaManager() {
             type="primary"
             onClick={addCriteria}
             loading={adding}
-            className="flex items-center justify-center w-full"
+            className="flex justify-center items-center w-full"
             icon={<PlusIcon className="size-4" />}
           >
             Thêm Tiêu chí

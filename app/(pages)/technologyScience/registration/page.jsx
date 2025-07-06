@@ -9,15 +9,14 @@ import {
   searchPeriods,
 } from "@/service/registrationService";
 
-import { Modal, Spin, message } from "antd";
+import { Spin, App } from "antd";
 import SearchBar from "./search-bar";
 import PeriodTable from "./period-table";
 
 export default function RegistrationPeriodPage() {
   const router = useRouter();
   const [periods, setPeriods] = useState();
-  const [messageApi, messageContextHolder] = message.useMessage();
-  const [modal, modalContextHolder] = Modal.useModal();
+  const { message, modal } = App.useApp();
 
   const handleEdit = (periodId) => {
     router.push(`/technologyScience/registration/${periodId}`);
@@ -35,20 +34,20 @@ export default function RegistrationPeriodPage() {
 
     if (res.status === 200) {
       res = await res.json();
-      const { message } = res;
-      messageApi
+      const { message: messageApi } = res;
+      message
         .open({
           type: "success",
-          content: message,
+          content: messageApi,
           duration: 2,
         })
         .then(() => loadPeriods());
     } else {
       res = await res.json();
-      const { message } = res;
-      messageApi.open({
+      const { message: messageApi } = res;
+      message.open({
         type: "error",
-        content: message,
+        content: messageApi,
         duration: 2,
       });
     }
@@ -82,7 +81,7 @@ export default function RegistrationPeriodPage() {
 
   return (
     <>
-      <div className="bg-gray-100 ">
+      <div className="bg-gray-100">
         <div className="flex flex-col py-6 mx-32">
           <SearchBar
             onSearch={handleSearch}
@@ -99,8 +98,6 @@ export default function RegistrationPeriodPage() {
             />
           </Spin>
         </div>
-        {modalContextHolder}
-        {messageContextHolder}
       </div>
     </>
   );

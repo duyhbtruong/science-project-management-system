@@ -1,7 +1,6 @@
 "use client";
 
-import { AlignLeftOutlined } from "@ant-design/icons";
-import { Form, Input, message, Space, Spin, DatePicker } from "antd";
+import { Form, Input, Space, Spin, DatePicker, App } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getPeriodById, updatePeriodById } from "@/service/registrationService";
@@ -14,7 +13,7 @@ export default function EditPeriodScreen({ params }) {
   const router = useRouter();
   const [form] = Form.useForm();
   const [period, setPeriod] = useState();
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const loadPeriod = async () => {
     let res = await getPeriodById(periodId);
@@ -53,20 +52,20 @@ export default function EditPeriodScreen({ params }) {
 
     if (res.status === 200) {
       res = await res.json();
-      const { message } = res;
-      messageApi
+      const { message: messageApi } = res;
+      message
         .open({
           type: "success",
-          content: message,
+          content: messageApi,
           duration: 2,
         })
         .then(() => router.back());
     } else {
       res = await res.json();
-      const { message } = res;
-      messageApi.open({
+      const { message: messageApi } = res;
+      message.open({
         type: "error",
-        content: message,
+        content: messageApi,
         duration: 2,
       });
     }
@@ -74,8 +73,7 @@ export default function EditPeriodScreen({ params }) {
 
   return (
     <>
-      <div className="bg-gray-100 ">
-        {contextHolder}
+      <div className="bg-gray-100">
         <div className="py-6 mx-32">
           <div className="flex justify-center pb-6 text-xl font-semibold">
             Cập nhật Đợt đăng ký

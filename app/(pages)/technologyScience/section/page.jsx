@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Input, message, Spin } from "antd";
+import { Button, Input, Spin, App } from "antd";
 import {
   DndContext,
   closestCenter,
@@ -33,7 +33,7 @@ export default function SectionManager() {
   const [adding, setAdding] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -71,9 +71,9 @@ export default function SectionManager() {
       await apiReorderSections(
         newSections.map((s) => ({ id: s.id, order: s.order }))
       );
-      messageApi.success("Sắp xếp thành công.");
+      message.success("Sắp xếp thành công.");
     } catch (err) {
-      messageApi.error("Sắp xếp thất bại.");
+      message.error("Sắp xếp thất bại.");
       const fresh = await getSections();
       setSections(
         fresh.map((s) => ({ id: s._id, title: s.title, order: s.order }))
@@ -149,7 +149,6 @@ export default function SectionManager() {
 
   return (
     <div className="p-4">
-      {contextHolder}
       <div className="space-y-4">
         <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow">
           <h2 className="text-lg font-medium">Thêm Tiêu chí Mới</h2>
@@ -162,7 +161,7 @@ export default function SectionManager() {
             type="primary"
             onClick={addSection}
             loading={adding}
-            className="flex items-center justify-center w-full"
+            className="flex justify-center items-center w-full"
             icon={<PlusIcon className="size-4" />}
           >
             Thêm Tiêu chí

@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { Modal, Table, message } from "antd";
+import { Table, App } from "antd";
 import { deleteTopicById } from "@/service/topicService";
 
 import ExpandedRow from "./expanded-row";
 import { getTableColumns } from "./table-columns";
 
 const TopicTable = ({ listTopic, loadTopics, showModal }) => {
-  const [modal, modalContextHolder] = Modal.useModal();
   const [activeExpRow, setActiveExpRow] = useState([]);
-  const [messageApi, messageContextHolder] = message.useMessage();
+  const { message, modal } = App.useApp();
 
   const deleteTopic = async (id) => {
     const confirmed = await modal.confirm({
@@ -21,18 +20,18 @@ const TopicTable = ({ listTopic, loadTopics, showModal }) => {
       res = await res.json();
 
       if (res.status === 200) {
-        const { message } = res;
-        messageApi.open({
+        const { message: messageApi } = res;
+        message.open({
           type: "success",
-          content: message,
+          content: messageApi,
           duration: 2,
         });
         loadTopics();
       } else {
-        const { message } = res;
-        messageApi.open({
+        const { message: messageApi } = res;
+        message.open({
           type: "error",
-          content: message,
+          content: messageApi,
           duration: 2,
         });
       }
@@ -60,8 +59,6 @@ const TopicTable = ({ listTopic, loadTopics, showModal }) => {
           },
         }}
       />
-      {modalContextHolder}
-      {messageContextHolder}
     </>
   );
 };

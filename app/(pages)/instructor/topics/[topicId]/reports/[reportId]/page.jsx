@@ -19,8 +19,7 @@ export default function ReportPage() {
   const [report, setReport] = useState();
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [msgApi, contextHolder] = message.useMessage();
-  const [savingStatus, setSavingStatus] = useState("idle"); // 'idle', 'saving', 'saved'
+  const [savingStatus, setSavingStatus] = useState("idle");
 
   const loadReport = async () => {
     const res = await getReportById(reportId);
@@ -76,12 +75,11 @@ export default function ReportPage() {
 
   return (
     <Room>
-      {contextHolder}
       <div className="relative">
         <form className="p-6 space-y-6 bg-white rounded-lg shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold h-9">Báo cáo</h1>
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex gap-3 items-center">
+              <h1 className="h-9 text-2xl font-bold">Báo cáo</h1>
               <Avatars />
             </div>
             {savingStatus !== "idle" && (

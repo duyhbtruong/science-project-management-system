@@ -1,16 +1,20 @@
-import { Button, Descriptions, Space, Tag, Card, Typography } from "antd";
 import {
-  CheckIcon,
-  LoaderIcon,
-  UploadIcon,
+  Button,
+  Descriptions,
+  Tag,
+  Card,
+  Typography,
+  Tooltip,
+  List,
+} from "antd";
+import {
   UsersIcon,
   BookOpenIcon,
-  FileTextIcon,
   ClipboardListIcon,
   TargetIcon,
-  ArrowRightIcon,
+  PencilLineIcon,
+  ArrowUpRightIcon,
 } from "lucide-react";
-import Link from "next/link";
 import ReviewAssignmentsCard from "@/components/review-assignments-card";
 import AppraiseAssignmentsCard from "@/components/appraise-assignments-card";
 
@@ -21,13 +25,13 @@ export const TopicDetails = ({ topic, router }) => {
     {
       key: "1",
       label: "Tên tiếng Việt",
-      children: <Text className="text-lg">{topic?.vietnameseName}</Text>,
+      children: <Text>{topic?.vietnameseName}</Text>,
       span: 2,
     },
     {
       key: "2",
       label: "Tên tiếng Anh",
-      children: <Text className="text-lg">{topic?.englishName}</Text>,
+      children: <Text>{topic?.englishName}</Text>,
       span: 2,
     },
     {
@@ -66,9 +70,13 @@ export const TopicDetails = ({ topic, router }) => {
       children: (
         <Tag
           color={
-            topic?.reviewAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            topic?.reviewAssignments.length === 0 ||
+            topic?.reviewAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.reviewAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "warning"
               : topic?.reviewPassed
               ? "success"
@@ -76,9 +84,13 @@ export const TopicDetails = ({ topic, router }) => {
           }
         >
           <span>
-            {topic?.reviewAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            {topic?.reviewAssignments.length === 0 ||
+            topic?.reviewAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.reviewAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "Đang chờ"
               : topic?.reviewPassed
               ? "Đạt"
@@ -94,9 +106,13 @@ export const TopicDetails = ({ topic, router }) => {
       children: (
         <Tag
           color={
-            topic?.appraiseAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            topic?.appraiseAssignments.length === 0 ||
+            topic?.appraiseAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.appraiseAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "warning"
               : topic?.appraisePassed
               ? "success"
@@ -104,9 +120,13 @@ export const TopicDetails = ({ topic, router }) => {
           }
         >
           <span>
-            {topic?.appraiseAssignments
-              .filter((assignment) => assignment.status !== "removed")
-              .every((assignment) => assignment.status !== "completed")
+            {topic?.appraiseAssignments.length === 0 ||
+            topic?.appraiseAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.appraiseAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "Đang chờ"
               : topic?.appraisePassed
               ? "Đạt"
@@ -133,22 +153,73 @@ export const TopicDetails = ({ topic, router }) => {
       </Card>
 
       <Card className="shadow-sm">
-        <div className="flex items-center justify-between">
-          <Title level={4}>Tài liệu đính kèm</Title>
-          <Button
-            disabled={!topic?.reviewPassed}
-            type="primary"
-            icon={<ArrowRightIcon className="size-4" />}
-            onClick={() =>
-              router.push(
-                `/instructor/topics/${topic?._id}/reports/${topic?.report[0]?._id}`
-              )
-            }
-            iconPosition="end"
-          >
-            Viết báo cáo
-          </Button>
+        <div className="flex justify-between items-center mb-4">
+          <Title level={4} className="!mb-0">
+            Tài liệu đính kèm
+          </Title>
+          <Tooltip title="Bạn chỉ có thể viết báo cáo khi đề tài được kiểm duyệt">
+            <Button
+              type="primary"
+              href={`/student/topics/${topic?._id}/reports/${topic?.report[0]?._id}`}
+              disabled={!topic?.reviewPassed}
+            >
+              <PencilLineIcon className="size-4" />
+              Viết báo cáo
+            </Button>
+          </Tooltip>
         </div>
+        {topic?.files?.length > 0 && (
+          <List
+            itemLayout="horizontal"
+            dataSource={topic?.files}
+            renderItem={(file) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={
+                    file.fileType === "register"
+                      ? "Hồ sơ đăng ký"
+                      : file.fileType === "contract"
+                      ? "Hợp đồng"
+                      : file.fileType === "submit"
+                      ? "Báo cáo"
+                      : "Báo cáo tài chính"
+                  }
+                  description={file.fileName}
+                />
+                <Button href={file.fileUrl} target="_blank">
+                  Đường dẫn
+                  <ArrowUpRightIcon className="size-4" />
+                </Button>
+              </List.Item>
+            )}
+          />
+        )}
+        {topic?.files?.length > 0 && (
+          <List
+            itemLayout="horizontal"
+            dataSource={topic?.files}
+            renderItem={(file) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={
+                    file.fileType === "register"
+                      ? "Hồ sơ đăng ký"
+                      : file.fileType === "contract"
+                      ? "Hợp đồng"
+                      : file.fileType === "submit"
+                      ? "Báo cáo"
+                      : "Báo cáo tài chính"
+                  }
+                  description={file.fileName}
+                />
+                <Button href={file.fileUrl} target="_blank">
+                  Đường dẫn
+                  <ArrowUpRightIcon className="size-4" />
+                </Button>
+              </List.Item>
+            )}
+          />
+        )}
       </Card>
 
       <Card className="shadow-sm">

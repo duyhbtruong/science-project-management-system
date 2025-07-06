@@ -6,7 +6,7 @@ import {
   getReviewsByInstructorId,
   deleteReviewById,
 } from "@/service/reviewService";
-import { Spin, Table, Modal, message, Select } from "antd";
+import { Spin, Table, Select, App } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getTableColumns } from "./table-columns";
@@ -26,8 +26,7 @@ export default function ReviewPage() {
   const [selectedPeriod, setSelectedPeriod] = useState();
   const [loading, setLoading] = useState(false);
 
-  const [modal, modalContextHolder] = Modal.useModal();
-  const [messageApi, messageContextHolder] = message.useMessage();
+  const { message, modal } = App.useApp();
 
   const config = {
     title: "Hủy kết quả kiểm duyệt?",
@@ -44,7 +43,7 @@ export default function ReviewPage() {
       setInstructor(res.instructor);
       setAccount(res.account);
     } catch (error) {
-      messageApi.error("Không thể tải thông tin tài khoản");
+      message.error("Không thể tải thông tin tài khoản");
     } finally {
       setLoading(false);
     }
@@ -57,7 +56,7 @@ export default function ReviewPage() {
       res = await res.json();
       setListReview(res);
     } catch (error) {
-      messageApi.error("Không thể tải danh sách kiểm duyệt");
+      message.error("Không thể tải danh sách kiểm duyệt");
     } finally {
       setLoading(false);
     }
@@ -70,7 +69,7 @@ export default function ReviewPage() {
       res = await res.json();
       setListPeriod(res);
     } catch (error) {
-      messageApi.error("Không thể tải danh sách đợt đăng ký");
+      message.error("Không thể tải danh sách đợt đăng ký");
     } finally {
       setLoading(false);
     }
@@ -84,15 +83,15 @@ export default function ReviewPage() {
         let res = await deleteReviewById(record._id);
         if (res.ok) {
           const data = await res.json();
-          messageApi.success(data.message || "Hủy kiểm duyệt thành công");
+          message.success(data.message || "Hủy kiểm duyệt thành công");
           loadListReview();
         } else {
           const data = await res.json();
-          messageApi.error(data.message || "Không thể hủy kiểm duyệt");
+          message.error(data.message || "Không thể hủy kiểm duyệt");
         }
       }
     } catch (error) {
-      messageApi.error("Có lỗi xảy ra khi hủy kiểm duyệt");
+      message.error("Có lỗi xảy ra khi hủy kiểm duyệt");
     } finally {
       setLoading(false);
     }
@@ -120,8 +119,6 @@ export default function ReviewPage() {
 
   return (
     <>
-      {modalContextHolder}
-      {messageContextHolder}
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">
@@ -134,7 +131,7 @@ export default function ReviewPage() {
 
         <div className="bg-white rounded-lg shadow">
           <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
               <div className="flex-1 max-w-sm">
                 <Select
                   className="w-full"
@@ -159,7 +156,7 @@ export default function ReviewPage() {
 
           <div className="p-6">
             {!selectedPeriod ? (
-              <div className="flex flex-col items-center justify-center py-12">
+              <div className="flex flex-col justify-center items-center py-12">
                 <div className="text-center">
                   <h3 className="mt-2 text-sm font-medium text-gray-900">
                     Chưa chọn đợt đăng ký

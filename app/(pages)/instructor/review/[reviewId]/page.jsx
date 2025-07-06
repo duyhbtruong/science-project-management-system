@@ -7,7 +7,7 @@ import {
   updateReviewById,
 } from "@/service/reviewService";
 
-import { Button, Form, Spin, message } from "antd";
+import { Button, Form, Spin, App } from "antd";
 
 import emailjs from "@emailjs/browser";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ export default function ReviewTopicPage({ params }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = App.useApp();
 
   const router = useRouter();
 
@@ -110,17 +110,17 @@ export default function ReviewTopicPage({ params }) {
         : await updateReviewById(review._id, values);
 
       if (res.status === 200 || res.status === 201) {
-        const { message } = await res.json();
-        await messageApi.open({
+        const { message: messageApi } = await res.json();
+        await message.open({
           type: "success",
-          content: message,
+          content: messageApi,
           duration: 2,
         });
         router.push(`/instructor/review`);
         sendEmail(formData, topic);
       }
     } catch (error) {
-      messageApi.open({
+      await message.open({
         type: "error",
         content: error.message,
         duration: 2,
@@ -192,14 +192,14 @@ export default function ReviewTopicPage({ params }) {
           loading={!topic}
           icon={<InfoIcon className="size-4" />}
           type="primary"
-          className="flex items-center justify-center"
+          className="flex justify-center items-center"
         >
           Thông tin chi tiết
         </Button>
       </div>
 
       <Spin spinning={!topic}>
-        <div className="relative flex gap-4">
+        <div className="flex relative gap-4">
           <ReviewForm form={form} onFinish={onFinish} criteria={criteria} />
 
           <div className="space-y-4 bg-white rounded-md sticky top-4 h-fit w-[290px] p-4">
@@ -235,8 +235,6 @@ export default function ReviewTopicPage({ params }) {
         onCancel={() => setIsModalOpen(false)}
         topic={topic}
       />
-
-      {contextHolder}
     </div>
   );
 }

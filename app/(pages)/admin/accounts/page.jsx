@@ -11,15 +11,15 @@ import {
 import { dateFormat } from "@/utils/format";
 import Link from "next/link";
 
-import { Button, Space, Table, Tag, Input, Modal } from "antd";
-import { Edit, ImportIcon, Plus, SearchIcon, TrashIcon } from "lucide-react";
+import { Button, Space, Table, Tag, Input, App } from "antd";
+import { Edit, Plus, SearchIcon, TrashIcon } from "lucide-react";
 const { Search } = Input;
 const { Column } = Table;
 
 const AccountsPage = () => {
   const router = useRouter();
   const [accounts, setAccounts] = useState();
-  const [modal, modalContextHolder] = Modal.useModal();
+  const { modal } = App.useApp();
 
   const loadAccounts = async () => {
     var res = await getAccounts();
@@ -66,12 +66,12 @@ const AccountsPage = () => {
             onChange={handleSearchChange}
           />
 
-          <div className="flex justify-end gap-4">
+          <div className="flex gap-4 justify-end">
             <Button
               type="primary"
               onClick={() => router.push("/admin/accounts/create")}
               icon={<Plus className="size-4" />}
-              className="flex items-center justify-center"
+              className="flex justify-center items-center"
             >
               Tạo tài khoản
             </Button>
@@ -79,7 +79,7 @@ const AccountsPage = () => {
             {/* <Button
               type="default"
               icon={<ImportIcon className="size-4" />}
-              className="flex items-center justify-center"
+              className="flex justify-center items-center"
             >
               Nhập danh sách
             </Button> */}
@@ -176,7 +176,6 @@ const AccountsPage = () => {
           />
         </Table>
       </div>
-      {modalContextHolder}
     </div>
   );
 };
