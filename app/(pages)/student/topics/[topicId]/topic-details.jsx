@@ -10,6 +10,8 @@ import {
   Select,
   List,
   Tooltip,
+  List,
+  Tooltip,
 } from "antd";
 import {
   UsersIcon,
@@ -21,15 +23,19 @@ import {
   XIcon,
   ArrowUpRightIcon,
   PencilLineIcon,
+  ArrowUpRightIcon,
+  PencilLineIcon,
 } from "lucide-react";
 import ReviewAssignmentsCard from "@/components/review-assignments-card";
 import AppraiseAssignmentsCard from "@/components/appraise-assignments-card";
 import { useState } from "react";
 import { updateTopicById } from "@/service/topicService";
 import { RESEARCH_TYPE } from "@/constant/research-types";
+import { RESEARCH_TYPE } from "@/constant/research-types";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
+export const TopicDetails = ({ topic, router, loadTopic, message }) => {
 export const TopicDetails = ({ topic, router, loadTopic, message }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTopic, setEditedTopic] = useState(topic);
@@ -65,6 +71,7 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
         expectedResult: values.expectedResult,
       };
 
+      await updateTopicById(topic?._id, updatedTopic);
       await updateTopicById(topic?._id, updatedTopic);
 
       setEditedTopic(updatedTopic);
@@ -102,8 +109,10 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           className="!mb-0"
         >
           <Input />
+          <Input />
         </Form.Item>
       ) : (
+        <Text>{topic?.vietnameseName}</Text>
         <Text>{topic?.vietnameseName}</Text>
       ),
       span: 2,
@@ -128,8 +137,10 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           className="!mb-0"
         >
           <Input />
+          <Input />
         </Form.Item>
       ) : (
+        <Text>{topic?.englishName}</Text>
         <Text>{topic?.englishName}</Text>
       ),
       span: 2,
@@ -166,6 +177,7 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
         >
           <Select
             options={RESEARCH_TYPE.map((type) => ({
+            options={RESEARCH_TYPE.map((type) => ({
               label: type,
               value: type,
             }))}
@@ -192,6 +204,13 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
             topic?.reviewAssignments.every(
               (assignment) => assignment.status === "removed"
             )
+            topic?.reviewAssignments.length === 0 ||
+            topic?.reviewAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.reviewAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "warning"
               : topic?.reviewPassed
               ? "success"
@@ -199,6 +218,13 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           }
         >
           <span>
+            {topic?.reviewAssignments.length === 0 ||
+            topic?.reviewAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.reviewAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
             {topic?.reviewAssignments.length === 0 ||
             topic?.reviewAssignments.some(
               (assignment) => assignment.status === "pending"
@@ -228,6 +254,13 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
             topic?.appraiseAssignments.every(
               (assignment) => assignment.status === "removed"
             )
+            topic?.appraiseAssignments.length === 0 ||
+            topic?.appraiseAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.appraiseAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
               ? "warning"
               : topic?.appraisePassed
               ? "success"
@@ -235,6 +268,13 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
           }
         >
           <span>
+            {topic?.appraiseAssignments.length === 0 ||
+            topic?.appraiseAssignments.some(
+              (assignment) => assignment.status === "pending"
+            ) ||
+            topic?.appraiseAssignments.every(
+              (assignment) => assignment.status === "removed"
+            )
             {topic?.appraiseAssignments.length === 0 ||
             topic?.appraiseAssignments.some(
               (assignment) => assignment.status === "pending"
@@ -256,6 +296,7 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
   return (
     <div className="space-y-6">
       <Card className="shadow-sm">
+        <div className="flex justify-between items-center mb-4">
         <div className="flex justify-between items-center mb-4">
           <Title level={4} className="!mb-0">
             Thông tin Đề tài
@@ -314,6 +355,32 @@ export const TopicDetails = ({ topic, router, loadTopic, message }) => {
             </Button>
           </Tooltip>
         </div>
+        {topic?.files?.length > 0 && (
+          <List
+            itemLayout="horizontal"
+            dataSource={topic?.files}
+            renderItem={(file) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={
+                    file.fileType === "register"
+                      ? "Hồ sơ đăng ký"
+                      : file.fileType === "contract"
+                      ? "Hợp đồng"
+                      : file.fileType === "submit"
+                      ? "Báo cáo"
+                      : "Báo cáo tài chính"
+                  }
+                  description={file.fileName}
+                />
+                <Button href={file.fileUrl} target="_blank">
+                  Đường dẫn
+                  <ArrowUpRightIcon className="size-4" />
+                </Button>
+              </List.Item>
+            )}
+          />
+        )}
         {topic?.files?.length > 0 && (
           <List
             itemLayout="horizontal"
