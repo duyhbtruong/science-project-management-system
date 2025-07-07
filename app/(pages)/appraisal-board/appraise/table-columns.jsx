@@ -18,19 +18,22 @@ export const getTableColumns = (router, handleDelete) => [
   },
   {
     title: "Tài liệu",
-    dataIndex: "submitFile",
-    key: "submitFile",
+    dataIndex: ["topicId", "files"],
+    key: "files",
     render: (_, record) => {
-      if (!record.submitFile) return <span>Chưa nộp</span>;
+      const submitFile = record.topicId.files.find(
+        (file) => file.fileType === "submit"
+      );
+      if (!submitFile) return <span>Chưa nộp</span>;
       return (
         <Link
           target="_blank"
-          href={record.submitFile}
-          className="flex items-center gap-x-1"
+          href={submitFile.fileUrl}
+          className="flex gap-x-1 items-center"
         >
           <LinkIcon className="text-blue-500 size-4 hover:text-blue-600" />
           <Text className="text-blue-500 hover:text-blue-600">
-            {record.submitFile}
+            {submitFile.fileName}
           </Text>
         </Link>
       );
@@ -64,7 +67,10 @@ export const getTableColumns = (router, handleDelete) => [
     render: (_, record) => (
       <Space size="middle">
         <Button
-          disabled={record.status === "cancelled"}
+          disabled={
+            record.status === "cancelled" ||
+            !record.topicId.files.some((file) => file.fileType === "submit")
+          }
           onClick={() => router.push(`/appraisal-board/appraise/${record._id}`)}
           icon={<EditIcon className="size-4" />}
         />

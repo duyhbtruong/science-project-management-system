@@ -16,21 +16,20 @@ export async function GET(request) {
 
     let topicIds = [];
     if (periodId) {
-      const topics = await Topic.find({ registrationPeriodId: periodId });
+      const topics = await Topic.find({ registrationPeriod: periodId });
       topicIds = topics.map((topic) => topic._id);
+      filter.topicId = { $in: topicIds };
     }
 
     if (appraisalBoardId) {
       filter.appraisalBoardId = appraisalBoardId;
     }
-    if (topicIds.length > 0) {
-      filter.topicId = { $in: topicIds };
-    }
 
     const appraises = await AppraiseGrade.find(filter)
       .populate({
         path: "topicId",
-        select: "vietnameseName englishName registrationPeriodId owner",
+        select: "vietnameseName englishName registrationPeriod owner",
+        populate: "files",
       })
       .populate({
         path: "appraisalBoardId",

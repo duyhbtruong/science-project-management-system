@@ -16,22 +16,20 @@ export async function GET(request, { params }) {
 
     let topicIds = [];
     if (periodId) {
-      const topics = await Topic.find({ registrationPeriodId: periodId });
+      const topics = await Topic.find({ registrationPeriod: periodId });
       topicIds = topics.map((topic) => topic._id);
+      filter.topicId = { $in: topicIds };
     }
 
     if (instructorId) {
       filter.instructorId = instructorId;
-    }
-    if (topicIds.length > 0) {
-      filter.topicId = { $in: topicIds };
     }
 
     const reviews = await ReviewGrade.find(filter)
       .populate({
         path: "topicId",
         select:
-          "vietnameseName englishName registrationPeriodId owner createdAt updatedAt",
+          "vietnameseName englishName registrationPeriod owner createdAt updatedAt",
       })
       .populate({
         path: "instructorId",
