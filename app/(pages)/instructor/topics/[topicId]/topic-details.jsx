@@ -160,7 +160,7 @@ export const TopicDetails = ({ topic, router }) => {
           <Tooltip title="Bạn chỉ có thể viết báo cáo khi đề tài được kiểm duyệt">
             <Button
               type="primary"
-              href={`/student/topics/${topic?._id}/reports/${topic?.report[0]?._id}`}
+              href={`/instructor/topics/${topic?._id}/reports/${topic?.report[0]?._id}`}
               disabled={!topic?.reviewPassed}
             >
               <PencilLineIcon className="size-4" />
