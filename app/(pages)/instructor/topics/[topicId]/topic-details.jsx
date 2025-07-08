@@ -194,32 +194,6 @@ export const TopicDetails = ({ topic, router }) => {
             )}
           />
         )}
-        {topic?.files?.length > 0 && (
-          <List
-            itemLayout="horizontal"
-            dataSource={topic?.files}
-            renderItem={(file) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    file.fileType === "register"
-                      ? "Hồ sơ đăng ký"
-                      : file.fileType === "contract"
-                      ? "Hợp đồng"
-                      : file.fileType === "submit"
-                      ? "Báo cáo"
-                      : "Báo cáo tài chính"
-                  }
-                  description={file.fileName}
-                />
-                <Button href={file.fileUrl} target="_blank">
-                  Đường dẫn
-                  <ArrowUpRightIcon className="size-4" />
-                </Button>
-              </List.Item>
-            )}
-          />
-        )}
       </Card>
 
       <Card className="shadow-sm">

@@ -10,7 +10,11 @@ export const publicRoutes = [];
  * These routes will redirect logged in user to /admin/accounts.
  * @type {string[]}
  */
-export const authRoutes = ["/auth/login"];
+export const authRoutes = [
+  "/auth/login",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+];
 
 /**
  * The prefix for API authentication routes.

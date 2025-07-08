@@ -5,6 +5,7 @@ import { Alert, Button, Form, Input } from "antd";
 import { login } from "@/app/(pages)/auth/login/page";
 import { LockIcon, MailIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const ROLE_DEFAULT_PATH = {
   admin: "/admin/accounts",
@@ -87,6 +88,15 @@ export const LoginForm = () => {
             Đăng nhập
           </Button>
         </Form.Item>
+
+        <div className="text-right">
+          <Link
+            href="/auth/forgot-password"
+            className="text-blue-600 hover:underline"
+          >
+            Quên mật khẩu?
+          </Link>
+        </div>
       </Form>
     </div>
   );
