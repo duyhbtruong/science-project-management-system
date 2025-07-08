@@ -12,18 +12,20 @@ import {
 } from "@/service/topicService";
 
 import TopicTable from "./topic-table";
-import { Button, Input, Select, Spin } from "antd";
+import { Button, Input, Select, Spin, App, Steps, Card } from "antd";
 const { Search } = Input;
 const { Option } = Select;
 
 import { exportTopicList } from "@/utils/export";
 import { DownloadIcon } from "lucide-react";
 import AssignmentModal from "./assignment-modal";
+import RegistrationPeriodTimeline from "@/components/registration-period-timeline";
 
-export default function TopicsManagePage() {
+function TopicsManageContent() {
   const [listTopic, setListTopic] = useState();
   const [listPeriod, setListPeriod] = useState();
   const [selectedPeriod, setSelectedPeriod] = useState();
+  const { message } = App.useApp();
 
   const [listAppraiseStaff, setListAppraiseStaff] = useState();
   const [listReviewInstructor, setListReviewInstructor] = useState();
@@ -101,15 +103,49 @@ export default function TopicsManagePage() {
   const handleModalOk = async () => {
     if (!selectedTopic) return;
 
+    const currentReviewers = (selectedTopic.reviewAssignments || [])
+      .filter((a) => a.status !== "removed")
+      .map((a) => a.instructor.id)
+      .sort();
+    const currentAppraisers = (selectedTopic.appraiseAssignments || [])
+      .filter((a) => a.status !== "removed")
+      .map((a) => a.appraisalBoard.id)
+      .sort();
+    const selectedReviewers = [...selectedInstructors].sort();
+    const selectedAppraisers = [...selectedStaffs].sort();
+
+    const isSameReviewers =
+      currentReviewers.length === selectedReviewers.length &&
+      currentReviewers.every((id, idx) => id === selectedReviewers[idx]);
+    const isSameAppraisers =
+      currentAppraisers.length === selectedAppraisers.length &&
+      currentAppraisers.every((id, idx) => id === selectedAppraisers[idx]);
+
+    if (isSameReviewers && isSameAppraisers) {
+      setIsModalVisible(false);
+      setSelectedTopic(null);
+      setSelectedInstructors([]);
+      setSelectedStaffs([]);
+      return;
+    }
+
+    const updatePayload = {};
+    if (!isSameReviewers)
+      updatePayload.reviewInstructorIds = selectedInstructors;
+    if (!isSameAppraisers) updatePayload.appraisalBoardIds = selectedStaffs;
+
     try {
       setConfirmLoading(true);
-      const response = await updateTopicById(selectedTopic._id, {
-        reviewInstructorIds: selectedInstructors,
-        appraisalBoardIds: selectedStaffs,
-      });
+      const response = await updateTopicById(selectedTopic._id, updatePayload);
 
       if (!response.ok) {
-        throw new Error("Failed to update assignments");
+        const errorData = await response.json();
+        message.error(errorData.message || "Cập nhật phân công thất bại");
+        setIsModalVisible(false);
+        setSelectedTopic(null);
+        setSelectedInstructors([]);
+        setSelectedStaffs([]);
+        throw new Error(errorData.message || "Cập nhật phân công thất bại");
       }
 
       await loadTopics();
@@ -117,8 +153,9 @@ export default function TopicsManagePage() {
       setSelectedTopic(null);
       setSelectedInstructors([]);
       setSelectedStaffs([]);
+      message.success("Cập nhật phân công thành công");
     } catch (error) {
-      console.error("Error updating assignments:", error);
+      console.error("Lỗi khi cập nhật phân công:", error);
     } finally {
       setConfirmLoading(false);
     }
@@ -146,6 +183,9 @@ export default function TopicsManagePage() {
   return (
     <div className="bg-gray-100">
       <div className="flex flex-col py-6 mx-32">
+        <RegistrationPeriodTimeline
+          period={listPeriod?.find((p) => p._id === selectedPeriod)}
+        />
         <div className="flex justify-between mb-4">
           <div className="space-x-4">
             {selectedPeriod && (
@@ -234,5 +274,13 @@ export default function TopicsManagePage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function TopicsManagePage() {
+  return (
+    <App>
+      <TopicsManageContent />
+    </App>
   );
 }

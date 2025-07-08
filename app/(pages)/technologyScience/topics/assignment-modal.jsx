@@ -1,4 +1,4 @@
-import { Modal, Select, Space, Tag } from "antd";
+import { Modal, Select, Space, Tag, Alert } from "antd";
 import { XIcon } from "lucide-react";
 const { Option } = Select;
 
@@ -33,12 +33,12 @@ const AssignmentModal = ({
 
   const getInstructorName = (id) => {
     const instructor = listReviewInstructor?.find((i) => i._id === id);
-    return instructor?.account.name || "Unknown";
+    return instructor?.account.name || "Không xác định";
   };
 
   const getStaffName = (id) => {
     const staff = listAppraiseStaff?.find((s) => s._id === id);
-    return staff?.account.name || "Unknown";
+    return staff?.account.name || "Không xác định";
   };
 
   const availableReviewers = listReviewInstructor?.filter(
@@ -58,6 +58,25 @@ const AssignmentModal = ({
       confirmLoading={confirmLoading}
     >
       <div className="flex flex-col space-y-6">
+        <Alert
+          message="Lưu ý về thời gian phân công"
+          description={
+            <ul className="pl-4 mt-2 list-disc">
+              <li>
+                Giảng viên kiểm duyệt: Chỉ có thể phân công sau khi kết thúc đợt
+                đăng ký và trước hạn kiểm duyệt
+              </li>
+              <li>
+                Hội đồng thẩm định: Chỉ có thể phân công sau khi hết hạn nộp báo
+                cáo
+              </li>
+            </ul>
+          }
+          type="info"
+          showIcon
+          className="mb-4"
+        />
+
         <div>
           <label className="block mb-2 text-sm font-medium text-gray-700">
             Giảng viên kiểm duyệt

@@ -130,7 +130,7 @@ export async function PUT(request, { params }) {
 
     const topic = await Topic.findOne({ _id: id }).populate({
       path: "registrationPeriod",
-      select: "reviewDeadline",
+      select: "reviewDeadline endDate submitDeadline",
     });
 
     if (!topic) {
@@ -138,6 +138,44 @@ export async function PUT(request, { params }) {
         { message: "Không tìm thấy đề tài." },
         { status: 404 }
       );
+    }
+
+    if (reviewInstructorIds) {
+      const today = new Date();
+      const endDate = new Date(topic.registrationPeriod.endDate);
+      const reviewDeadline = new Date(topic.registrationPeriod.reviewDeadline);
+
+      if (today < endDate) {
+        return NextResponse.json(
+          { message: "Chưa đến thời gian phân công giảng viên phản biện." },
+          {
+            status: 400,
+          }
+        );
+      }
+
+      if (today > reviewDeadline) {
+        return NextResponse.json(
+          { message: "Đã hết thời gian phân công giảng viên phản biện." },
+          {
+            status: 400,
+          }
+        );
+      }
+    }
+
+    if (appraisalBoardIds) {
+      const today = new Date();
+      const submitDeadline = new Date(topic.registrationPeriod.submitDeadline);
+
+      if (today < submitDeadline) {
+        return NextResponse.json(
+          { message: "Chưa đến thời gian phân công hội đồng chấm điểm." },
+          {
+            status: 400,
+          }
+        );
+      }
     }
 
     const updatedTopic = {
