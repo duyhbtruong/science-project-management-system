@@ -196,8 +196,8 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
             )
               ? "warning"
               : topic?.reviewPassed
-              ? "success"
-              : "error"
+                ? "success"
+                : "error"
           }
         >
           <span>
@@ -210,8 +210,8 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
             )
               ? "Đang chờ"
               : topic?.reviewPassed
-              ? "Đạt"
-              : "Không đạt"}
+                ? "Đạt"
+                : "Không đạt"}
           </span>
         </Tag>
       ),
@@ -232,8 +232,8 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
             )
               ? "warning"
               : topic?.appraisePassed
-              ? "success"
-              : "error"
+                ? "success"
+                : "error"
           }
         >
           <span>
@@ -246,8 +246,8 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
             )
               ? "Đang chờ"
               : topic?.appraisePassed
-              ? "Đạt"
-              : "Không đạt"}
+                ? "Đạt"
+                : "Không đạt"}
           </span>
         </Tag>
       ),
@@ -327,10 +327,10 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
                     file.fileType === "register"
                       ? "Hồ sơ đăng ký"
                       : file.fileType === "contract"
-                      ? "Hợp đồng"
-                      : file.fileType === "submit"
-                      ? "Báo cáo"
-                      : "Báo cáo tài chính"
+                        ? "Hợp đồng"
+                        : file.fileType === "submit"
+                          ? "Báo cáo"
+                          : "Báo cáo tài chính"
                   }
                   description={file.fileName}
                 />

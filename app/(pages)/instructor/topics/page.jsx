@@ -7,6 +7,7 @@ import { Select, Spin, Table } from "antd";
 import { useEffect, useState } from "react";
 import { getTableColumns } from "./table-columns";
 import { useCustomSession } from "@/hooks/use-custom-session";
+import RegistrationPeriodTimeline from "@/components/registration-period-timeline";
 const { Option } = Select;
 
 export default function TopicsPage() {
@@ -61,8 +62,11 @@ export default function TopicsPage() {
   const columns = getTableColumns();
 
   return (
-    <div className="bg-gray-100 ">
+    <div className="bg-gray-100">
       <div className="flex flex-col py-6 mx-32">
+        <RegistrationPeriodTimeline
+          period={listPeriod?.find((p) => p._id === selectedPeriod)}
+        />
         <div className="mb-4 space-x-4">
           {selectedPeriod && (
             <Select
@@ -81,9 +85,9 @@ export default function TopicsPage() {
         </div>
 
         {!selectedPeriod ? (
-          <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow">
+          <div className="flex flex-col justify-center items-center p-8 bg-white rounded-lg shadow">
             <Select
-              className="w-64 mb-4"
+              className="mb-4 w-64"
               placeholder="Chọn đợt đăng ký..."
               onChange={handlePeriodChange}
               value={selectedPeriod}

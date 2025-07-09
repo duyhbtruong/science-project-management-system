@@ -2,8 +2,10 @@ import { mongooseConnect } from "@/lib/mongoose";
 import { ReviewGrade } from "@/models/ReviewGrade";
 import { Topic } from "@/models/Topic";
 import { Instructor } from "@/models/users/Instructor";
+import { RegistrationPeriod } from "@/models/RegistrationPeriod";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+import { isWithinReviewPeriod } from "@/utils/validator";
 
 export async function GET(request, { params }) {
   try {
@@ -71,12 +73,26 @@ export async function POST(request) {
 
     await mongooseConnect();
 
-    const topic = await Topic.findOne({ _id: topicId });
+    const topic = await Topic.findOne({ _id: topicId }).populate({
+      path: "registrationPeriod",
+      select: "endDate reviewDeadline",
+    });
 
     if (!topic) {
       return NextResponse.json(
         { message: "Không tìm thấy đề tài." },
         { status: 404 }
+      );
+    }
+
+    // Check if we're in the review period
+    if (!isWithinReviewPeriod(topic.registrationPeriod)) {
+      return NextResponse.json(
+        {
+          message:
+            "Không trong thời gian kiểm duyệt. Chỉ có thể kiểm duyệt đề tài trong khoảng thời gian từ ngày kết thúc đăng ký đến hạn kiểm duyệt.",
+        },
+        { status: 403 }
       );
     }
 

@@ -3,6 +3,7 @@ import { ReviewGrade } from "@/models/ReviewGrade";
 import { Topic } from "@/models/Topic";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+import { isWithinReviewPeriod } from "@/utils/validator";
 
 export async function GET(request, { params }) {
   try {
@@ -22,7 +23,7 @@ export async function GET(request, { params }) {
     const review = await ReviewGrade.findOne({ _id: reviewId }).populate({
       path: "topicId",
       select:
-        "vietnameseName englishName summary expectedResult participants reference instructor owner",
+        "vietnameseName englishName summary expectedResult participants reference instructor owner registrationPeriod",
       populate: [
         {
           path: "instructor",
@@ -37,6 +38,9 @@ export async function GET(request, { params }) {
             path: "accountId",
             select: "name email phone role",
           },
+        },
+        {
+          path: "registrationPeriod",
         },
       ],
     });
@@ -75,12 +79,29 @@ export async function PUT(request, { params }) {
 
     await mongooseConnect();
 
-    const review = await ReviewGrade.findOne({ _id: reviewId });
+    const review = await ReviewGrade.findOne({ _id: reviewId }).populate({
+      path: "topicId",
+      populate: {
+        path: "registrationPeriod",
+        select: "endDate reviewDeadline",
+      },
+    });
 
     if (!review) {
       return NextResponse.json(
         { message: "Không tìm thấy đánh giá." },
         { status: 404 }
+      );
+    }
+
+    // Check if we're in the review period
+    if (!isWithinReviewPeriod(review.topicId.registrationPeriod)) {
+      return NextResponse.json(
+        {
+          message:
+            "Không trong thời gian kiểm duyệt. Chỉ có thể kiểm duyệt đề tài trong khoảng thời gian từ ngày kết thúc đăng ký đến hạn kiểm duyệt.",
+        },
+        { status: 403 }
       );
     }
 
@@ -133,12 +154,29 @@ export async function DELETE(request, { params }) {
 
     await mongooseConnect();
 
-    const review = await ReviewGrade.findOne({ _id: reviewId });
+    const review = await ReviewGrade.findOne({ _id: reviewId }).populate({
+      path: "topicId",
+      populate: {
+        path: "registrationPeriod",
+        select: "endDate reviewDeadline",
+      },
+    });
 
     if (!review) {
       return NextResponse.json(
         { message: "Không tìm thấy đánh giá." },
         { status: 404 }
+      );
+    }
+
+    // Check if we're in the review period
+    if (!isWithinReviewPeriod(review.topicId.registrationPeriod)) {
+      return NextResponse.json(
+        {
+          message:
+            "Không trong thời gian kiểm duyệt. Chỉ có thể hủy kiểm duyệt đề tài trong khoảng thời gian từ ngày kết thúc đăng ký đến hạn kiểm duyệt.",
+        },
+        { status: 403 }
       );
     }
 

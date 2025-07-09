@@ -49,15 +49,15 @@ export const getTableColumns = (router, handleDelete) => [
           record.status === "completed"
             ? "success"
             : record.status === "pending"
-            ? "processing"
-            : "error"
+              ? "processing"
+              : "error"
         }
       >
         {record.status === "completed"
           ? "Đã thẩm định"
           : record.status === "pending"
-          ? "Chưa thẩm định"
-          : "Đã hủy"}
+            ? "Chưa thẩm định"
+            : "Đã hủy"}
       </Tag>
     ),
   },

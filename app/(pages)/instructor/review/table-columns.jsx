@@ -2,7 +2,7 @@ import { Button, Space, Tag } from "antd";
 import { EditIcon, TrashIcon } from "lucide-react";
 import { dateFormat } from "@/utils/format";
 
-export const getTableColumns = (router, handleDelete) => [
+export const getTableColumns = (router, handleDelete, disabled = false) => [
   {
     title: "Tên đề tài (Tiếng Việt)",
     dataIndex: ["topicId", "vietnameseName"],
@@ -41,15 +41,15 @@ export const getTableColumns = (router, handleDelete) => [
           record.status === "completed"
             ? "success"
             : record.status === "pending"
-            ? "processing"
-            : "error"
+              ? "processing"
+              : "error"
         }
       >
         {record.status === "completed"
           ? "Đã kiểm duyệt"
           : record.status === "pending"
-          ? "Chưa kiểm duyệt"
-          : "Đã hủy"}
+            ? "Chưa kiểm duyệt"
+            : "Đã hủy"}
       </Tag>
     ),
   },
@@ -60,14 +60,17 @@ export const getTableColumns = (router, handleDelete) => [
     render: (_, record) => (
       <Space size="middle">
         <Button
-          disabled={record.status === "cancelled"}
+          disabled={record.status === "cancelled" || disabled}
           onClick={() => router.push(`/instructor/review/${record._id}`)}
           icon={<EditIcon className="size-4" />}
+          title={disabled ? "Không trong thời gian kiểm duyệt" : undefined}
         />
         <Button
           onClick={() => handleDelete(record)}
           danger
           icon={<TrashIcon className="size-4" />}
+          disabled={disabled}
+          title={disabled ? "Không trong thời gian kiểm duyệt" : undefined}
         />
       </Space>
     ),

@@ -6,11 +6,13 @@ import {
   getReviewsByInstructorId,
   deleteReviewById,
 } from "@/service/reviewService";
-import { Spin, Table, Select, App } from "antd";
+import { Spin, Table, Select, App, Alert } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getTableColumns } from "./table-columns";
 import { useCustomSession } from "@/hooks/use-custom-session";
+import RegistrationPeriodTimeline from "@/components/registration-period-timeline";
+import { isWithinReviewPeriod } from "@/utils/validator";
 const { Option } = Select;
 
 export default function ReviewPage() {
@@ -25,6 +27,7 @@ export default function ReviewPage() {
   const [listPeriod, setListPeriod] = useState();
   const [selectedPeriod, setSelectedPeriod] = useState();
   const [loading, setLoading] = useState(false);
+  const [isReviewPeriod, setIsReviewPeriod] = useState(false);
 
   const { message, modal } = App.useApp();
 
@@ -53,8 +56,15 @@ export default function ReviewPage() {
     try {
       setLoading(true);
       let res = await getReviewsByInstructorId(selectedPeriod, instructor._id);
-      res = await res.json();
-      setListReview(res);
+      if (res.ok) {
+        res = await res.json();
+        setListReview(res);
+      } else {
+        const errorData = await res.json();
+        message.error(
+          errorData.message || "Không thể tải danh sách kiểm duyệt"
+        );
+      }
     } catch (error) {
       message.error("Không thể tải danh sách kiểm duyệt");
     } finally {
@@ -115,12 +125,21 @@ export default function ReviewPage() {
     loadListReview();
   }, [selectedPeriod, instructor]);
 
-  const columns = getTableColumns(router, handleDelete);
+  useEffect(() => {
+    if (!selectedPeriod || !listPeriod) return;
+
+    const period = listPeriod.find((p) => p._id === selectedPeriod);
+    if (period) {
+      setIsReviewPeriod(isWithinReviewPeriod(period));
+    }
+  }, [selectedPeriod, listPeriod]);
+
+  const columns = getTableColumns(router, handleDelete, !isReviewPeriod);
 
   return (
     <>
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="mb-8">
+        <div className="mb-4">
           <h1 className="text-2xl font-semibold text-gray-900">
             Kiểm duyệt đề tài
           </h1>
@@ -128,6 +147,20 @@ export default function ReviewPage() {
             Quản lý và kiểm duyệt các đề tài nghiên cứu khoa học
           </p>
         </div>
+
+        <RegistrationPeriodTimeline
+          period={listPeriod?.find((p) => p._id === selectedPeriod)}
+        />
+
+        {selectedPeriod && !isReviewPeriod && (
+          <Alert
+            message="Không trong thời gian kiểm duyệt"
+            description="Chỉ có thể kiểm duyệt đề tài trong khoảng thời gian từ ngày kết thúc đăng ký đến hạn kiểm duyệt."
+            type="warning"
+            showIcon
+            className="mb-4"
+          />
+        )}
 
         <div className="bg-white rounded-lg shadow">
           <div className="p-6 border-b border-gray-200">
@@ -175,7 +208,6 @@ export default function ReviewPage() {
                   dataSource={listReview}
                   pagination={{
                     pageSize: 8,
-                    showSizeChanger: true,
                     showTotal: (total) => `Tổng số ${total} đề tài`,
                   }}
                   className="review-table"

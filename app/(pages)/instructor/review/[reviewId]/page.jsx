@@ -7,7 +7,7 @@ import {
   updateReviewById,
 } from "@/service/reviewService";
 
-import { Button, Form, Spin, App } from "antd";
+import { Button, Form, Spin, App, Alert } from "antd";
 
 import emailjs from "@emailjs/browser";
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ import DetailModal from "./detail-modal";
 import { getCriteria } from "@/service/criteriaService";
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 import { useCustomSession } from "@/hooks/use-custom-session";
+import { isWithinReviewPeriod } from "@/utils/validator";
 
 export default function ReviewTopicPage({ params }) {
   const { reviewId } = params;
@@ -29,6 +30,7 @@ export default function ReviewTopicPage({ params }) {
   const [topic, setTopic] = useState();
   const [review, setReview] = useState();
   const [criteria, setCriteria] = useState();
+  const [isReviewPeriod, setIsReviewPeriod] = useState(false);
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
@@ -84,7 +86,21 @@ export default function ReviewTopicPage({ params }) {
     setLoading(false);
   }, [review]);
 
+  useEffect(() => {
+    if (!topic?.registrationPeriod) return;
+
+    const isInReviewPeriod = isWithinReviewPeriod(topic.registrationPeriod);
+    setIsReviewPeriod(isInReviewPeriod);
+  }, [topic]);
+
   const onFinish = async (formData) => {
+    if (!isReviewPeriod) {
+      message.error(
+        "Không trong thời gian kiểm duyệt. Chỉ có thể kiểm duyệt đề tài trong khoảng thời gian từ ngày kết thúc đăng ký đến hạn kiểm duyệt."
+      );
+      return;
+    }
+
     const criteriaGrades = Object.entries(formData)
       .filter(([key]) => key.startsWith("criteria_"))
       .map(([key, grade]) => {
@@ -118,6 +134,9 @@ export default function ReviewTopicPage({ params }) {
         });
         router.push(`/instructor/review`);
         sendEmail(formData, topic);
+      } else {
+        const errorData = await res.json();
+        message.error(errorData.message || "Có lỗi xảy ra khi gửi đánh giá");
       }
     } catch (error) {
       await message.open({
@@ -198,9 +217,24 @@ export default function ReviewTopicPage({ params }) {
         </Button>
       </div>
 
+      {topic && !isReviewPeriod && (
+        <Alert
+          message="Không trong thời gian kiểm duyệt"
+          description="Chỉ có thể kiểm duyệt đề tài trong khoảng thời gian từ ngày kết thúc đăng ký đến hạn kiểm duyệt."
+          type="warning"
+          showIcon
+          className="mb-4"
+        />
+      )}
+
       <Spin spinning={!topic}>
         <div className="flex relative gap-4">
-          <ReviewForm form={form} onFinish={onFinish} criteria={criteria} />
+          <ReviewForm
+            form={form}
+            onFinish={onFinish}
+            criteria={criteria}
+            disabled={!isReviewPeriod}
+          />
 
           <div className="space-y-4 bg-white rounded-md sticky top-4 h-fit w-[290px] p-4">
             <span className="font-medium">Danh sách tiêu chí</span>
