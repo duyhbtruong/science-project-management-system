@@ -3,6 +3,7 @@ import { AppraiseGrade } from "@/models/AppraiseGrade";
 import { Topic } from "@/models/Topic";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+import { isWithinAppraisalPeriod } from "@/utils/validator";
 
 export async function GET(request, { params }) {
   try {
@@ -22,7 +23,7 @@ export async function GET(request, { params }) {
     const appraise = await AppraiseGrade.findOne({ _id: appraiseId }).populate({
       path: "topicId",
       select:
-        "vietnameseName englishName summary expectedResult participants reference instructor owner",
+        "vietnameseName englishName summary expectedResult participants reference instructor owner registrationPeriod",
       populate: [
         {
           path: "instructor",
@@ -37,6 +38,11 @@ export async function GET(request, { params }) {
             path: "accountId",
             select: "name email phone role",
           },
+        },
+        {
+          path: "registrationPeriod",
+          select:
+            "title startDate endDate reviewDeadline submitDeadline appraiseDeadline",
         },
       ],
     });
@@ -77,7 +83,13 @@ export async function PUT(request, { params }) {
 
     await mongooseConnect();
 
-    const appraise = await AppraiseGrade.findOne({ _id: appraiseId });
+    const appraise = await AppraiseGrade.findOne({ _id: appraiseId }).populate({
+      path: "topicId",
+      populate: {
+        path: "registrationPeriod",
+        select: "submitDeadline appraiseDeadline",
+      },
+    });
 
     if (!appraise) {
       return NextResponse.json(
@@ -85,6 +97,16 @@ export async function PUT(request, { params }) {
         {
           status: 404,
         }
+      );
+    }
+
+    if (!isWithinAppraisalPeriod(appraise.topicId.registrationPeriod)) {
+      return NextResponse.json(
+        {
+          message:
+            "Không trong thời gian thẩm định. Chỉ có thể thẩm định đề tài trong khoảng thời gian từ ngày kết thúc nộp báo cáo đến hạn thẩm định.",
+        },
+        { status: 403 }
       );
     }
 
@@ -137,7 +159,13 @@ export async function DELETE(request, { params }) {
 
     await mongooseConnect();
 
-    const appraise = await AppraiseGrade.findOne({ _id: appraiseId });
+    const appraise = await AppraiseGrade.findOne({ _id: appraiseId }).populate({
+      path: "topicId",
+      populate: {
+        path: "registrationPeriod",
+        select: "submitDeadline appraiseDeadline",
+      },
+    });
 
     if (!appraise) {
       return NextResponse.json(
@@ -145,6 +173,16 @@ export async function DELETE(request, { params }) {
         {
           status: 404,
         }
+      );
+    }
+
+    if (!isWithinAppraisalPeriod(appraise.topicId.registrationPeriod)) {
+      return NextResponse.json(
+        {
+          message:
+            "Không trong thời gian thẩm định. Chỉ có thể hủy thẩm định đề tài trong khoảng thời gian từ ngày kết thúc nộp báo cáo đến hạn thẩm định.",
+        },
+        { status: 403 }
       );
     }
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LinkIcon } from "lucide-react";
+import { Link2Icon } from "lucide-react";
 import { Modal, Descriptions, Typography } from "antd";
 const { Text } = Typography;
 
@@ -61,9 +61,10 @@ export default function DetailModal({ isOpen, onOk, onCancel, topic }) {
       children: (
         <Link
           className="flex items-center space-x-1"
+          target="_blank"
           href={`https://mail.google.com/mail/?view=cm&fs=1&to=${topic?.instructor?.email}`}
         >
-          <LinkIcon className="text-blue-500 size-4 hover:text-blue-600" />
+          <Link2Icon className="text-blue-500 size-4 hover:text-blue-600" />
           <Text className="text-blue-500 hover:text-blue-600">
             {topic?.instructor?.accountId.email}
           </Text>

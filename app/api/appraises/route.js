@@ -4,6 +4,7 @@ import { Topic } from "@/models/Topic";
 import { AppraisalBoard } from "@/models/users/AppraisalBoard";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+import { isWithinAppraisalPeriod } from "@/utils/validator";
 
 export async function GET(request) {
   try {
@@ -75,12 +76,25 @@ export async function POST(request) {
 
     await mongooseConnect();
 
-    const topic = await Topic.findOne({ _id: topicId });
+    const topic = await Topic.findOne({ _id: topicId }).populate({
+      path: "registrationPeriod",
+      select: "submitDeadline appraiseDeadline",
+    });
 
     if (!topic) {
       return NextResponse.json(
         { message: "Không tìm thấy đề tài." },
         { status: 404 }
+      );
+    }
+
+    if (!isWithinAppraisalPeriod(topic.registrationPeriod)) {
+      return NextResponse.json(
+        {
+          message:
+            "Không trong thời gian thẩm định. Chỉ có thể thẩm định đề tài trong khoảng thời gian từ ngày kết thúc nộp báo cáo đến hạn thẩm định.",
+        },
+        { status: 403 }
       );
     }
 

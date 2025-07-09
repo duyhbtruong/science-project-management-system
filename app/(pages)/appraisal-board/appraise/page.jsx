@@ -1,6 +1,6 @@
 "use client";
 
-import { Spin, Table, Select, App } from "antd";
+import { Spin, Table, Select, App, Alert } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -11,6 +11,8 @@ import { getAccountById } from "@/service/accountService";
 import { getAllPeriods } from "@/service/registrationService";
 import { getTableColumns } from "./table-columns";
 import { useCustomSession } from "@/hooks/use-custom-session";
+import { isWithinAppraisalPeriod } from "@/utils/validator";
+import RegistrationPeriodTimeline from "@/components/registration-period-timeline";
 const { Option } = Select;
 
 export default function AppraiseTopicPage() {
@@ -24,6 +26,7 @@ export default function AppraiseTopicPage() {
   const [listAppraise, setListAppraise] = useState();
   const [selectedPeriod, setSelectedPeriod] = useState();
   const [loading, setLoading] = useState(false);
+  const [isAppraisalPeriod, setIsAppraisalPeriod] = useState(false);
 
   const { message, modal } = App.useApp();
 
@@ -78,6 +81,13 @@ export default function AppraiseTopicPage() {
   };
 
   const handleDelete = async (record) => {
+    if (!isAppraisalPeriod) {
+      message.error(
+        "Không trong thời gian thẩm định. Chỉ có thể hủy thẩm định đề tài trong khoảng thời gian từ ngày kết thúc nộp báo cáo đến hạn thẩm định."
+      );
+      return;
+    }
+
     try {
       const confirmed = await modal.confirm(config);
       if (confirmed) {
@@ -101,6 +111,11 @@ export default function AppraiseTopicPage() {
 
   const handlePeriodChange = (value) => {
     setSelectedPeriod(value);
+    const period = listPeriod?.find((p) => p._id === value);
+    if (period) {
+      const isInAppraisalPeriod = isWithinAppraisalPeriod(period);
+      setIsAppraisalPeriod(isInAppraisalPeriod);
+    }
   };
 
   useEffect(() => {
@@ -117,77 +132,79 @@ export default function AppraiseTopicPage() {
     loadListAppraise();
   }, [selectedPeriod, appraisalBoard]);
 
-  const columns = getTableColumns(router, handleDelete);
-
-  console.log(listAppraise);
+  const columns = getTableColumns(router, handleDelete, !isAppraisalPeriod);
 
   return (
-    <>
-      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="mb-8">
+    <div className="min-h-[calc(100vh-56px)] bg-gray-100 px-32 py-4">
+      <div className="flex justify-between items-start mb-4">
+        <div>
           <h1 className="text-2xl font-semibold text-gray-900">
             Thẩm định đề tài
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-gray-600">
             Quản lý và thẩm định các đề tài nghiên cứu khoa học
           </p>
         </div>
-
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex justify-between items-center">
-              <div className="flex-1 max-w-sm">
-                <Select
-                  className="w-full"
-                  placeholder="Chọn đợt đăng ký..."
-                  onChange={handlePeriodChange}
-                  value={selectedPeriod}
-                  size="large"
-                  loading={loading}
-                >
-                  {listPeriod?.map((period, index) => (
-                    <Option
-                      key={`registration-period-${index}`}
-                      value={period._id}
-                    >
-                      {period.title}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {!selectedPeriod ? (
-              <div className="flex flex-col justify-center items-center py-12">
-                <div className="text-center">
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">
-                    Chưa chọn đợt đăng ký
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Vui lòng chọn đợt đăng ký để xem danh sách thẩm định đề tài
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <Spin spinning={loading}>
-                <Table
-                  rowKey={(record) => record._id}
-                  tableLayout="fixed"
-                  columns={columns}
-                  dataSource={listAppraise}
-                  pagination={{
-                    pageSize: 8,
-                    showSizeChanger: true,
-                    showTotal: (total) => `Tổng số ${total} đề tài`,
-                  }}
-                />
-              </Spin>
-            )}
-          </div>
+        <div className="flex items-center">
+          <span className="mr-2">Đợt đăng ký:</span>
+          <Select
+            value={selectedPeriod}
+            placeholder="Chọn đợt đăng ký"
+            style={{ width: 220 }}
+            onChange={handlePeriodChange}
+          >
+            {listPeriod?.map((period) => (
+              <Option key={period._id} value={period._id}>
+                {period.title}
+              </Option>
+            ))}
+          </Select>
         </div>
       </div>
-    </>
+
+      {selectedPeriod && (
+        <div className="my-4">
+          <RegistrationPeriodTimeline
+            period={listPeriod?.find((p) => p._id === selectedPeriod)}
+          />
+        </div>
+      )}
+
+      {selectedPeriod && !isAppraisalPeriod && (
+        <Alert
+          message="Không trong thời gian thẩm định"
+          description="Chỉ có thể thẩm định đề tài trong khoảng thời gian từ ngày kết thúc nộp báo cáo đến hạn thẩm định."
+          type="warning"
+          showIcon
+          className="mb-4"
+        />
+      )}
+
+      {!selectedPeriod ? (
+        <div className="flex flex-col justify-center items-center py-12 bg-white rounded-lg shadow">
+          <div className="text-center">
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              Chưa chọn đợt đăng ký
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Vui lòng chọn đợt đăng ký để xem danh sách thẩm định đề tài
+            </p>
+          </div>
+        </div>
+      ) : (
+        <Spin spinning={loading}>
+          <Table
+            className="mt-4"
+            dataSource={listAppraise}
+            columns={columns}
+            pagination={{
+              pageSize: 8,
+              showTotal: (total) => `Tổng số ${total} đề tài`,
+            }}
+            rowKey="_id"
+          />
+        </Spin>
+      )}
+    </div>
   );
 }

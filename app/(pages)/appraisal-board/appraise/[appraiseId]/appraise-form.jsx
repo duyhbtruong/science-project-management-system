@@ -2,7 +2,12 @@ import { useState } from "react";
 import { Form, Input, Radio, Select, Space } from "antd";
 import { SubmitButton } from "@/components/submit-button";
 
-export default function AppraiseForm({ form, onFinish, criteria }) {
+export default function AppraiseForm({
+  form,
+  onFinish,
+  criteria,
+  disabled = false,
+}) {
   const [value, setValue] = useState();
   const [finalGrade, setFinalGrade] = useState(
     form.getFieldValue("finalGrade")
@@ -47,6 +52,7 @@ export default function AppraiseForm({ form, onFinish, criteria }) {
               criterion.maxGrade,
               criterion.step
             )}
+            disabled={disabled}
           />
         </Form.Item>
       ))}
@@ -63,6 +69,7 @@ export default function AppraiseForm({ form, onFinish, criteria }) {
             value: (i + 1) * 5,
             label: String((i + 1) * 5),
           }))}
+          disabled={disabled}
         />
       </Form.Item>
 
@@ -72,7 +79,11 @@ export default function AppraiseForm({ form, onFinish, criteria }) {
         label="Đề tài xuất sắc đạt yêu cầu tham gia giải EUREKA"
         rules={[{ required: true, message: "Không được để trống mục này!" }]}
       >
-        <Radio.Group value={value} onChange={(e) => setValue(e.target.value)}>
+        <Radio.Group
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          disabled={disabled}
+        >
           <Space direction="vertical">
             <Radio value="Có">Có</Radio>
             <Radio value="Không">Không</Radio>
@@ -95,11 +106,17 @@ export default function AppraiseForm({ form, onFinish, criteria }) {
             : []
         }
       >
-        <Input.TextArea autoSize placeholder="Nhập nhận xét..." />
+        <Input.TextArea
+          autoSize
+          placeholder="Nhập nhận xét..."
+          disabled={disabled}
+        />
       </Form.Item>
 
       <Form.Item className="mt-auto">
-        <SubmitButton form={form}>Xác nhận</SubmitButton>
+        <SubmitButton form={form} disabled={disabled}>
+          {disabled ? "Không thể chỉnh sửa" : "Xác nhận"}
+        </SubmitButton>
       </Form.Item>
     </Form>
   );

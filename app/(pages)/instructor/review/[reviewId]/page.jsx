@@ -203,7 +203,7 @@ export default function ReviewTopicPage({ params }) {
   if (loading) return <FullscreenLoader label="Loading..." />;
 
   return (
-    <div className="min-h-[calc(100vh-45.8px)] bg-gray-100 px-32">
+    <div className="min-h-[calc(100vh-56px)] bg-gray-100 px-32">
       <div className="flex justify-between py-4">
         <span className="text-lg font-semibold">Kiểm duyệt đề tài</span>
         <Button

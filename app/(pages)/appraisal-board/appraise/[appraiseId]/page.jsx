@@ -6,7 +6,7 @@ import {
   getAppraiseById,
   updateAppraiseById,
 } from "@/service/appraiseGradeService";
-import { Button, Form, Spin, App } from "antd";
+import { Button, Form, Spin, App, Alert } from "antd";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import emailjs from "@emailjs/browser";
@@ -17,6 +17,7 @@ import { FullscreenLoader } from "@/components/fullscreen-loader";
 import AppraiseForm from "./appraise-form";
 import { getCriteria } from "@/service/criteriaService";
 import { useCustomSession } from "@/hooks/use-custom-session";
+import { isWithinAppraisalPeriod } from "@/utils/validator";
 
 export default function AppraiseTopicPage({ params }) {
   const { appraiseId } = params;
@@ -28,6 +29,7 @@ export default function AppraiseTopicPage({ params }) {
   const [topic, setTopic] = useState();
   const [appraise, setAppraise] = useState();
   const [criteria, setCriteria] = useState();
+  const [isAppraisalPeriod, setIsAppraisalPeriod] = useState(false);
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
@@ -82,7 +84,23 @@ export default function AppraiseTopicPage({ params }) {
     setLoading(false);
   }, [appraise]);
 
+  useEffect(() => {
+    if (!topic?.registrationPeriod) return;
+
+    const isInAppraisalPeriod = isWithinAppraisalPeriod(
+      topic.registrationPeriod
+    );
+    setIsAppraisalPeriod(isInAppraisalPeriod);
+  }, [topic]);
+
   const onFinish = async (formData) => {
+    if (!isAppraisalPeriod) {
+      message.error(
+        "Không trong thời gian thẩm định. Chỉ có thể thẩm định đề tài trong khoảng thời gian từ ngày kết thúc nộp báo cáo đến hạn thẩm định."
+      );
+      return;
+    }
+
     const criteriaGrades = Object.entries(formData)
       .filter(([key]) => key.startsWith("criteria_"))
       .map(([key, grade]) => {
@@ -182,7 +200,7 @@ export default function AppraiseTopicPage({ params }) {
   if (loading) return <FullscreenLoader label="Loading..." />;
 
   return (
-    <div className="min-h-[calc(100vh-45.8px)] bg-gray-100 px-32">
+    <div className="min-h-[calc(100vh-56px)] bg-gray-100 px-32">
       <div className="flex justify-between py-4">
         <span className="text-lg font-semibold">Thẩm định đề tài</span>
         <Button
@@ -196,9 +214,24 @@ export default function AppraiseTopicPage({ params }) {
         </Button>
       </div>
 
+      {topic && !isAppraisalPeriod && (
+        <Alert
+          message="Không trong thời gian thẩm định"
+          description="Chỉ có thể thẩm định đề tài trong khoảng thời gian từ ngày kết thúc nộp báo cáo đến hạn thẩm định."
+          type="warning"
+          showIcon
+          className="mb-4"
+        />
+      )}
+
       <Spin spinning={!topic}>
         <div className="flex relative gap-4">
-          <AppraiseForm form={form} onFinish={onFinish} criteria={criteria} />
+          <AppraiseForm
+            form={form}
+            onFinish={onFinish}
+            criteria={criteria}
+            disabled={!isAppraisalPeriod}
+          />
 
           <div className="space-y-4 bg-white rounded-md sticky top-4 h-fit w-[290px] p-4">
             <span className="font-medium">Danh sách tiêu chí</span>

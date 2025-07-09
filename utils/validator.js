@@ -23,9 +23,28 @@ export const isWithinReviewPeriod = (period) => {
   const endDate = new Date(period.endDate);
   const reviewDeadline = new Date(period.reviewDeadline);
 
-  // Set time to end of day for endDate and reviewDeadline
   endDate.setHours(23, 59, 59, 999);
   reviewDeadline.setHours(23, 59, 59, 999);
 
   return today >= endDate && today <= reviewDeadline;
+};
+
+/**
+ * Check if the current date is within the appraisal period
+ * @param {Object} period - Registration period object with submitDeadline and appraiseDeadline
+ * @returns {boolean} - True if current date is within appraisal period
+ */
+export const isWithinAppraisalPeriod = (period) => {
+  if (!period || !period.submitDeadline || !period.appraiseDeadline) {
+    return false;
+  }
+
+  const today = new Date();
+  const submitDeadline = new Date(period.submitDeadline);
+  const appraiseDeadline = new Date(period.appraiseDeadline);
+
+  submitDeadline.setHours(23, 59, 59, 999);
+  appraiseDeadline.setHours(23, 59, 59, 999);
+
+  return today >= submitDeadline && today <= appraiseDeadline;
 };

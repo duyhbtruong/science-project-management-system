@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Button, Space, Tag, Typography } from "antd";
-import { EditIcon, LinkIcon, TrashIcon } from "lucide-react";
+import { EditIcon, Link2Icon, TrashIcon } from "lucide-react";
 const { Text } = Typography;
 
-export const getTableColumns = (router, handleDelete) => [
+export const getTableColumns = (router, handleDelete, disabled = false) => [
   {
     title: "Tên tiếng Việt",
     dataIndex: ["topicId", "vietnameseName"],
@@ -31,8 +31,8 @@ export const getTableColumns = (router, handleDelete) => [
           href={submitFile.fileUrl}
           className="flex gap-x-1 items-center"
         >
-          <LinkIcon className="text-blue-500 size-4 hover:text-blue-600" />
-          <Text className="text-blue-500 hover:text-blue-600">
+          <Link2Icon className="text-blue-500 size-4 hover:text-blue-600" />
+          <Text className="flex-1 text-blue-500 truncate hover:text-blue-600">
             {submitFile.fileName}
           </Text>
         </Link>
@@ -67,17 +67,17 @@ export const getTableColumns = (router, handleDelete) => [
     render: (_, record) => (
       <Space size="middle">
         <Button
-          disabled={
-            record.status === "cancelled" ||
-            !record.topicId.files.some((file) => file.fileType === "submit")
-          }
+          disabled={disabled || record.status === "cancelled"}
           onClick={() => router.push(`/appraisal-board/appraise/${record._id}`)}
           icon={<EditIcon className="size-4" />}
+          title={disabled ? "Không trong thời gian thẩm định" : undefined}
         />
         <Button
           onClick={() => handleDelete(record)}
           danger
           icon={<TrashIcon className="size-4" />}
+          disabled={disabled}
+          title={disabled ? "Không trong thời gian thẩm định" : undefined}
         />
       </Space>
     ),

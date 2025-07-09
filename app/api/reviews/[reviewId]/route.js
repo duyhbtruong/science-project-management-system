@@ -94,7 +94,6 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Check if we're in the review period
     if (!isWithinReviewPeriod(review.topicId.registrationPeriod)) {
       return NextResponse.json(
         {
@@ -169,7 +168,6 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Check if we're in the review period
     if (!isWithinReviewPeriod(review.topicId.registrationPeriod)) {
       return NextResponse.json(
         {

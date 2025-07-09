@@ -85,7 +85,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if we're in the review period
     if (!isWithinReviewPeriod(topic.registrationPeriod)) {
       return NextResponse.json(
         {
