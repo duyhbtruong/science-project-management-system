@@ -82,6 +82,23 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
     }
   };
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const calculateDaysLate = (submitDeadline) => {
+    if (!submitDeadline) return null;
+    const today = new Date();
+    const deadline = new Date(submitDeadline);
+    const diffTime = today - deadline;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : null;
+  };
+
   const topicItems = [
     {
       key: "1",
@@ -320,26 +337,55 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
           <List
             itemLayout="horizontal"
             dataSource={topic?.files}
-            renderItem={(file) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    file.fileType === "register"
-                      ? "Hồ sơ đăng ký"
-                      : file.fileType === "contract"
-                        ? "Hợp đồng"
-                        : file.fileType === "submit"
-                          ? "Báo cáo"
-                          : "Báo cáo tài chính"
-                  }
-                  description={file.fileName}
-                />
-                <Button href={file.fileUrl} target="_blank">
-                  Đường dẫn
-                  <ArrowUpRightIcon className="size-4" />
-                </Button>
-              </List.Item>
-            )}
+            renderItem={(file) => {
+              const isSubmitFile = file.fileType === "submit";
+              const daysLate = isSubmitFile
+                ? calculateDaysLate(topic?.registrationPeriod?.submitDeadline)
+                : null;
+
+              return (
+                <List.Item>
+                  <List.Item.Meta
+                    title={
+                      file.fileType === "register"
+                        ? "Hồ sơ đăng ký"
+                        : file.fileType === "contract"
+                          ? "Hợp đồng"
+                          : file.fileType === "submit"
+                            ? "Báo cáo"
+                            : "Báo cáo tài chính"
+                    }
+                    description={
+                      <div>
+                        <div>{file.fileName}</div>
+                        {isSubmitFile &&
+                          topic?.registrationPeriod?.submitDeadline && (
+                            <div className="mt-1">
+                              <Text type="secondary" className="text-xs">
+                                Hạn nộp:{" "}
+                                {formatDate(
+                                  topic.registrationPeriod.submitDeadline
+                                )}
+                              </Text>
+                              {daysLate && (
+                                <div className="mt-1">
+                                  <Tag color="red" className="text-xs">
+                                    Trễ {daysLate} ngày
+                                  </Tag>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                      </div>
+                    }
+                  />
+                  <Button href={file.fileUrl} target="_blank">
+                    Đường dẫn
+                    <ArrowUpRightIcon className="size-4" />
+                  </Button>
+                </List.Item>
+              );
+            }}
           />
         )}
       </Card>

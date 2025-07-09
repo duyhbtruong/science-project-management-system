@@ -9,6 +9,7 @@ import { deleteFile } from "@/service/uploadService";
 import { TopicDetails } from "./topic-details";
 import { StudentDetails } from "./student-details";
 import { InstructorDetails } from "./instructor-details";
+import RegistrationPeriodTimeline from "@/components/registration-period-timeline";
 
 export default function TopicInformationPage({ params }) {
   const { topicId } = params;
@@ -83,6 +84,8 @@ export default function TopicInformationPage({ params }) {
           Hủy đăng ký
         </Button>
       </div>
+
+      <RegistrationPeriodTimeline period={period} />
 
       <div className="grid grid-cols-1 gap-6">
         <Spin spinning={!topic}>

@@ -50,6 +50,14 @@ export default function TopicsPage() {
 
   return (
     <div className="flex flex-col p-6">
+      <div className="mb-4">
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Quản lý đề tài cá nhân
+        </h1>
+        <p className="mt-1 text-sm text-gray-600">
+          Quản lý các đề tài nghiên cứu khoa học của bạn
+        </p>
+      </div>
       <TopicTable listTopic={listTopic} />
     </div>
   );
