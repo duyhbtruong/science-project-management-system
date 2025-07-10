@@ -131,20 +131,6 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
     setIsModalOpen(false);
   };
 
-  const toggleCard = (index) => {
-    setExpandedCards((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
-  const truncateContent = (content) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    const text = tempDiv.textContent || tempDiv.innerText;
-    return text.length > 200 ? text.substring(0, 200) + "..." : text;
-  };
-
   const handleViewReport = async (reportId) => {
     const res = await getReportById(reportId);
     if (res.ok) {

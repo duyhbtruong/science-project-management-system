@@ -90,11 +90,11 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
     return `${day}/${month}/${year}`;
   };
 
-  const calculateDaysLate = (submitDeadline) => {
-    if (!submitDeadline) return null;
-    const today = new Date();
+  const calculateDaysLate = (submitDeadline, submittedDate) => {
+    if (!submitDeadline || !submittedDate) return null;
     const deadline = new Date(submitDeadline);
-    const diffTime = today - deadline;
+    const submitted = new Date(submittedDate);
+    const diffTime = submitted - deadline;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays > 0 ? diffDays : null;
   };
@@ -340,7 +340,10 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
             renderItem={(file) => {
               const isSubmitFile = file.fileType === "submit";
               const daysLate = isSubmitFile
-                ? calculateDaysLate(topic?.registrationPeriod?.submitDeadline)
+                ? calculateDaysLate(
+                    topic?.registrationPeriod?.submitDeadline,
+                    file.updatedAt
+                  )
                 : null;
 
               return (
@@ -362,10 +365,7 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
                           topic?.registrationPeriod?.submitDeadline && (
                             <div className="mt-1">
                               <Text type="secondary" className="text-xs">
-                                Hạn nộp:{" "}
-                                {formatDate(
-                                  topic.registrationPeriod.submitDeadline
-                                )}
+                                Lần cuối cập nhật: {formatDate(file.updatedAt)}
                               </Text>
                               {daysLate && (
                                 <div className="mt-1">

@@ -25,6 +25,41 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const [savingStatus, setSavingStatus] = useState("idle");
 
+  const cleanLiveblocksHtml = (html) => {
+    if (!html) return html;
+
+    // First, remove any style attributes that might cause issues with html2canvas
+    let cleanedHtml = html.replace(/style="[^"]*"/g, "");
+
+    // Remove data-lb-thread-id and class attributes from span tags
+    cleanedHtml = cleanedHtml.replace(
+      /<span[^>]*data-lb-thread-id="[^"]*"[^>]*class="[^"]*"[^>]*>/g,
+      "<span>"
+    );
+
+    cleanedHtml = cleanedHtml.replace(
+      /<span[^>]*class="[^"]*"[^>]*data-lb-thread-id="[^"]*"[^>]*>/g,
+      "<span>"
+    );
+
+    cleanedHtml = cleanedHtml.replace(
+      /<span[^>]*class="[^"]*lb-[^"]*"[^>]*>/g,
+      "<span>"
+    );
+
+    // Remove span tags but preserve the content
+    cleanedHtml = cleanedHtml.replace(/<span[^>]*>(.*?)<\/span>/g, "$1");
+
+    // Clean up any empty attributes
+    cleanedHtml = cleanedHtml.replace(/<([^>]+)\s+>/g, "<$1>");
+
+    // Remove any remaining problematic attributes
+    cleanedHtml = cleanedHtml.replace(/\s+(data-[^=]+="[^"]*")/g, "");
+    cleanedHtml = cleanedHtml.replace(/\s+(class="[^"]*")/g, "");
+
+    return cleanedHtml;
+  };
+
   const loadReport = async () => {
     const res = await getReportById(reportId);
     setReport(await res.json());
@@ -123,18 +158,21 @@ export default function ReportPage() {
       const currentSection = report?.sections?.find(
         (sec) => sec.templateId === id
       );
-      if (currentSection && currentSection.content === newContent) {
+
+      const cleanedContent = cleanLiveblocksHtml(newContent);
+
+      if (currentSection && currentSection.content === cleanedContent) {
         return;
       }
       setSavingStatus("saving");
       setSections((prev) => {
         const updatedSections = prev.map((sec) =>
-          sec._id === id ? { ...sec, content: newContent } : sec
+          sec._id === id ? { ...sec, content: cleanedContent } : sec
         );
         return updatedSections;
       });
 
-      await updateReportSection(reportId, id, newContent);
+      await updateReportSection(reportId, id, cleanedContent);
       loadReport();
       setSavingStatus("saved");
     } catch (error) {

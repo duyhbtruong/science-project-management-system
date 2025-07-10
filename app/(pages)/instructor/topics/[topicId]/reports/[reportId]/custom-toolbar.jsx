@@ -5,7 +5,7 @@ import { Toolbar } from "@liveblocks/react-tiptap";
 import { Button, Dropdown, Modal, Drawer, Card, App, Divider } from "antd";
 import { Icon } from "@liveblocks/react-ui";
 import { getReportById, semanticSearchReports } from "@/service/reportService";
-import { ArrowRightIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 
 export const CustomToolbar = ({ editor, savingStatus, field }) => {
   const params = useParams();
@@ -129,20 +129,6 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
 
   const handleRejectChanges = () => {
     setIsModalOpen(false);
-  };
-
-  const toggleCard = (index) => {
-    setExpandedCards((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
-
-  const truncateContent = (content) => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    const text = tempDiv.textContent || tempDiv.innerText;
-    return text.length > 200 ? text.substring(0, 200) + "..." : text;
   };
 
   const handleViewReport = async (reportId) => {

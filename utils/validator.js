@@ -48,3 +48,21 @@ export const isWithinAppraisalPeriod = (period) => {
 
   return today >= submitDeadline && today <= appraiseDeadline;
 };
+
+/**
+ * Check if the current date is after the review deadline
+ * @param {Object} period - Registration period object with reviewDeadline
+ * @returns {boolean} - True if current date is after review deadline
+ */
+export const isAfterReviewDeadline = (period) => {
+  if (!period || !period.reviewDeadline) {
+    return false;
+  }
+
+  const today = new Date();
+  const reviewDeadline = new Date(period.reviewDeadline);
+
+  reviewDeadline.setHours(23, 59, 59, 999);
+
+  return today > reviewDeadline;
+};
