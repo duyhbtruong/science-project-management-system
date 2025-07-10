@@ -108,7 +108,7 @@ export default function Dashboard() {
           periodStat.reviewStats.failed++;
         }
 
-        const participants = topic.participants.length + 1;
+        const participants = topic.participants.length;
         periodStat.totalParticipants += participants;
         totalParticipants += participants;
 
@@ -178,7 +178,7 @@ export default function Dashboard() {
         totalTopics++;
 
         // Count participants
-        const participants = topic.participants.length + 1;
+        const participants = topic.participants.length;
         facultyData[faculty].totalParticipants += participants;
         totalParticipants += participants;
 
@@ -258,7 +258,7 @@ export default function Dashboard() {
         totalTopics++;
 
         // Count participants
-        const participants = topic.participants.length + 1;
+        const participants = topic.participants.length;
         yearData[year].totalParticipants += participants;
         totalParticipants += participants;
 
