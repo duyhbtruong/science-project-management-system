@@ -99,11 +99,11 @@ export async function GET(request) {
             },
           },
         },
-        // {
-        //   $match: {
-        //     score: { $gte: 0.75 },
-        //   },
-        // },
+        {
+          $match: {
+            score: { $gte: 0.75 },
+          },
+        },
         {
           $sort: { score: -1 },
         },
