@@ -146,7 +146,6 @@ export const TopicDetails = ({ topic, loadTopic, message }) => {
           className="!mb-0"
         >
           <Input />
-          <Input />
         </Form.Item>
       ) : (
         <Text>{topic?.englishName}</Text>
