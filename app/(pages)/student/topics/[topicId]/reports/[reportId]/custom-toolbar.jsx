@@ -215,7 +215,7 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
                   <div className="flex justify-between pb-2 border-b border-gray-100">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">
-                        {result.template.order}. {result.template.title}
+                        {result.template.title}
                       </span>
                     </div>
 
@@ -331,7 +331,7 @@ export const CustomToolbar = ({ editor, savingStatus, field }) => {
                 <div key={`selected-report-section-${index}`}>
                   {section.templateId && (
                     <h3 className="mb-2 text-lg font-semibold text-gray-800">
-                      {section.templateId.order}. {section.templateId.title}
+                      {section.templateId.title}
                     </h3>
                   )}
                   <div className="p-4 bg-gray-50 rounded-lg tiptap">
