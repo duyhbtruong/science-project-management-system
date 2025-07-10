@@ -103,12 +103,6 @@ export default function ReportPage() {
       report.studentId.studentId
     }.BaoCaoNT.${formatString(report.topicId.vietnameseName)}.pdf`;
 
-    let startDate = new Date(report.topicId.registrationPeriod.startDate);
-    let endDate = new Date(report.topicId.registrationPeriod.endDate);
-    startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
-    endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
-    const periodDir = `${report.topicId.registrationPeriod.title}-${startDate}-${endDate}`;
-
     const pdfBlob = await html2pdf()
       .from(pdf)
       .set({
@@ -131,7 +125,7 @@ export default function ReportPage() {
     formData.append("file", submitFile);
     formData.append("fileType", "submit");
     formData.append("fileName", fileName);
-    formData.append("periodDir", periodDir);
+    formData.append("periodDir", report.topicId.registrationPeriod.title);
     formData.append("studentId", report.studentId.studentId);
 
     const res = await uploadFile(report.topicId._id, formData);

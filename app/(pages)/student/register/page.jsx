@@ -186,18 +186,12 @@ export default function TopicPage() {
     if (listFile.length === 0) {
       return;
     }
-    let startDate = new Date(period.startDate);
-    let endDate = new Date(period.endDate);
-    startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
-    endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
-    const periodDir = `${period.title}-${startDate}-${endDate}`;
-
     const file = listFile[0];
     const formData = new FormData();
     formData.append("file", file.originFileObj);
     formData.append("fileType", "register");
     formData.append("fileName", file.name);
-    formData.append("periodDir", periodDir);
+    formData.append("periodDir", period.title);
     formData.append("studentId", student?.studentId);
 
     const res = await uploadFile(topicId, formData);

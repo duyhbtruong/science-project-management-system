@@ -144,18 +144,12 @@ export default function FilesPage() {
         return;
       }
 
-      let startDate = new Date(selectedTopic.registrationPeriod?.startDate);
-      let endDate = new Date(selectedTopic.registrationPeriod?.endDate);
-      startDate = startDate.toISOString().slice(0, 10).replace(/-/g, "");
-      endDate = endDate.toISOString().slice(0, 10).replace(/-/g, "");
-      const periodDir = `${selectedTopic.registrationPeriod?.title}-${startDate}-${endDate}`;
-
       const selectedFile = file.fileList[0];
       const formData = new FormData();
       formData.append("file", selectedFile.originFileObj);
       formData.append("fileType", fileType);
       formData.append("fileName", selectedFile.name);
-      formData.append("periodDir", periodDir);
+      formData.append("periodDir", selectedTopic.registrationPeriod.title);
       formData.append("studentId", selectedTopic.owner.studentId);
 
       const res = await uploadFile(topicId, formData);
