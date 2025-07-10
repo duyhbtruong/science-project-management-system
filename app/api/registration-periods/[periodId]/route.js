@@ -133,7 +133,7 @@ export async function PUT(request, { params }) {
 
     const periods = await RegistrationPeriod.find(
       { _id: { $ne: id } },
-      { startDate: 1, endDate: 1 }
+      { startDate: 1, appraiseDeadline: 1 }
     );
 
     const isOverlapping = periods.some((period) => {
