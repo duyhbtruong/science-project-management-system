@@ -49,7 +49,7 @@ export default function SectionManager() {
           }))
         );
       } catch (err) {
-        messageApi.error("Lỗi lấy danh sách tiêu chí.");
+        message.error("Lỗi lấy danh sách mục.");
       } finally {
         setLoading(false);
       }
@@ -91,9 +91,9 @@ export default function SectionManager() {
         { id: created._id, title: created.title, order: created.order },
       ]);
       setNewTitle("");
-      messageApi.success("Thêm tiêu chí thành công.");
+      message.success("Thêm mục thành công.");
     } catch (err) {
-      messageApi.error("Thêm tiêu chí thất bại.");
+      message.error("Thêm mục thất bại.");
     } finally {
       setAdding(false);
     }
@@ -106,7 +106,7 @@ export default function SectionManager() {
     try {
       await updateSection(id, { title });
     } catch (err) {
-      messageApi.error("Cập nhật tiêu chí thất bại.");
+      message.error("Cập nhật mục thất bại.");
       const fresh = await getSections();
       setSections(
         fresh.map((s) => ({ id: s._id, title: s.title, order: s.order }))
@@ -118,9 +118,9 @@ export default function SectionManager() {
     setSections((prev) => prev.filter((sec) => sec.id !== id));
     try {
       await apiDeleteSection(id);
-      messageApi.success("Xóa tiêu chí thành công.");
+      message.success("Xóa mục thành công.");
     } catch (err) {
-      messageApi.error("Xóa tiêu chí thất bại.");
+      message.error("Xóa mục thất bại.");
       const fresh = await getSections();
       setSections(
         fresh.map((s) => ({ id: s._id, title: s.title, order: s.order }))
@@ -137,9 +137,9 @@ export default function SectionManager() {
       setSections(
         updated.map((s) => ({ id: s._id, title: s.title, order: s.order }))
       );
-      messageApi.success("Tất cả tiêu chí đã được lưu.");
+      message.success("Tất cả mục đã được lưu.");
     } catch {
-      messageApi.error("Lưu thất bại.");
+      message.error("Lưu thất bại.");
     } finally {
       setSaving(false);
     }
@@ -151,9 +151,9 @@ export default function SectionManager() {
     <div className="p-4">
       <div className="space-y-4">
         <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow">
-          <h2 className="text-lg font-medium">Thêm Tiêu chí Mới</h2>
+          <h2 className="text-lg font-medium">Thêm Mục Mới</h2>
           <Input
-            placeholder="Tiêu đề tiêu chí..."
+            placeholder="Tiêu đề mục..."
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
           />
@@ -164,7 +164,7 @@ export default function SectionManager() {
             className="flex justify-center items-center w-full"
             icon={<PlusIcon className="size-4" />}
           >
-            Thêm Tiêu chí
+            Thêm Mục
           </Button>
         </div>
 

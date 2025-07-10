@@ -1,12 +1,13 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Input, Space } from "antd";
+import { Button, Input, Space, Modal } from "antd";
 import { GripVerticalIcon, TrashIcon } from "lucide-react";
 import { useState } from "react";
 
 export const SortableItem = ({ id, title, onChange, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -21,17 +22,30 @@ export const SortableItem = ({ id, title, onChange, onDelete }) => {
     setIsEditing(false);
   };
 
+  const showDeleteConfirm = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    onDelete(id);
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+  };
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-4 p-4 mb-2 bg-white border rounded shadow-sm"
+      className="flex gap-4 items-center p-4 mb-2 bg-white rounded border shadow-sm"
     >
       <div {...attributes} {...listeners} className="cursor-grab">
         <GripVerticalIcon className="text-gray-400" />
       </div>
 
-      <div className="flex items-center flex-1">
+      <div className="flex flex-1 items-center">
         {isEditing ? (
           <Input
             value={editTitle}
@@ -56,10 +70,21 @@ export const SortableItem = ({ id, title, onChange, onDelete }) => {
         <Button
           type="text"
           danger
-          onClick={() => onDelete(id)}
+          onClick={showDeleteConfirm}
           icon={<TrashIcon className="size-4" />}
         />
       </Space>
+
+      <Modal
+        title="Xác nhận xóa"
+        open={isDeleteModalOpen}
+        onOk={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        okText="Xóa"
+        cancelText="Hủy"
+      >
+        <p>Bạn có chắc chắn muốn xóa mục "{title}" không?</p>
+      </Modal>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Input, InputNumber, Space } from "antd";
+import { Button, Input, InputNumber, Space, Modal, App } from "antd";
 import { GripVerticalIcon, TrashIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -18,6 +18,9 @@ export const SortableItem = ({
   const [editMinGrade, setEditMinGrade] = useState(minGrade);
   const [editMaxGrade, setEditMaxGrade] = useState(maxGrade);
   const [editStep, setEditStep] = useState(step);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const { message } = App.useApp();
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -48,6 +51,19 @@ export const SortableItem = ({
       step: editStep,
     });
     setIsEditing(false);
+  };
+
+  const showDeleteConfirm = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    onDelete(id);
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -123,10 +139,21 @@ export const SortableItem = ({
         <Button
           type="text"
           danger
-          onClick={() => onDelete(id)}
+          onClick={showDeleteConfirm}
           icon={<TrashIcon className="size-4" />}
         />
       </Space>
+
+      <Modal
+        title="Xác nhận xóa"
+        open={isDeleteModalOpen}
+        onOk={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        okText="Xóa"
+        cancelText="Hủy"
+      >
+        <p>Bạn có chắc chắn muốn xóa tiêu chí "{title}" không?</p>
+      </Modal>
     </div>
   );
 };
