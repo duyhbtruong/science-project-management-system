@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   LiveblocksProvider,
   RoomProvider,
@@ -9,11 +9,13 @@ import {
 import { FullscreenLoader } from "@/components/fullscreen-loader";
 import { getAccounts } from "@/service/accountService";
 import { useEffect, useMemo, useState } from "react";
+import { App } from "antd";
 
 export function Room({ children }) {
   const params = useParams();
-
+  const router = useRouter();
   const [users, setUsers] = useState([]);
+  const { message } = App.useApp();
 
   const fetchUsers = useMemo(
     () => async () => {
@@ -41,6 +43,22 @@ export function Room({ children }) {
           method: "POST",
           body: JSON.stringify({ room }),
         });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            message.error("Bạn không có quyền truy cập vào phòng này");
+            router.push("/instructor/topics");
+            return null;
+          } else if (response.status === 404) {
+            message.error("Không tìm thấy báo cáo");
+            router.push("/instructor/topics");
+            return null;
+          } else {
+            message.error("Đã xảy ra lỗi khi kết nối đến phòng");
+            router.push("/instructor/topics");
+            return null;
+          }
+        }
 
         return await response.json();
       }}
