@@ -26,8 +26,8 @@ import {
   DownloadIcon,
   TrashIcon,
   EyeIcon,
-  UploadIcon,
   PlusIcon,
+  InboxIcon,
 } from "lucide-react";
 import { dateFormat } from "@/utils/format";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -384,8 +384,8 @@ export default function FilesPage() {
               fileList={listFileUpload}
               onChange={({ fileList }) => setListFileUpload(fileList)}
             >
-              <p className="ant-upload-drag-icon">
-                <UploadIcon className="text-gray-400 size-8" />
+              <p className="flex justify-center ant-upload-drag-icon">
+                <InboxIcon className="text-gray-400 size-8" />
               </p>
               <p className="ant-upload-text">
                 Nhấp hoặc kéo thả tệp vào đây để tải lên
